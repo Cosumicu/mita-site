@@ -1,12 +1,10 @@
-import Image from "next/image";
-import Link from "next/link";
 import LeftImage from "./LeftImage";
 import SearchBar from "./SearchBar";
 
 const Navbar = async () => {
   return (
-    <nav className="w-full fixed top-0 left-0 z-10 bg-red-100">
-      <div className="flex gap-2 justify-evenly items-center">
+    <nav className="w-full h-16 fixed top-0 left-0 z-10 bg-red-100">
+      <div className="flex gap-2 justify-around items-center h-full">
         <LeftImage/>
         <SearchBar/>
         <div className="flex gap-2">

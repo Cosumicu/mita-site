@@ -16,7 +16,6 @@ class PropertyListSerializer(serializers.ModelSerializer):
             'views',
         ]
 
-
 class PropertyDetailSerializer(serializers.ModelSerializer):
     user = UserDetailSerializer(read_only=True, many=False)
 

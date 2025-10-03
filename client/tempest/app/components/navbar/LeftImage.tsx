@@ -7,7 +7,7 @@ function LeftImage() {
       <img
         className="w-24 h-auto object-contain"
         src=""
-        alt="logo"
+        alt="Mita"
       />
     </Link>
   );

@@ -1,13 +1,10 @@
-import Navbar from "./components/navbar/Navbar";
+import Properties from "./components/properties/Properties";
 import PropertyList from "./components/properties/PropertyList";
 
 export default function Home() {
   return (
     <>
-      <Navbar />
-      <PropertyList />
-      <PropertyList />
-      <PropertyList />
+    <Properties />
     </>
   );
 }

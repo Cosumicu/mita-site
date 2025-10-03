@@ -151,7 +151,7 @@ TIME_ZONE = "Asia/Manila"
 
 SITE_ID = 1
 
-WEBSITE_URL = 'http//localhost:8000'
+WEBSITE_URL = 'http://localhost:8000'
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=2),
@@ -174,8 +174,18 @@ REST_AUTH = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    'http://127.0.0.1:8000',
-    'http://127.0.0.1:3000',
+    'http://localhost:8000',
+    'http://localhost:3000',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://localhost:3000',
+]
+
+CORS_ORIGINS_WHITELIST = [
+    'http://localhost:8000',
+    'http://localhost:3000',
 ]
 
 logger = logging.getLogger(__name__)
