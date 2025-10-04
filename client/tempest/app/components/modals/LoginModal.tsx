@@ -1,9 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Modal, Form, Input, Button } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
 import { login, reset } from "../../lib/features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 
@@ -14,11 +13,20 @@ type LoginModalProps = {
 };
 
 function LoginModal({ open, close, success }: LoginModalProps) {
-  
   const dispatch = useAppDispatch();
+  const { isError, isLoading, isSuccess, message } = useAppSelector(
+    (state) => state.auth
+  );
 
   const [form] = Form.useForm();
-  const { user } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(reset());
+      close();
+    }
+    console.log(message);
+  }, [isError, isSuccess, message, dispatch]);
 
   const onFinish = async (formData: { email: string; password: string }) => {
     dispatch(login(formData));
