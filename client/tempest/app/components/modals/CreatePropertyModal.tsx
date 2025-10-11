@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -6,10 +6,15 @@ import {
   Radio,
   InputNumber,
   Upload,
-  message,
   Steps,
   theme,
 } from "antd";
+import { useAppSelector, useAppDispatch } from "@/app/lib/hooks";
+import {
+  createProperty,
+  reset as resetProperty,
+} from "@/app/lib/features/properties/propertySlice";
+import { toast } from "react-toastify";
 
 const { TextArea } = Input;
 
@@ -39,6 +44,10 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const [form] = Form.useForm();
+  const { isError, isLoading, isSuccess, message } = useAppSelector(
+    (state) => state.property
+  );
+  const dispatch = useAppDispatch();
 
   const next = async () => {
     try {
@@ -58,7 +67,7 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
           fieldsToValidate = ["location"];
           break;
         case 4:
-          fieldsToValidate = ["images"];
+          fieldsToValidate = ["image"];
           break;
         default:
           fieldsToValidate = [];
@@ -78,19 +87,46 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
 
   const items = steps.map((item) => ({ key: item.title, title: item.title }));
 
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Property created successfully");
+
+      if (onSuccess) onSuccess(); // close modal
+
+      dispatch(resetProperty());
+    }
+    if (isError) {
+      toast.error(message);
+      resetProperty();
+    }
+  });
+
   const onFinish = (values: any) => {
-    console.log("All form data:", values);
-    message.success("Processing complete!");
+    const formData = new FormData();
+
+    formData.append("category", values.category);
+    formData.append("title", values.title);
+    formData.append("description", values.description);
+    formData.append("bedrooms", values.bedrooms);
+    formData.append("beds", values.beds);
+    formData.append("bathrooms", values.bathrooms);
+    formData.append("guests", values.guests);
+    formData.append("location", values.location);
+    formData.append("image", values.image?.[0]?.originFileObj); // do this if using antd upload
+
+    console.log([...formData.entries()]);
+    dispatch(createProperty(formData as any));
   };
 
   return (
     <Form form={form} layout="vertical" onFinish={onFinish}>
       <Steps current={current} items={items} />
       <div style={{ marginTop: 24 }}>
-        {current === 0 && (
+        <div style={{ display: current === 0 ? "block" : "none" }}>
           <div className="flex justify-center items-center h-[400px]">
             <Form.Item
               name="category"
+              preserve={true}
               label={
                 <span className="text-lg font-bold my-4">
                   Which of these best describes your place?
@@ -121,8 +157,8 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
               </Radio.Group>
             </Form.Item>
           </div>
-        )}
-        {current === 1 && (
+        </div>
+        <div style={{ display: current === 1 ? "block" : "none" }}>
           <div className="flex justify-center items-center h-[400px]">
             <div className="flex flex-col w-[400px]">
               <span className="text-lg font-bold my-4">Describe you place</span>
@@ -145,8 +181,8 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
               </Form.Item>
             </div>
           </div>
-        )}
-        {current === 2 && (
+        </div>
+        <div style={{ display: current === 2 ? "block" : "none" }}>
           <div className="flex justify-center items-center h-[400px]">
             <div className="w-[400px]">
               <span className="text-lg font-bold my-4">
@@ -171,7 +207,7 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
                 <label>Bedrooms</label>
                 <div className="ml-auto my-4">
                   <Form.Item
-                    name="bedroom"
+                    name="bedrooms"
                     initialValue={0}
                     rules={[{ required: true, message: "Guests required" }]}
                     required={false}
@@ -233,8 +269,8 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
               </div>
             </div>
           </div>
-        )}
-        {current === 3 && (
+        </div>
+        <div style={{ display: current === 3 ? "block" : "none" }}>
           <div className="flex justify-center items-center h-[400px]">
             <div className="flex flex-col w-[400px]">
               <span className="text-lg font-bold my-4">
@@ -249,42 +285,30 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
               </Form.Item>
             </div>
           </div>
-        )}
-        {current === 4 && (
+        </div>
+        <div style={{ display: current === 4 ? "block" : "none" }}>
           <div className="flex justify-center items-center h-[400px]">
             <div className="flex flex-col w-[400px]">
               <span className="text-lg font-bold my-4">Add images</span>
 
               <Form.Item
                 name="image"
-                label="Upload Image"
+                label="Image"
                 valuePropName="fileList"
-                getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+                getValueFromEvent={(e) => e?.fileList}
                 rules={[{ required: true, message: "Please upload an image" }]}
               >
                 <Upload
-                  name="image"
-                  listType="picture-card"
-                  beforeUpload={() => false} // prevents auto upload
+                  beforeUpload={() => false} // prevent auto upload
+                  listType="picture"
                   maxCount={1}
-                  onChange={({ fileList }) => {
-                    // update form value manually when upload changes
-                    form.setFieldsValue({ image: fileList });
-                  }}
-                  showUploadList={{
-                    showPreviewIcon: true,
-                    showRemoveIcon: true,
-                  }}
                 >
-                  {/* hide upload button if 1 file already uploaded */}
-                  {form.getFieldValue("image")?.length >= 1 ? null : (
-                    <div>Click or Drag to Upload</div>
-                  )}
+                  <Button>Upload Image</Button>
                 </Upload>
               </Form.Item>
             </div>
           </div>
-        )}
+        </div>
       </div>
       <div style={{ marginTop: 24 }}>
         {current < steps.length - 1 && (
@@ -293,11 +317,7 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
           </Button>
         )}
         {current === steps.length - 1 && (
-          <Button
-            type="primary"
-            htmlType="submit"
-            onClick={() => message.success("Processing complete!")}
-          >
+          <Button type="primary" htmlType="submit">
             Done
           </Button>
         )}

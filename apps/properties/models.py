@@ -15,16 +15,14 @@ class Property(TimeStampedUUIDModel):
     description = models.TextField()
     price_per_night = models.DecimalField(max_digits=8, decimal_places=2, default=0.0)
     bedrooms = models.IntegerField()
+    beds = models.IntegerField()
     bathrooms = models.IntegerField()
     guests = models.IntegerField()
-    country = CountryField(default="PH",)
-    country_code = models.CharField(max_length=10)
-    city = models.CharField(max_length=255, default="Manila")
+    location = models.CharField(max_length=255)
     category = models.CharField(max_length=255)
     favorited = models.ManyToManyField(User, related_name='favorites', blank=True)
-    image = models.ImageField(upload_to='uploads/properties')
+    image = models.ImageField(upload_to='uploads/properties', default='/uploads/properties/default_property.png')
     views = models.IntegerField(default=0)
-
 
     def image_url(self):
         return f'{settings.WEBSITE_URL}{self.image.url}'

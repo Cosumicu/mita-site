@@ -3,9 +3,9 @@
 import React, { useEffect } from "react";
 import { Form, Input, Button } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
-import { login, reset as resetAuth } from "../../lib/features/auth/authSlice";
-import { getCurrentUser } from "../../lib/features/users/userSlice";
-import { useAppDispatch, useAppSelector } from "../../lib/hooks";
+import { login, reset as resetAuth } from "@/app/lib/features/auth/authSlice";
+import { getCurrentUser } from "@/app/lib/features/users/userSlice";
+import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import { toast } from "react-toastify";
 
 type LoginFormProps = {

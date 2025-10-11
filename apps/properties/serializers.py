@@ -4,7 +4,6 @@ from .models import Property, Reservation
 
 from apps.profiles.serializers import ProfileSerializer
 
-
 class PropertyListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
@@ -13,27 +12,54 @@ class PropertyListSerializer(serializers.ModelSerializer):
             'title',
             'price_per_night',
             'image_url',
+            'favorited',
             'views',
         ]
 
+    def get_image(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
+
 class PropertyDetailSerializer(serializers.ModelSerializer):
-    user = ProfileSerializer(read_only=True, many=False)
+    user = ProfileSerializer()
 
     class Meta:
         model = Property
         fields = [
             'id',
+            'user'
             'title',
             'description',
             'price_per_night',
-            'image_url',
             'bedrooms',
+            'beds',
             'bathrooms',
             'guests',
-            'user'
+            'location',
+            'category',
+            'favorited',
+            'image_url',
+            'views',
         ]
 
-
+class PropertyCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Property
+        fields = [
+            'title',
+            'description',
+            'price_per_night',
+            'bedrooms',
+            'beds',
+            'bathrooms',
+            'guests',
+            'location',
+            'category',
+            'favorited',
+            'image',
+        ]
+        
 class ReservationsListSerializer(serializers.ModelSerializer):
     property = PropertyListSerializer(read_only=True, many=False)
     

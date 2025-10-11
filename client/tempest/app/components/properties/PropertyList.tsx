@@ -3,7 +3,12 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Card, Button, Skeleton } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
-import axios from "axios";
+import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
+import {
+  getPropertyList,
+  reset as resetProperty,
+} from "@/app/lib/features/properties/propertySlice";
+import { toast } from "react-toastify";
 
 type PropertyType = {
   id: string;
@@ -19,18 +24,25 @@ type PropertyListProps = {
 };
 
 const PropertyList = ({ label, location }: PropertyListProps) => {
-  const [properties, setProperties] = useState<PropertyType[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const getProperties = async () => {
-    const result = await axios.get("http://localhost:8000/api/v1/properties/");
-    setProperties(result.data);
-    setLoading(false);
-  };
+  const dispatch = useAppDispatch();
+  const { propertyList, isError, isSuccess, isLoading, message } =
+    useAppSelector((state) => state.property);
 
   useEffect(() => {
-    getProperties();
-  }, []);
+    // Fetch property list once on mount
+    dispatch(getPropertyList());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(resetProperty());
+    }
+
+    if (isError) {
+      toast.error(message);
+      dispatch(resetProperty());
+    }
+  }, [isSuccess, isError, message, dispatch]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -77,7 +89,7 @@ const PropertyList = ({ label, location }: PropertyListProps) => {
         ref={scrollRef}
         className="flex gap-4 overflow-x-auto mt-2 p-2 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none]"
       >
-        {loading
+        {isLoading
           ? Array.from({ length: 8 }).map((_, i) => (
               <Card
                 className="flex-shrink-0 w-40 md:w-60 snap-start !shadow-none"
@@ -96,11 +108,11 @@ const PropertyList = ({ label, location }: PropertyListProps) => {
                   active
                   loading={true}
                   title={false}
-                  paragraph={{ rows: 1, width: "100%"}}
+                  paragraph={{ rows: 1, width: "100%" }}
                 />
               </Card>
             ))
-          : properties.map((property) => (
+          : propertyList.map((property) => (
               <Link href={`/properties/${property.id}`}>
                 <Card
                   className="flex-shrink-0 w-40 md:w-60 snap-start !shadow-none"
