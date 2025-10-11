@@ -22,13 +22,13 @@ class PropertyListSerializer(serializers.ModelSerializer):
         return None
 
 class PropertyDetailSerializer(serializers.ModelSerializer):
-    user = ProfileSerializer()
+    user = ProfileSerializer(source="user.profile")
 
     class Meta:
         model = Property
         fields = [
             'id',
-            'user'
+            'user',
             'title',
             'description',
             'price_per_night',
@@ -59,6 +59,8 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
             'favorited',
             'image',
         ]
+
+    # use image for creating 
         
 class ReservationsListSerializer(serializers.ModelSerializer):
     property = PropertyListSerializer(read_only=True, many=False)

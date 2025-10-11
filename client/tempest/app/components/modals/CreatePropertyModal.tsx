@@ -123,7 +123,7 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
       <Steps current={current} items={items} />
       <div style={{ marginTop: 24 }}>
         <div style={{ display: current === 0 ? "block" : "none" }}>
-          <div className="flex justify-center items-center h-[400px]">
+          <div className="flex justify-center items-center sm:h-[200px] md:h-[500px]">
             <Form.Item
               name="category"
               preserve={true}
@@ -159,7 +159,7 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
           </div>
         </div>
         <div style={{ display: current === 1 ? "block" : "none" }}>
-          <div className="flex justify-center items-center h-[400px]">
+          <div className="flex justify-center items-center sm:h-[200px] md:h-[500px]">
             <div className="flex flex-col w-[400px]">
               <span className="text-lg font-bold my-4">Describe you place</span>
               <Form.Item
@@ -183,7 +183,7 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
           </div>
         </div>
         <div style={{ display: current === 2 ? "block" : "none" }}>
-          <div className="flex justify-center items-center h-[400px]">
+          <div className="flex justify-center items-center sm:h-[200px] md:h-[500px]">
             <div className="w-[400px]">
               <span className="text-lg font-bold my-4">
                 Which of these best describes your place?
@@ -271,7 +271,7 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
           </div>
         </div>
         <div style={{ display: current === 3 ? "block" : "none" }}>
-          <div className="flex justify-center items-center h-[400px]">
+          <div className="flex justify-center items-center sm:h-[200px] md:h-[500px]">
             <div className="flex flex-col w-[400px]">
               <span className="text-lg font-bold my-4">
                 Where's your place located?
@@ -287,7 +287,7 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
           </div>
         </div>
         <div style={{ display: current === 4 ? "block" : "none" }}>
-          <div className="flex justify-center items-center h-[400px]">
+          <div className="flex justify-center items-center sm:h-[200px] md:h-[500px]">
             <div className="flex flex-col w-[400px]">
               <span className="text-lg font-bold my-4">Add images</span>
 

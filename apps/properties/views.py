@@ -16,7 +16,7 @@ class PropertyDetailView(generics.RetrieveAPIView):
     lookup_url_kwarg = "id"
 
     def get_object(self):
-        property_id = self.kwargs.get(self.lookup_url_kwargs)
+        property_id = self.kwargs.get(self.lookup_url_kwarg)
         return get_object_or_404(Property, id=property_id)
 
 class PropertyCreateView(generics.CreateAPIView):
