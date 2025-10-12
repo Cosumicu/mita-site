@@ -16,7 +16,7 @@ class Profile(TimeStampedUUIDModel):
     user = models.OneToOneField(User, related_name="profile", on_delete = models.CASCADE)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    profile_picture = models.ImageField(upload_to="mediafiles/profile_pictures", default="mediafiles/default_profile_picture.jpg")
+    profile_picture = models.ImageField(upload_to="profile_pictures", default="profile_pictures/default_profile_picture.jpg")
     about_me = models.TextField(default="...", max_length=255)
     phone_number = PhoneNumberField(max_length=30, default="+639000000000")
     gender = models.CharField(choices=Gender.choices, default=Gender.OTHER, max_length=10)

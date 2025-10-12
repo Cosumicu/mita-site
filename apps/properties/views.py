@@ -6,7 +6,7 @@ from .models import Property
 from .serializers import PropertyListSerializer, PropertyDetailSerializer, PropertyCreateSerializer
 
 class PropertyListView(generics.ListAPIView):
-    queryset = Property.objects.all()
+    queryset = Property.objects.all().order_by('-created_at')
     serializer_class = PropertyListSerializer
     permission_classes = [permissions.AllowAny]
 

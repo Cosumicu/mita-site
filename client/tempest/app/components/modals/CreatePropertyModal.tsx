@@ -111,6 +111,7 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
     formData.append("beds", values.beds);
     formData.append("bathrooms", values.bathrooms);
     formData.append("guests", values.guests);
+    formData.append("price_per_night", values.price_per_night);
     formData.append("location", values.location);
     formData.append("image", values.image?.[0]?.originFileObj); // do this if using antd upload
 
@@ -143,16 +144,16 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
                     gap: 8, // gap between buttons
                   }}
                 >
-                  <Radio.Button value="house">House</Radio.Button>
-                  <Radio.Button value="apartment">Apartment</Radio.Button>
-                  <Radio.Button value="bed&breakfast">
+                  <Radio.Button value="House">House</Radio.Button>
+                  <Radio.Button value="Apartment">Apartment</Radio.Button>
+                  <Radio.Button value="Bed & Breakfast">
                     Bed & Breakfast
                   </Radio.Button>
-                  <Radio.Button value="cabin">Cabin</Radio.Button>
-                  <Radio.Button value="tent">Tent</Radio.Button>
-                  <Radio.Button value="hotel">Hotel</Radio.Button>
-                  <Radio.Button value="treehouse">Tree House</Radio.Button>
-                  <Radio.Button value="barn">Barn</Radio.Button>
+                  <Radio.Button value="Cabin">Cabin</Radio.Button>
+                  <Radio.Button value="Tent">Tent</Radio.Button>
+                  <Radio.Button value="Hotel">Hotel</Radio.Button>
+                  <Radio.Button value="Treehouse">Tree House</Radio.Button>
+                  <Radio.Button value="Barn">Barn</Radio.Button>
                 </div>
               </Radio.Group>
             </Form.Item>

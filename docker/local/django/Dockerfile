@@ -14,7 +14,7 @@ COPY ./requirements.txt .
 
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-COPY . .
+# COPY . .
 
 COPY ./docker/local/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
