@@ -115,7 +115,6 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
     formData.append("location", values.location);
     formData.append("image", values.image?.[0]?.originFileObj); // do this if using antd upload
 
-    console.log([...formData.entries()]);
     dispatch(createProperty(formData as any));
   };
 

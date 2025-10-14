@@ -1,9 +1,10 @@
 from django.urls import path
 
-from .views import PropertyListView, PropertyDetailView, PropertyCreateView
+from .views import PropertyListView, PropertyDetailView, PropertyCreateView, ReservationListCreateView
 
 urlpatterns = [
     path('', PropertyListView.as_view(), name='property_list'),
     path('<uuid:id>/', PropertyDetailView.as_view(), name='property-details'),
     path('create/', PropertyCreateView.as_view(), name='property-create'),
+    path('reservation/', ReservationListCreateView.as_view(), name='reservation-create'),
 ]

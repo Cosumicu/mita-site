@@ -3,6 +3,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from autoslug import AutoSlugField
 from django_countries.fields import CountryField
+from decimal import Decimal
+from datetime import datetime
 
 from apps.common.models import TimeStampedUUIDModel
 
@@ -13,7 +15,7 @@ class Property(TimeStampedUUIDModel):
     title = models.CharField(max_length=255)
     slug = AutoSlugField(populate_from="title", unique=True, always_update=True)
     description = models.TextField()
-    price_per_night = models.DecimalField(max_digits=8, decimal_places=2, default=0.0)
+    price_per_night = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'))
     bedrooms = models.IntegerField()
     beds = models.IntegerField()
     bathrooms = models.IntegerField()
@@ -38,7 +40,10 @@ class Reservation(TimeStampedUUIDModel):
     end_date = models.DateField()
     number_of_nights = models.IntegerField()
     guests = models.IntegerField()
-    total_price = models.FloatField()
+
+    def total_amount(self):
+        return self.property.price_per_night * self.number_of_nights
+
 
 class PropertyView(TimeStampedUUIDModel):
     property = models.ForeignKey(Property, related_name="property_views", on_delete=models.CASCADE)

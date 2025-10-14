@@ -29,7 +29,6 @@ const PropertyList = ({ label, location }: PropertyListProps) => {
     useAppSelector((state) => state.property);
 
   useEffect(() => {
-    // Fetch property list once on mount
     dispatch(getPropertyList());
   }, [dispatch]);
 
