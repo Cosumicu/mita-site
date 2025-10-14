@@ -4,15 +4,25 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import MultiPartParser, FormParser
 from decimal import Decimal
 from datetime import datetime
+import django_filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Property, Reservation
 from .serializers import PropertyListSerializer, PropertyDetailSerializer, PropertyCreateSerializer, ReservationSerializer
 
-class PropertyListView(generics.ListAPIView):
+class PropertyFilter(django_filters.FilterSet):
+    user = django_filters.UUIDFilter(field_name='user__profile__id')
 
+    class Meta:
+        model = Property
+        fields = ['user']
+
+class PropertyListView(generics.ListAPIView):
     queryset = Property.objects.all().order_by('-created_at')
     serializer_class = PropertyListSerializer
     permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PropertyFilter
 
 class PropertyDetailView(generics.RetrieveAPIView):
     serializer_class = PropertyDetailSerializer
