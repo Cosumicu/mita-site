@@ -8,6 +8,7 @@ import {
 } from "@/app/lib/features/properties/propertySlice";
 import { Avatar } from "antd";
 import CreateReservationForm from "@/app/components/forms/CreateReservationForm";
+import Link from "next/link";
 
 function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
@@ -72,7 +73,7 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           </div>
 
           <div className="flex items-center justify-center sm:justify-start w-full py-4">
-            <Avatar size="large" src={property.user.profile_picture} />
+            <Link href={`/users/profile/${property.user.id}`}><Avatar size="large" src={property.user.profile_picture} /></Link>
             <div className="ml-2">
               <p>{`Hosted by ${property.user.username}`}</p>
             </div>

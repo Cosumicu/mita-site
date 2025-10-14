@@ -20,6 +20,7 @@ import { logout, reset as resetAuth } from "../../lib/features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { toast } from "react-toastify";
 import CreatePropertyModal from "../modals/CreatePropertyModal";
+import Link from "next/link";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -138,7 +139,7 @@ function RightMenu() {
           >
             Host Property
           </Button>
-          <Avatar size="large" src={user?.profile_picture} />
+          <Link href={`/users/profile/${user.id}`}><Avatar size="large" src={user?.profile_picture} /></Link>
         </>
       ) : (
         <></>
