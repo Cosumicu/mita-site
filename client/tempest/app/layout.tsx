@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import StoreProvider from "./StoreProvider";
@@ -8,14 +8,13 @@ import { ToastContainer } from "react-toastify";
 import Navbar from "./components/navbar/Navbar";
 import { InitUser } from "./users/InitUser";
 import Loading from "./components/common/Loading";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import { ConfigProvider } from "antd";
+import NavbarMobile from "./components/navbar/NavbarMobile";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -30,28 +29,37 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: "#7289DA",
+          },
+        }}
       >
-        <StoreProvider>
-          <AntdRegistry>
-            <Loading />
-            <InitUser />
-            <Navbar />
-            <div className="pt-16">{children}</div>
-          </AntdRegistry>
-        </StoreProvider>
-        <ToastContainer
-          position="bottom-right"
-          autoClose={3000}
-          newestOnTop={false}
-          closeOnClick={false}
-          hideProgressBar={true}
-          pauseOnFocusLoss
-          pauseOnHover
-          theme="light"
-        />
-      </body>
+        <body className={`${inter.variable} ${inter.variable} antialiased`}>
+          <StoreProvider>
+            <AntdRegistry>
+              <Loading />
+              <InitUser />
+              <Navbar />
+              <div className="pt-25">{children}</div>
+              <div className="sm:hidden">
+                <NavbarMobile />
+              </div>
+            </AntdRegistry>
+          </StoreProvider>
+          <ToastContainer
+            position="bottom-right"
+            autoClose={3000}
+            newestOnTop={false}
+            closeOnClick={false}
+            hideProgressBar={true}
+            pauseOnFocusLoss
+            pauseOnHover
+            theme="light"
+          />
+        </body>
+      </ConfigProvider>
     </html>
   );
 }

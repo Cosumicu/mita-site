@@ -135,7 +135,7 @@ function RightMenu() {
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-1 sm:gap-4">
       {user ? (
         <>
           {" "}
@@ -143,11 +143,16 @@ function RightMenu() {
             type="primary"
             icon={<HomeOutlined />}
             onClick={() => setIsCreatePropertyModalOpen(true)}
+            className="px-6 py-2 !rounded-full tracking-wide"
           >
-            Host Property
+            <div className="hidden sm:inline-block">Host Property </div>
           </Button>
           <Link href={`/users/profile/${user.id}`}>
-            <Avatar size="large" src={user?.profile_picture} />
+            <Avatar
+              className="!hidden sm:!inline-block"
+              size={48}
+              src={user?.profile_picture}
+            />
           </Link>
         </>
       ) : (

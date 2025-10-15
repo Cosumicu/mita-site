@@ -65,7 +65,7 @@ export default function MyPropertiesPage() {
                   </p>
                 </div>
                 <p className="text-sm text-gray-500 mt-2">
-                  Created:
+                  Created: {property.created_at}
                 </p>
               </div>
             </div>

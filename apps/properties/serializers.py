@@ -10,10 +10,12 @@ class PropertyListSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'title',
+            'location',
             'price_per_night',
             'image_url',
             'favorited',
             'views',
+            'created_at',
         ]
 
     def get_image(self, obj):

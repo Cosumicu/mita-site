@@ -3,8 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --primary: #1677ff;
-  --secondary: #f3f4f6;
+  --primary: #7289da;
+  --secondary: #f7f7f9;
 }
 
 @theme inline {
@@ -12,6 +12,7 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

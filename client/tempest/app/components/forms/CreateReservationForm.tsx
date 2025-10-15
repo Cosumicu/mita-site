@@ -95,7 +95,9 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
           name="guests"
           label="Guests"
           initialValue={1}
-          rules={[{ required: true, message: "Please select number of guests" }]}
+          rules={[
+            { required: true, message: "Please select number of guests" },
+          ]}
         >
           <InputNumber
             min={1}
@@ -121,11 +123,7 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
           type="primary"
           htmlType="submit"
           loading={isLoading}
-          className="h-11 text-white font-semibold text-lg rounded-lg hover:bg-pink-500"
-          style={{
-            backgroundColor: "rgb(236 72 153)",
-            border: "none",
-          }}
+          className="!text-lg"
         >
           Reserve
         </Button>
