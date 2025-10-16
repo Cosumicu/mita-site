@@ -6,7 +6,7 @@ function LeftImage() {
     <div className="hidden sm:inline-block">
       <Link href="/">
         <div className="text-2xl whitespace-nowrap">
-          <span className="font-bold text-2xl">
+          <span className="text-2xl">
             Mita{" "}
             <span
               style={{

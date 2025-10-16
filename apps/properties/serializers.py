@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Property, Reservation
+from .models import Property, Reservation, PropertyLike
 
 from apps.profiles.serializers import ProfileSerializer
 
@@ -13,8 +13,9 @@ class PropertyListSerializer(serializers.ModelSerializer):
             'location',
             'price_per_night',
             'image_url',
-            'favorited',
-            'views',
+            'views_count',
+            'likes_count',
+            'reservations_count',
             'created_at',
         ]
 
@@ -40,9 +41,10 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             'guests',
             'location',
             'category',
-            'favorited',
             'image_url',
-            'views',
+            'views_count',
+            'likes_count',
+            'reservations_count',
         ]
 
 class PropertyCreateSerializer(serializers.ModelSerializer):
@@ -58,7 +60,6 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
             'guests',
             'location',
             'category',
-            'favorited',
             'image',
         ]
     # Use field 'image' for creating instance of property
@@ -85,3 +86,13 @@ class ReservationSerializer(serializers.ModelSerializer):
     
     def get_total_amount(self, obj):
         return obj.total_amount()
+
+class PropertyLikeSerializer(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PropertyLike
+        fields = ["id", "property", "user", "created", "modified"]
+
+    def get_id(self, obj):
+        return str(obj.id)

@@ -62,7 +62,7 @@ export default function ReservationListPage() {
                   </p>
                 </div>
                 <p className="text-lg font-semibold mt-2">
-                  Total: ₱{res.total_price}
+                  Total: ₱{res.total_amount}
                 </p>
               </div>
             </div>

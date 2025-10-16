@@ -22,9 +22,10 @@ class Property(TimeStampedUUIDModel):
     guests = models.IntegerField()
     location = models.CharField(max_length=255)
     category = models.CharField(max_length=255)
-    favorited = models.ManyToManyField(User, related_name='favorites', blank=True)
+    views_count = models.PositiveIntegerField(default=0)
+    likes_count = models.PositiveIntegerField(default=0)
+    reservations_count = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to='uploads/properties', default='/uploads/properties/default_property.png')
-    views = models.IntegerField(default=0)
 
     def image_url(self):
         return f'{settings.WEBSITE_URL}{self.image.url}'
@@ -44,7 +45,16 @@ class Reservation(TimeStampedUUIDModel):
     def total_amount(self):
         return self.property.price_per_night * self.number_of_nights
 
-
 class PropertyView(TimeStampedUUIDModel):
-    property = models.ForeignKey(Property, related_name="property_views", on_delete=models.CASCADE)
+    property = models.ForeignKey(Property, related_name="views", on_delete=models.CASCADE)
     ip_address = models.GenericIPAddressField()
+
+    class Meta:
+        unique_together = ("property", "ip_address")
+
+class PropertyLike(TimeStampedUUIDModel):
+    user = models.ForeignKey(User, related_name="likes", on_delete=models.CASCADE)
+    property = models.ForeignKey(Property, related_name="likes", on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("property", "user")

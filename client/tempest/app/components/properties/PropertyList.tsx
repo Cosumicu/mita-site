@@ -2,12 +2,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Card, Button, Skeleton } from "antd";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import {
+  LeftOutlined,
+  RightOutlined,
+  HeartFilled,
+  HeartOutlined,
+} from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import {
   getPropertyList,
+  toggleFavorite,
   reset as resetProperty,
 } from "@/app/lib/features/properties/propertySlice";
+
 import { toast } from "react-toastify";
 
 type PropertyListProps = {
@@ -49,6 +56,15 @@ const PropertyList = ({ label, location }: PropertyListProps) => {
         behavior: "smooth",
       });
     }
+  };
+
+  const handleToggleFavorite = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    propertyId: string
+  ) => {
+    e.preventDefault(); // prevent Link navigation
+    e.stopPropagation();
+    dispatch(toggleFavorite(propertyId));
   };
 
   return (
@@ -112,14 +128,23 @@ const PropertyList = ({ label, location }: PropertyListProps) => {
                   size="small"
                   variant="borderless"
                   cover={
-                    <img
-                      className="w-full h-[150px] sm:h-[200px]"
-                      alt={property.title}
-                      src={property.image_url}
-                      style={{
-                        borderRadius: 12,
-                      }}
-                    />
+                    <div className="relative w-full h-[150px] sm:h-[200px]">
+                      <img
+                        className="w-full h-full object-cover rounded-xl"
+                        alt={property.title}
+                        src={property.image_url}
+                      />
+                      <div
+                        onClick={(e) => handleToggleFavorite(e, property.id)}
+                        className="absolute top-2 right-2 bg-white bg-opacity-70 hover:bg-opacity-100 rounded-full p-1 cursor-pointer transition"
+                      >
+                        {property.favorited ? (
+                          <HeartFilled className="text-red-500 text-lg" />
+                        ) : (
+                          <HeartOutlined className="text-gray-700 text-lg" />
+                        )}
+                      </div>
+                    </div>
                   }
                 >
                   <div className="ml-[-10]">
