@@ -97,6 +97,14 @@ class ReservationListCreateView(generics.ListCreateAPIView):
         property.reservations_count = property.reservations.count()
         property.save(update_fields=["reservations_count"])
 
+class ReservationListProperty(generics.ListAPIView):
+    serializer_class = ReservationSerializer
+    permission_classes = [permissions.AllowAny]
+    lookup_url_kwarg = 'id'
+
+    def get_queryset(self):
+        return Reservation.objects.filter(property__id=self.kwargs.get(self.lookup_url_kwarg)).order_by("-created_at")
+
 class ToggleFavoriteView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
