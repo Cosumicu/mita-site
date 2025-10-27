@@ -1,10 +1,11 @@
+from rest_framework import serializers
 from .models import Conversation, Message
-from apps.profile.serializers import ProfileSerializer
+from apps.profiles.serializers import ProfileSerializer
 from apps.properties.serializers import ReservationSerializer
 
 class ConversationSerializer(serializers.ModelSerializer):
-    guest = ProfileSerializer(source='user.profile', read_only=True)
-    landlord = ProfileSerializer(source='user.profile', read_only=True)
+    guest = ProfileSerializer(source='guest.profile', read_only=True)
+    landlord = ProfileSerializer(source='landlord.profile', read_only=True)
     reservation = ReservationSerializer(read_only=True)
     
     class Meta:
@@ -18,7 +19,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         ]
 
 class MessageSerializer(serializers.ModelSerializer):
-    sender = ProfileSerializer(source='user.profile', read_only=True)
+    sender = ProfileSerializer(source='sender.profile', read_only=True)
 
     class Meta:
         model = Message

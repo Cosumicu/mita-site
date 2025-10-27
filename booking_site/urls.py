@@ -30,6 +30,7 @@ urlpatterns = [
     path('api/v1/profile/', include('apps.profiles.urls')),
     path('api/v1/properties/', include('apps.properties.urls')),
     path('api/v1/ratings/', include('apps.ratings.urls')),
+    path('api/v1/chat/', include('apps.chat.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -7,9 +7,9 @@ from apps.properties.models import Reservation
 User = get_user_model()
 
 class Conversation(TimeStampedUUIDModel):
-    reservation = models.ForeignKey(Reservation, related_name='conversations' on_delete=models.CASCADE)
-    guest = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    landlord = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    reservation = models.ForeignKey(Reservation, related_name='conversations', on_delete=models.CASCADE)
+    guest = models.ForeignKey(User, related_name='guest_conversations', on_delete=models.DO_NOTHING)
+    landlord = models.ForeignKey(User, related_name='landlord_conversations', on_delete=models.DO_NOTHING)
 
 class Message(TimeStampedUUIDModel):
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.CASCADE)

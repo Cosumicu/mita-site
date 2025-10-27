@@ -10,6 +10,7 @@ import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Property, Reservation, PropertyView, PropertyLike
+from apps.chat.models import Conversation
 from .serializers import PropertyListSerializer, PropertyDetailSerializer, PropertyCreateSerializer, ReservationSerializer
 
 class PropertyFilter(django_filters.FilterSet):
@@ -88,10 +89,16 @@ class ReservationListCreateView(generics.ListCreateAPIView):
 
         number_of_nights = (end_date_ - start_date_).days
     
-        serializer.save(
+        reservation = serializer.save(
             user=self.request.user,
             property=property,
             number_of_nights=number_of_nights,
+        )
+
+        Conversation.objects.create(
+            reservation=reservation,
+            guest=self.request.user,
+            landlord=property.user
         )
 
         property.reservations_count = property.reservations.count()
