@@ -6,6 +6,7 @@ import {
   getConversationMessages,
   addMessage,
 } from "@/app/lib/features/messages/messageSlice";
+import Avatar from "antd/es/avatar/Avatar";
 
 type Props = { conversationId: string | null };
 
@@ -17,9 +18,6 @@ export default function ChatWindow({ conversationId }: Props) {
   const [text, setText] = useState("");
   const socketRef = useRef<WebSocket | null>(null);
 
-  // -------------------------------
-  // 🔌 Connect WebSocket
-  // -------------------------------
   useEffect(() => {
     if (!conversationId) return;
 
@@ -31,43 +29,32 @@ export default function ChatWindow({ conversationId }: Props) {
     ws.onclose = () => console.log("WebSocket closed.");
     ws.onerror = (e) => console.error("WebSocket error:", e);
 
+    // This block of code is a listener
+    // Every time backend call [chat_message], this code runs
+    // NOTE:
+    // websockets always returns a string, therefore, we parse it
+    // ======================================================
     ws.onmessage = (event) => {
-      const { type, ...message } = JSON.parse(event.data); // remove `type`
-      dispatch(addMessage(message));
+      const { type, ...message } = JSON.parse(event.data);
+      dispatch(addMessage(message)); // appends the message into the [conversationMessages]
     };
+    // ======================================================
 
     socketRef.current = ws;
     return () => ws.close();
   }, [conversationId, dispatch]);
 
-  // -------------------------------
-  // 🧠 Helper to check WS connection
-  // -------------------------------
   const isConnected = () => socketRef.current?.readyState === WebSocket.OPEN;
 
-  // Optional debug check
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log("WebSocket connected?", isConnected());
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     console.log("WebSocket connected?", isConnected());
+  //   }, 2000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
-  // -------------------------------
-  // 📨 Send message
-  // -------------------------------
   const handleSend = () => {
     if (!socketRef.current || !text.trim() || !user) return;
-
-    const tempMessage = {
-      id: Date.now().toString(),
-      conversation_id: conversationId!,
-      text,
-      sender: user,
-      created_at: new Date().toISOString(),
-    };
-
-    dispatch(addMessage(tempMessage)); // show message immediately
 
     socketRef.current.send(
       JSON.stringify({
@@ -80,44 +67,42 @@ export default function ChatWindow({ conversationId }: Props) {
     setText("");
   };
 
-  // -------------------------------
-  // 🧷 Auto-scroll on new messages
-  // -------------------------------
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messageList]);
 
-  // -------------------------------
-  // 💬 UI
-  // -------------------------------
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 mb-10">
         {isLoading && <div>Loading messages...</div>}
 
         {messageList.map((msg) => {
-          const isMine = msg.sender.id === user?.id;
+          const isMe = msg.sender.id === user?.id;
           return (
             <div
               key={msg.id}
-              className={`flex ${isMine ? "justify-end" : "justify-start"}`}
+              className={`flex ${isMe ? "justify-end" : "justify-start"}`}
             >
+              {!isMe && (
+                <Avatar size="large" src={msg.sender.profile_picture}></Avatar>
+              )}
               <div
                 className={`px-3 py-2 rounded-2xl max-w-xs ${
-                  isMine
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 text-gray-900"
+                  isMe ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-900"
                 }`}
               >
                 {msg.text}
               </div>
+              {isMe && (
+                <Avatar size="large" src={msg.sender.profile_picture}></Avatar>
+              )}
             </div>
           );
         })}
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t p-3 flex items-center gap-2">
+      <div className="fixed bg-white bottom-0 border-t p-3 flex items-center gap-2">
         <input
           type="text"
           value={text}

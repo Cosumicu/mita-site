@@ -3,6 +3,7 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 
 from .models import Profile
+from apps.users.models import User
 from .serializers import ProfileSerializer, ProfileUpdateSerializer
 
 class ProfileListView(generics.ListAPIView):
@@ -23,8 +24,9 @@ class ProfileDetailView(generics.RetrieveAPIView):
     lookup_url_kwarg = "id"
 
     def get_object(self):
-        profile_id = self.kwargs.get(self.lookup_url_kwarg)
-        return get_object_or_404(Profile, id=profile_id)
+        user_id = self.kwargs.get(self.lookup_url_kwarg)
+        user = get_object_or_404(User, id=user_id)
+        return user.profile
     
 class ProfileUpdateView(generics.UpdateAPIView):
     serializer_class = ProfileUpdateSerializer

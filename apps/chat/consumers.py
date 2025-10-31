@@ -11,7 +11,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
-        print("Joining group:", self.room_group_name)  # DEBUG
+
+        print("Joining group:", self.room_group_name)
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
@@ -21,26 +22,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
+
         conversation_id = data.get("conversation_id")
         sender_id = data.get("sender_id")
         text = data.get("text")
+
         print(text)
 
         if not text or not sender_id:
             return
 
-        # Save message first
+        # Save message to database
         message = await self.create_message(conversation_id, sender_id, text)
 
-        # Broadcast full message
         await self.channel_layer.group_send(
             self.room_group_name,
             {
-                "type": "chat_message",  # method name
-                "id": str(message.id),  # convert UUID to string
-                "conversation_id": str(message.conversation.id),  # UUID → str
+                "type": "chat_message",
+                "id": str(message.id),
+                "conversation_id": str(message.conversation.id),
                 "sender": {
-                    "id": str(message.sender.id),  # if UUID, convert
+                    "id": str(message.sender.id),
                     "username": message.sender.username,
                 },
                 "text": message.text,
