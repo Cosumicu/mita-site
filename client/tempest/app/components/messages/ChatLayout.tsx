@@ -9,12 +9,12 @@ export default function ChatLayout() {
   >(null);
 
   return (
-    <div className="flex h-[100vh] border rounded-2xl overflow-hidden bg-white shadow mt-5 m-auto">
+    <div className="fixed top-25 left-0 right-0 bottom-0 flex border rounded-none overflow-hidden bg-gradient-to-br from-gray-50 to-white shadow-xl">
       <ChatSidebar
         onSelectConversation={(id) => setSelectedConversationId(id)}
         selectedId={selectedConversationId || undefined}
       />
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         <ChatWindow conversationId={selectedConversationId} />
       </div>
     </div>

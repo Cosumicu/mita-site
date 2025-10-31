@@ -24,7 +24,6 @@ export default function ChatWindow({ conversationId }: Props) {
     dispatch(getConversationMessages(conversationId));
 
     const ws = new WebSocket(`ws://localhost:8000/ws/chat/${conversationId}/`);
-
     ws.onopen = () => console.log("WebSocket connected!");
     ws.onclose = () => console.log("WebSocket closed.");
     ws.onerror = (e) => console.error("WebSocket error:", e);
@@ -44,15 +43,6 @@ export default function ChatWindow({ conversationId }: Props) {
     return () => ws.close();
   }, [conversationId, dispatch]);
 
-  const isConnected = () => socketRef.current?.readyState === WebSocket.OPEN;
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     console.log("WebSocket connected?", isConnected());
-  //   }, 2000);
-  //   return () => clearInterval(interval);
-  // }, []);
-
   const handleSend = () => {
     if (!socketRef.current || !text.trim() || !user) return;
 
@@ -63,7 +53,6 @@ export default function ChatWindow({ conversationId }: Props) {
         text,
       })
     );
-
     setText("");
   };
 
@@ -72,48 +61,50 @@ export default function ChatWindow({ conversationId }: Props) {
   }, [messageList]);
 
   return (
-    <div className="flex flex-col w-full h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 mb-10">
-        {isLoading && <div>Loading messages...</div>}
+    <div className="flex flex-col h-full bg-gradient-to-br from-white to-gray-50">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        {isLoading && <div className="text-gray-500">Loading messages...</div>}
 
         {messageList.map((msg) => {
           const isMe = msg.sender.id === user?.id;
           return (
             <div
               key={msg.id}
-              className={`flex ${isMe ? "justify-end" : "justify-start"}`}
+              className={`flex items-end gap-2 ${
+                isMe ? "justify-end" : "justify-start"
+              }`}
             >
               {!isMe && (
-                <Avatar size="large" src={msg.sender.profile_picture}></Avatar>
+                <Avatar size="large" src={msg.sender.profile_picture} />
               )}
               <div
-                className={`px-3 py-2 rounded-2xl max-w-xs ${
-                  isMe ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-900"
+                className={`px-4 py-2 rounded-2xl max-w-xs shadow-sm ${
+                  isMe
+                    ? "bg-blue-500 text-white rounded-br-none"
+                    : "bg-gray-200 text-gray-900 rounded-bl-none"
                 }`}
               >
                 {msg.text}
               </div>
-              {isMe && (
-                <Avatar size="large" src={msg.sender.profile_picture}></Avatar>
-              )}
+              {isMe && <Avatar size="large" src={msg.sender.profile_picture} />}
             </div>
           );
         })}
         <div ref={bottomRef} />
       </div>
 
-      <div className="fixed bg-white bottom-0 border-t p-3 flex items-center gap-2">
+      <div className="border-t bg-white p-4 flex items-center gap-3">
         <input
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          className="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="flex-1 border rounded-full px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400"
           placeholder="Type a message..."
         />
         <button
           onClick={handleSend}
-          className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600"
+          className="bg-blue-500 text-white px-5 py-3 rounded-full hover:bg-blue-600 active:scale-95 transition-transform"
         >
           Send
         </button>
