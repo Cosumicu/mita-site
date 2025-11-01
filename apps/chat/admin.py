@@ -7,7 +7,7 @@ class ConversationAdmin(admin.ModelAdmin):
     list_display_links = ['id']
 
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ['id', 'text']
+    list_display = ['id', 'text', 'created_at', 'sender']
     list_display_links = ['id']
 
 admin.site.register(Conversation, ConversationAdmin)

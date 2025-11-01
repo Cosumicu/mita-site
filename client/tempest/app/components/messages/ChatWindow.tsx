@@ -2,10 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector, useAppDispatch } from "@/app/lib/hooks";
-import {
-  getConversationMessages,
-  addMessage,
-} from "@/app/lib/features/messages/messageSlice";
+import { getConversationMessages } from "@/app/lib/features/messages/messageSlice";
 import Avatar from "antd/es/avatar/Avatar";
 
 type Props = { conversationId: string | null };
@@ -13,7 +10,9 @@ type Props = { conversationId: string | null };
 export default function ChatWindow({ conversationId }: Props) {
   const { user } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const { messageList, isLoading } = useAppSelector((state) => state.message);
+  const { data: messageList, loading: messageListLoading } = useAppSelector(
+    (state) => state.message.messageList
+  );
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const [text, setText] = useState("");
   const socketRef = useRef<WebSocket | null>(null);
@@ -34,8 +33,9 @@ export default function ChatWindow({ conversationId }: Props) {
     // websockets always returns a string, therefore, we parse it
     // ======================================================
     ws.onmessage = (event) => {
-      const { type, ...message } = JSON.parse(event.data);
-      dispatch(addMessage(message)); // appends the message into the [conversationMessages]
+      // const { type, ...message } = JSON.parse(event.data);
+      // dispatch(addMessage(message)); // appends the message into the [conversationMessages]
+      dispatch(getConversationMessages(conversationId));
     };
     // ======================================================
 
@@ -63,8 +63,6 @@ export default function ChatWindow({ conversationId }: Props) {
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-white to-gray-50">
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {isLoading && <div className="text-gray-500">Loading messages...</div>}
-
         {messageList.map((msg) => {
           const isMe = msg.sender.id === user?.id;
           return (

@@ -8,11 +8,12 @@ import {
   QuestionCircleOutlined,
   HomeOutlined,
   UserOutlined,
+  MailOutlined,
   SettingOutlined,
   LogoutOutlined,
   GiftOutlined,
   PlusOutlined,
-  HeartFilled,
+  HeartOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import RegisterForm from "../forms/RegisterForm";
@@ -61,8 +62,9 @@ const items2: MenuItem[] = [
 
 const items1: MenuItem[] = [
   { key: "profile", label: "Profile", icon: <UserOutlined /> },
+  { key: "inbox", label: "Inbox", icon: <MailOutlined /> },
   { key: "properties", label: "My Properties", icon: <HomeOutlined /> },
-  { key: "favorites", label: "My Favorites", icon: <HeartFilled /> },
+  { key: "favorites", label: "My Favorites", icon: <HeartOutlined /> },
   { key: "reservations", label: "My Reservations", icon: <GiftOutlined /> },
   { key: "settings", label: "Settings", icon: <SettingOutlined /> },
   { type: "divider" },
@@ -120,6 +122,9 @@ function RightMenu() {
     if (e.key === "profile") {
       setOpenMain(false);
       router.push(`/users/profile/${user?.id}`);
+    } else if (e.key === "inbox") {
+      setOpenMain(false);
+      router.push(`/messages`);
     } else if (e.key === "properties") {
       setOpenMain(false);
       router.push(`/myproperties`);
