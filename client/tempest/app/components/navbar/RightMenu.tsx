@@ -238,6 +238,7 @@ function RightMenu() {
           setIsCreatePropertyModalOpen(false);
         }}
         width={1100}
+        centered
         destroyOnHidden
       >
         <CreatePropertyModal

@@ -2,12 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Card, Button, Skeleton } from "antd";
-import {
-  LeftOutlined,
-  RightOutlined,
-  HeartFilled,
-  HeartOutlined,
-} from "@ant-design/icons";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import {
   getPropertyList,
@@ -172,7 +167,7 @@ const PropertyList = ({ label, location }: PropertyListProps) => {
                 >
                   <div className="ml-[-10]">
                     <h3 className="text-[.75rem] font-semibold truncate">
-                      {property.title}
+                      {property.category} in {property.location}
                     </h3>
                     <p className="text-[.75rem] text-gray-500">
                       ₱{property.price_per_night}/night

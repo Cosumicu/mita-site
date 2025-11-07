@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
@@ -10,15 +11,30 @@ import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Property, Reservation, PropertyView, PropertyLike
+from .pagination import PropertyPagination
 from apps.chat.models import Conversation
 from .serializers import PropertyListSerializer, PropertyDetailSerializer, PropertyCreateSerializer, ReservationSerializer
 
 class PropertyFilter(django_filters.FilterSet):
-    user = django_filters.UUIDFilter(field_name='user__profile__id')
+    # [lookup_expr], iexact looks for the exact string(case insensitive)
+    # icontains looks for the value that contains the string
+
+    # user filter is used on user property list
+    user = django_filters.UUIDFilter(field_name='user__id')
+
+    location = django_filters.CharFilter(method='filter_search')
+    guests = django_filters.NumberFilter(field_name='guests')
+    min_price_per_night = django_filters.NumberFilter(field_name='price_per_night', lookup_expr='gte')
+    max_price_per_night = django_filters.NumberFilter(field_name='price_per_night', lookup_expr='lte')
 
     class Meta:
         model = Property
-        fields = ['user']
+        fields = ['user', 'location', 'guests', 'min_price_per_night', 'max_price_per_night']
+
+    def filter_search(self, queryset, name, value):
+        return queryset.filter(
+            Q(location__icontains=value) | Q(title__icontains=value)
+        )
 
 class PropertyListView(generics.ListAPIView):
     queryset = Property.objects.all().order_by('-created_at')
@@ -26,6 +42,7 @@ class PropertyListView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend]
     filterset_class = PropertyFilter
+    # pagination_class = PropertyPagination
 
 class PropertyDetailView(generics.RetrieveAPIView):
     serializer_class = PropertyDetailSerializer

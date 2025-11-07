@@ -12,6 +12,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'title',
+            'category',
             'location',
             'price_per_night',
             'image_url',

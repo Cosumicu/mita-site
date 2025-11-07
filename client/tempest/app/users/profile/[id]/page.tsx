@@ -9,14 +9,7 @@ import {
 } from "@/app/lib/features/users/userSlice";
 import { getUserPropertyList } from "@/app/lib/features/properties/propertySlice";
 import { useParams } from "next/navigation";
-import {
-  Avatar,
-  Card,
-  Skeleton,
-  Rate,
-  Button,
-  Empty,
-} from "antd";
+import { Avatar, Card, Skeleton, Rate, Button, Empty } from "antd";
 import {
   MailOutlined,
   PhoneOutlined,
@@ -31,18 +24,12 @@ function UserProfilePage() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
 
-  const {
-    userDetail,
-    isError,
-    isSuccess,
-    isLoading,
-    message,
-  } = useAppSelector((state) => state.user);
+  const { userDetail, isError, isSuccess, isLoading, message } = useAppSelector(
+    (state) => state.user
+  );
 
-  const {
-    userPropertyList,
-    isLoading: isPropertyLoading,
-  } = useAppSelector((state) => state.property);
+  const { data: userPropertyList, loading: userPropertyListLoading } =
+    useAppSelector((state) => state.property.userPropertyList);
 
   // 🔹 Fetch user profile and property list
   useEffect(() => {
@@ -146,7 +133,7 @@ function UserProfilePage() {
       <UserPropertyList
         label={`${user.username}'s Properties`}
         propertyList={userPropertyList}
-        isLoading={isPropertyLoading}
+        isLoading={userPropertyListLoading}
       />
     </div>
   );

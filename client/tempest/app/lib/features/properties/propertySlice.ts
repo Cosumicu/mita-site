@@ -3,6 +3,13 @@ import { AxiosError } from "axios";
 import propertyService from "./propertyService";
 import { Property, Reservation } from "../../definitions";
 
+type PropertyFilters = {
+  location?: string;
+  start_date?: string;
+  end_date?: string;
+  guests?: string;
+};
+
 type AsyncState<T> = {
   data: T;
   loading: boolean;
@@ -45,11 +52,11 @@ const initialState: PropertyState = {
 
 export const getPropertyList = createAsyncThunk<
   Property[],
-  void,
+  PropertyFilters | undefined,
   { rejectValue: string }
->("property/getPropertyList", async (_, thunkAPI) => {
+>("property/getPropertyList", async (filters, thunkAPI) => {
   try {
-    const response = await propertyService.getPropertyList();
+    const response = await propertyService.getPropertyList(filters);
     return response;
   } catch (err) {
     const error = err as AxiosError<{ message?: string }>;

@@ -7,8 +7,15 @@ const GET_PROPERTY_LIST_URL = PROPERTY_BASE_URL;
 const CREATE_PROPERTY_URL = `${PROPERTY_BASE_URL}create/`;
 const LIST_CREATE_RESERVATION_URL = `${PROPERTY_BASE_URL}reservation/`;
 
-const getPropertyList = async () => {
-  const response = await api.get<Property[]>(GET_PROPERTY_LIST_URL);
+const getPropertyList = async (filters?: {
+  location?: string;
+  start_date?: string;
+  end_date?: string;
+  guests?: string;
+}) => {
+  const response = await api.get<Property[]>(GET_PROPERTY_LIST_URL, {
+    params: filters,
+  });
   return response.data;
 };
 

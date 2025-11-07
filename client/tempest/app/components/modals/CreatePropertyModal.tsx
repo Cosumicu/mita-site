@@ -97,8 +97,8 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
       toast.success("Property created successfully");
       dispatch(getPropertyList());
       dispatch(resetPropertyList());
-      if (onSuccess) onSuccess(); // close modal
       dispatch(resetCreateProperty());
+      if (onSuccess) onSuccess(); // close modal
     }
     if (createPropertyError) {
       toast.error(createPropertyMessage);
