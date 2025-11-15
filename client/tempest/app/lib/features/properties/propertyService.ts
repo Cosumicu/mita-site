@@ -6,6 +6,7 @@ const PROPERTY_BASE_URL = `${process.env.NEXT_PUBLIC_API_HOST}properties/`;
 const GET_PROPERTY_LIST_URL = PROPERTY_BASE_URL;
 const CREATE_PROPERTY_URL = `${PROPERTY_BASE_URL}create/`;
 const LIST_CREATE_RESERVATION_URL = `${PROPERTY_BASE_URL}reservation/`;
+const GET_USER_LIKES_URL = `${PROPERTY_BASE_URL}likes/`;
 
 const getPropertyList = async (filters?: {
   location?: string;
@@ -55,6 +56,11 @@ const createReservation = async (formData: Reservation) => {
   return response.data;
 };
 
+const getUserLikesList = async () => {
+  const response = await api.get<Property[]>(GET_USER_LIKES_URL);
+  return response.data;
+};
+
 const toggleFavorite = async (propertyId: string) => {
   const response = await api.post(
     `${PROPERTY_BASE_URL}${propertyId}/toggle-favorite/`
@@ -70,6 +76,7 @@ const propertyService = {
   createProperty,
   getPropertyDetail,
   createReservation,
+  getUserLikesList,
   toggleFavorite,
 };
 export default propertyService;

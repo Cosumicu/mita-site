@@ -25,6 +25,7 @@ type PropertyState = {
   reservationList: AsyncState<Reservation[]>;
   reservationPropertyList: AsyncState<Reservation[]>;
   propertyDetail: AsyncState<Property | null>;
+  likedList: AsyncState<Property[]>;
 
   // POST
   createProperty: AsyncState<Property | null>;
@@ -45,6 +46,7 @@ const initialState: PropertyState = {
   reservationList: initialAsyncState([]),
   reservationPropertyList: initialAsyncState([]),
   propertyDetail: initialAsyncState(null),
+  likedList: initialAsyncState([]),
 
   createProperty: initialAsyncState(null),
   createReservation: initialAsyncState(null),
@@ -157,6 +159,22 @@ export const getReservationPropertyList = createAsyncThunk<
     const response = await propertyService.getReservationPropertyList(
       propertyId
     );
+    return response;
+  } catch (err) {
+    const error = err as AxiosError<{ message?: string }>;
+    return thunkAPI.rejectWithValue(
+      error.response?.data?.message || error.message
+    );
+  }
+});
+
+export const getUserLikesList = createAsyncThunk<
+  Property[],
+  void,
+  { rejectValue: string }
+>("property/getUserLikesList", async (_, thunkAPI) => {
+  try {
+    const response = await propertyService.getUserLikesList();
     return response;
   } catch (err) {
     const error = err as AxiosError<{ message?: string }>;
@@ -339,6 +357,24 @@ export const propertySlice = createSlice({
         state.reservationPropertyList.error = true;
         state.reservationPropertyList.message = action.payload as string;
       })
+      // GET USER FAVORITES
+      .addCase(getUserLikesList.pending, (state) => {
+        state.likedList.loading = true;
+      })
+      .addCase(
+        getUserLikesList.fulfilled,
+        (state, action: PayloadAction<Property[]>) => {
+          state.likedList.loading = false;
+          state.likedList.success = true;
+          state.likedList.data = action.payload;
+        }
+      )
+      .addCase(getUserLikesList.rejected, (state, action) => {
+        state.likedList.loading = false;
+        state.likedList.error = true;
+        state.likedList.message = action.payload as string;
+      })
+      // TOGGLE LIKE
       .addCase(toggleFavorite.fulfilled, (state, action) => {
         const { propertyId } = action.payload;
 
