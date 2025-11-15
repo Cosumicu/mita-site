@@ -144,6 +144,14 @@ class ReservationListProperty(generics.ListAPIView):
     def get_queryset(self):
         return Reservation.objects.filter(property__id=self.kwargs.get(self.lookup_url_kwarg)).order_by("-created_at")
 
+class UserFavoritesView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PropertyListSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Property.objects.filter(likes__user=user).distinct()
+
 class ToggleFavoriteView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
