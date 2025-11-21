@@ -76,7 +76,7 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
 
           <div className="flex items-center justify-center sm:justify-start w-full py-4">
             <Link href={`/users/profile/${property.user.id}`}>
-              <Avatar size="large" src={property.user.profile_picture} />
+              <Avatar size="large" src={property.user.profile_picture_url} />
             </Link>
             <div className="ml-2">
               <p>{`Hosted by ${property.user.username}`}</p>

@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
@@ -24,6 +25,9 @@ class Profile(TimeStampedUUIDModel):
     city = models.CharField(max_length=180, default="Manila", blank=False, null=False)
     rating = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
     num_reviews = models.IntegerField(default=0, null=True, blank=True)
+
+    def profile_picture_url(self):
+        return f'{settings.WEBSITE_URL}{self.profile_picture.url}'
 
     def __str__(self):
         return f"{self.user.username}'s profile"

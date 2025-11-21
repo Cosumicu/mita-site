@@ -65,7 +65,7 @@ function UserProfilePage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center space-x-6 gap-4">
             <Avatar
-              src={user.profile_picture}
+              src={user.profile_picture_url}
               size={110}
               className="shadow-md border border-gray-200"
             />

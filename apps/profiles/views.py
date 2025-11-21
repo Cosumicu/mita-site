@@ -20,7 +20,7 @@ class CurrentUserProfileDetailView(generics.RetrieveAPIView):
     
 class ProfileDetailView(generics.RetrieveAPIView):
     serializer_class = ProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     lookup_url_kwarg = "id"
 
     def get_object(self):

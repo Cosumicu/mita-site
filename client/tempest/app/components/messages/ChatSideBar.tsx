@@ -58,7 +58,7 @@ export default function ChatSidebar({
                   : "hover:bg-gray-100 bg-white"
               }`}
             >
-              <Avatar size="large" src={other.profile_picture} />
+              <Avatar size="large" src={other.profile_picture_url} />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-800 truncate">
                   {other.username}

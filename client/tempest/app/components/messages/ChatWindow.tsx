@@ -28,7 +28,7 @@ export default function ChatWindow({ conversation, onBack }: Props) {
 
     dispatch(getConversationMessages(conversationId));
 
-    const ws = new WebSocket(`ws://localhost:8000/ws/chat/${conversationId}/`);
+    const ws = new WebSocket(`ws://localhost:8001/ws/chat/${conversationId}/`);
     ws.onopen = () => console.log("WebSocket connected!");
     ws.onclose = () => console.log("WebSocket closed.");
     ws.onerror = (e) => console.error("WebSocket error:", e);
@@ -83,8 +83,8 @@ export default function ChatWindow({ conversation, onBack }: Props) {
               size="large"
               src={
                 conversation.landlord.id === user?.id
-                  ? conversation.guest.profile_picture
-                  : conversation.landlord.profile_picture
+                  ? conversation.guest.profile_picture_url
+                  : conversation.landlord.profile_picture_url
               }
             />
             {/* Other user's username */}
@@ -110,7 +110,7 @@ export default function ChatWindow({ conversation, onBack }: Props) {
               }`}
             >
               {!isMe && (
-                <Avatar size="large" src={msg.sender.profile_picture} />
+                <Avatar size="large" src={msg.sender.profile_picture_url} />
               )}
               <div
                 className={`px-4 py-2 rounded-2xl max-w-xs shadow-sm text-sm ${
@@ -123,7 +123,7 @@ export default function ChatWindow({ conversation, onBack }: Props) {
               </div>
               <div className="mb-auto">
                 {isMe && (
-                  <Avatar size="large" src={msg.sender.profile_picture} />
+                  <Avatar size="large" src={msg.sender.profile_picture_url} />
                 )}
               </div>
             </div>

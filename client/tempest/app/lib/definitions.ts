@@ -31,7 +31,7 @@ export interface User {
   last_name: string;
   email: string;
   phone_number: string;
-  profile_picture: string;
+  profile_picture_url: string;
   about_me: string;
   gender: string;
   country: string;

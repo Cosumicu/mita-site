@@ -128,6 +128,9 @@ function RightMenu() {
     } else if (e.key === "properties") {
       setOpenMain(false);
       router.push(`/myproperties`);
+    } else if (e.key === "favorites") {
+      setOpenMain(false);
+      router.push(`/liked`);
     } else if (e.key === "reservations") {
       setOpenMain(false);
       router.push(`/reservations`);
@@ -158,7 +161,7 @@ function RightMenu() {
             <Avatar
               className="!hidden sm:!inline-block"
               size={48}
-              src={user?.profile_picture}
+              src={user?.profile_picture_url}
             />
           </Link>
         </>
