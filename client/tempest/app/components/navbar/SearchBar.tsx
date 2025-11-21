@@ -57,10 +57,11 @@ const SearchBar: React.FC = () => {
         </div>
 
         {/* Dates */}
-        <div className="flex items-center w-6/12 px-3 gap-2">
+        <div className="flex items-center w-4/12 px-3 gap-2">
           <CalendarOutlined className="text-gray-500 text-lg" />
           <RangePicker
-            className="!border-none !shadow-none w-full"
+            suffixIcon=""
+            className="!border-none !shadow-none w-full [&>.ant-picker-suffix]:hidden"
             onChange={(values) =>
               setDates(values as [dayjs.Dayjs | null, dayjs.Dayjs | null])
             }
@@ -69,7 +70,7 @@ const SearchBar: React.FC = () => {
         </div>
 
         {/* Guests */}
-        <div className="flex items-center w-2/12 px-3 gap-2">
+        <div className="flex items-center w-2/10 px-3 gap-2">
           <UserOutlined className="text-gray-500 text-lg" />
           <InputNumber
             min={1}

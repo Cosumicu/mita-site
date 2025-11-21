@@ -19,12 +19,16 @@ const PropertyList = ({ label, location }: PropertyListProps) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.user);
 
-  // Local state to store this component's list independently
+  // Local state for properties
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // State to track if horizontal scroll is possible
+  const [isScrollable, setIsScrollable] = useState(false);
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Fetch properties
   useEffect(() => {
     const fetchProperties = async () => {
       setLoading(true);
@@ -42,6 +46,28 @@ const PropertyList = ({ label, location }: PropertyListProps) => {
     fetchProperties();
   }, [dispatch, location]);
 
+  // Check if the list is scrollable
+  useEffect(() => {
+    if (scrollRef.current) {
+      const { scrollWidth, clientWidth } = scrollRef.current;
+      setIsScrollable(scrollWidth > clientWidth);
+    }
+  }, [properties]);
+
+  // Update scrollability on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (scrollRef.current) {
+        setIsScrollable(
+          scrollRef.current.scrollWidth > scrollRef.current.clientWidth
+        );
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Scroll left or right
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
       const card = scrollRef.current.querySelector<HTMLDivElement>(".ant-card");
@@ -59,29 +85,36 @@ const PropertyList = ({ label, location }: PropertyListProps) => {
   const handleToggleFavorite = (e: React.MouseEvent, propertyId: string) => {
     e.preventDefault();
     e.stopPropagation();
+
     dispatch(toggleFavorite(propertyId));
+
+    // Optimistically update local state
+    // This is a temporary solution to toggle like
+    // cons: when 2 identical properties are in the page,
+    //       they are out of sync
+    setProperties((prev) =>
+      prev.map((p) => (p.id === propertyId ? { ...p, liked: !p.liked } : p))
+    );
   };
 
   return (
     <div className="my-2">
+      {/* Header with label and arrows */}
       <div className="flex justify-between items-center">
-        <h2>{label}</h2>
-        <div className="hidden sm:flex gap-1">
-          <Button
-            shape="circle"
-            size="small"
-            icon={<LeftOutlined />}
-            onClick={() => scroll("left")}
-          />
-          <Button
-            shape="circle"
-            size="small"
-            icon={<RightOutlined />}
-            onClick={() => scroll("right")}
-          />
-        </div>
+        <h2 className="font-bold">{label}</h2>
+        {isScrollable && (
+          <div className="hidden sm:flex gap-1">
+            <Button shape="circle" size="small" onClick={() => scroll("left")}>
+              &lt;
+            </Button>
+            <Button shape="circle" size="small" onClick={() => scroll("right")}>
+              &gt;
+            </Button>
+          </div>
+        )}
       </div>
 
+      {/* Scrollable property list */}
       <div
         ref={scrollRef}
         className="flex gap-4 overflow-x-auto mt-2 p-2 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none]"
@@ -156,7 +189,15 @@ const PropertyList = ({ label, location }: PropertyListProps) => {
                       {property.category} in {property.location}
                     </h3>
                     <p className="text-[.75rem] text-gray-500">
-                      ₱{property.price_per_night}/night
+                      ₱
+                      {Number(property.price_per_night).toLocaleString(
+                        undefined,
+                        {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 2,
+                        }
+                      )}{" "}
+                      / night
                     </p>
                   </div>
                 </Card>
