@@ -61,18 +61,57 @@ const items2: MenuItem[] = [
 ];
 
 const items1: MenuItem[] = [
-  { key: "profile", label: "Profile", icon: <UserOutlined /> },
-  { key: "inbox", label: "Inbox", icon: <MailOutlined /> },
-  { key: "properties", label: "My Properties", icon: <HomeOutlined /> },
-  { key: "favorites", label: "My Favorites", icon: <HeartOutlined /> },
-  { key: "reservations", label: "My Reservations", icon: <GiftOutlined /> },
-  { key: "settings", label: "Settings", icon: <SettingOutlined /> },
+  {
+    key: "user-section",
+    label: "User",
+    type: "group",
+    children: [
+      { key: "profile", label: "Profile", icon: <UserOutlined /> },
+      { key: "inbox", label: "Inbox", icon: <MailOutlined /> },
+    ],
+  },
+  { type: "divider" },
+
+  {
+    key: "user-section",
+    label: "Guest",
+    type: "group",
+    children: [
+      {
+        key: "reservations",
+        label: "My Reservations",
+      },
+      { key: "favorites", label: "My Favorites" },
+    ],
+  },
   { type: "divider" },
   {
-    key: "logout",
-    label: "Logout",
-    icon: <LogoutOutlined />,
-    className: "text-red-500 font-semibold",
+    key: "user-section",
+    label: "Host",
+    type: "group",
+    children: [
+      { key: "properties", label: "My Properties" },
+      {
+        key: "requests",
+        label: "Reservation Requests",
+      },
+    ],
+  },
+  { type: "divider" },
+
+  {
+    key: "logout-section",
+    label: "Account",
+    type: "group",
+    children: [
+      { key: "settings", label: "Settings", icon: <SettingOutlined /> },
+      {
+        key: "logout",
+        label: "Logout",
+        icon: <LogoutOutlined />,
+        className: "text-red-500 font-semibold",
+      },
+    ],
   },
 ];
 
@@ -128,6 +167,9 @@ function RightMenu() {
     } else if (e.key === "properties") {
       setOpenMain(false);
       router.push(`/myproperties`);
+    } else if (e.key === "requests") {
+      setOpenMain(false);
+      router.push(`/requests`);
     } else if (e.key === "favorites") {
       setOpenMain(false);
       router.push(`/liked`);

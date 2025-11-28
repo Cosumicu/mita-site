@@ -1,15 +1,23 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import { getPropertyDetail } from "@/app/lib/features/properties/propertySlice";
-import { Avatar } from "antd";
+import { Avatar, Button, Modal } from "antd";
 import CreateReservationForm from "@/app/components/forms/CreateReservationForm";
+import UpdatePropertyModal from "@/app/components/modals/UpdatePropertyModal";
 import Link from "next/link";
 
 function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
   const dispatch = useAppDispatch();
+
+  const [isUpdatePropertyModalOpen, setIsUpdatePropertyModalOpen] =
+    useState(false);
+  const [isDeletePropertyModalOpen, setIsDeletePropertyModalOpen] =
+    useState(false);
+
+  const { user } = useAppSelector((state) => state.user);
   const {
     data: propertyDetail,
     loading: propertyDetailLoading,
@@ -32,7 +40,19 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <div className="max-w-[1100px] mx-auto">
-      <p className="text-2xl my-4">{property.title}</p>
+      <div className="flex items-center">
+        <p className="text-2xl my-4">{property.title}</p>
+        {property.user.id === user?.id && (
+          <div className="flex gap-1 ml-auto">
+            <Button onClick={() => setIsUpdatePropertyModalOpen(true)}>
+              Edit
+            </Button>
+            <Button onClick={() => setIsDeletePropertyModalOpen(true)}>
+              Delete
+            </Button>
+          </div>
+        )}
+      </div>
 
       {/* Image section */}
       <div className="w-full h-[450px] rounded-xl flex justify-center items-center">
@@ -91,6 +111,26 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           <CreateReservationForm property={property} />
         </div>
       </div>
+      <Modal
+        title={
+          <div style={{ textAlign: "center", width: "100%" }}>
+            Update Property
+          </div>
+        }
+        open={isUpdatePropertyModalOpen}
+        footer={null}
+        onCancel={() => {
+          setIsUpdatePropertyModalOpen(false);
+        }}
+        width={1100}
+        centered
+        destroyOnHidden
+      >
+        <UpdatePropertyModal
+          property={property}
+          onSuccess={() => setIsUpdatePropertyModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }

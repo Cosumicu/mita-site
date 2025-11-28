@@ -98,9 +98,10 @@ class ReservationSerializer(serializers.ModelSerializer):
             'guests',
             'number_of_nights',
             'total_amount',
+            'status',
             'created_at',
         ]
-        read_only_fields = ['id', 'user', 'property', 'created_at', 'number_of_nights', 'total_amount']
+        read_only_fields = ['id', 'user', 'property', 'created_at', 'number_of_nights', 'total_amount', 'status',]
     
     def get_total_amount(self, obj):
         return obj.total_amount()

@@ -10,6 +10,14 @@ from apps.common.models import TimeStampedUUIDModel
 
 User = get_user_model()
 
+class ReservationStatus(models.TextChoices):
+    PENDING = "PENDING", "Pending"
+    APPROVED = "APPROVED", "Approved"
+    DECLINED = "DECLINED", "Declined"
+    ONGOING = "ONGOING", "Ongoing"
+    COMPLETED = "COMPLETED", "Completed"
+    CANCELLED = "CANCELLED", "Cancelled"
+
 class Property(TimeStampedUUIDModel):
     user = models.ForeignKey(User, related_name='properties', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
@@ -41,6 +49,11 @@ class Reservation(TimeStampedUUIDModel):
     end_date = models.DateField()
     number_of_nights = models.IntegerField()
     guests = models.IntegerField()
+    status = models.CharField(
+        max_length=20,
+        choices=ReservationStatus.choices,
+        default=ReservationStatus.PENDING
+    )
 
     def total_amount(self):
         return self.property.price_per_night * self.number_of_nights

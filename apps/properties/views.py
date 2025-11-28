@@ -3,14 +3,14 @@ from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.parsers import MultiPartParser, FormParser
 from decimal import Decimal
 from datetime import datetime
 import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Property, Reservation, PropertyView, PropertyLike
+from .models import Property, Reservation, PropertyView, PropertyLike, ReservationStatus
 from .pagination import PropertyPagination
 from apps.chat.models import Conversation
 from .serializers import PropertyListSerializer, PropertyDetailSerializer, PropertyCreateSerializer, ReservationSerializer
@@ -100,9 +100,34 @@ class PropertyCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+class PropertyUpdateView(generics.UpdateAPIView):
+    queryset = Property.objects.all()
+    serializer_class = PropertyCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "id"
+
+    def get_object(self):
+        obj = super().get_object()
+        if obj.user != self.request.user:
+            raise PermissionDenied("You cannot edit this property.")
+        return obj
+
+class PropertyDeleteView(generics.DestroyAPIView):
+    queryset = Property.objects.all()
+    serializer_class = PropertyCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "id"
+
+    def get_object(self):
+        obj = super().get_object()
+        if obj.user != self.request.user:
+            raise PermissionDenied("You cannot delete this property.")
+        return obj
+
 class ReservationListCreateView(generics.ListCreateAPIView):
     serializer_class = ReservationSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = PropertyPagination
 
     def get_queryset(self):
         print("Current user:", self.request.user)
@@ -139,10 +164,63 @@ class ReservationListCreateView(generics.ListCreateAPIView):
 class ReservationListProperty(generics.ListAPIView):
     serializer_class = ReservationSerializer
     permission_classes = [permissions.AllowAny]
-    lookup_url_kwarg = 'id'
+    lookup_url_kwarg = 'reservation_id'
 
     def get_queryset(self):
-        return Reservation.objects.filter(property__id=self.kwargs.get(self.lookup_url_kwarg)).order_by("-created_at")
+        return Reservation.objects.filter(
+            property__id=self.kwargs.get(self.lookup_url_kwarg),
+            status=ReservationStatus.APPROVED
+        ).order_by("-created_at")
+
+
+class PendingReservationListView(generics.ListAPIView):
+    serializer_class = ReservationSerializer
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Reservation.objects.filter(
+            property__user=self.request.user,
+            status='PENDING'
+        ).select_related('user', 'property').order_by('-created_at')
+
+
+class ApproveReservationView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, reservation_id):
+        reservation = get_object_or_404(Reservation, id=reservation_id)
+
+        if reservation.property.user != request.user:
+            return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+
+        if reservation.status != ReservationStatus.PENDING:
+            return Response({"detail": "Reservation is not pending"}, status=status.HTTP_400_BAD_REQUEST)
+
+        reservation.status = ReservationStatus.APPROVED
+        reservation.save()
+
+        # TODO: send notification to guest
+
+        return Response({"detail": "Reservation approved successfully"}, status=status.HTTP_200_OK)
+
+class DeclineReservationView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, reservation_id):
+        reservation = get_object_or_404(Reservation, id=reservation_id)
+
+        if reservation.property.user != request.user:
+            return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+
+        if reservation.status != ReservationStatus.PENDING:
+            return Response({"detail": "Reservation is not pending"}, status=status.HTTP_400_BAD_REQUEST)
+
+        reservation.status = ReservationStatus.DECLINED
+        reservation.save()
+
+        # TODO: send notification to guest
+
+        return Response({"detail": "Reservation declined successfully"}, status=status.HTTP_200_OK)
 
 class UserFavoritesView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
