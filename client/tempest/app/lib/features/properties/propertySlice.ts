@@ -32,13 +32,15 @@ type PaginatedAsyncState<T> = {
 
 type PropertyState = {
   // GET
+  propertyDetail: AsyncState<Property | null>;
+  reservationPropertyList: AsyncState<Reservation[]>;
+
+  // PAGINATED LIST
   propertyList: AsyncState<Property[]>;
   userPropertyList: AsyncState<Property[]>;
   reservationList: PaginatedAsyncState<Reservation>;
-  reservationPropertyList: AsyncState<Reservation[]>;
-  propertyDetail: AsyncState<Property | null>;
   likedList: AsyncState<Property[]>;
-  reservationRequestsList: AsyncState<Reservation[]>;
+  reservationRequestsList: PaginatedAsyncState<Reservation>;
 
   // POST
   createProperty: AsyncState<Property | null>;
@@ -78,7 +80,7 @@ const initialState: PropertyState = {
   reservationPropertyList: initialAsyncState([]),
   propertyDetail: initialAsyncState(null),
   likedList: initialAsyncState([]),
-  reservationRequestsList: initialAsyncState([]),
+  reservationRequestsList: initialPaginatedAsyncState(),
 
   createProperty: initialAsyncState(null),
   createReservation: initialAsyncState(null),
@@ -243,20 +245,25 @@ export const getReservationPropertyList = createAsyncThunk<
 });
 
 export const getReservationRequestsList = createAsyncThunk<
-  Reservation[],
-  void,
+  Paginated<Reservation>, // return type
+  { page?: number; pageSize?: number }, // argument type
   { rejectValue: string }
->("property/getReservationRequestsList", async (_, thunkAPI) => {
-  try {
-    const response = await propertyService.getReservationRequestsList();
-    return response;
-  } catch (err) {
-    const error = err as AxiosError<{ message?: string }>;
-    return thunkAPI.rejectWithValue(
-      error.response?.data?.message || error.message
-    );
+>(
+  "property/getReservationRequestsList",
+  async ({ page = 1, pageSize = 10 }, thunkAPI) => {
+    try {
+      const response = await propertyService.getReservationRequestsList({
+        page,
+        pageSize,
+      });
+      return response;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(
+        err.message || "Failed to fetch reservations"
+      );
+    }
   }
-});
+);
 
 export const approveReservation = createAsyncThunk<
   { reservationId: string }, // return type
@@ -533,10 +540,13 @@ export const propertySlice = createSlice({
       })
       .addCase(
         getReservationRequestsList.fulfilled,
-        (state, action: PayloadAction<Reservation[]>) => {
+        (state, action: PayloadAction<Paginated<Reservation>>) => {
           state.reservationRequestsList.loading = false;
           state.reservationRequestsList.success = true;
-          state.reservationRequestsList.data = action.payload;
+          state.reservationRequestsList.data = action.payload.results;
+          state.reservationRequestsList.count = action.payload.count;
+          state.reservationRequestsList.next = action.payload.next;
+          state.reservationRequestsList.previous = action.payload.previous;
         }
       )
       .addCase(getReservationRequestsList.rejected, (state, action) => {

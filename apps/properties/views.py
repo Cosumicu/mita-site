@@ -176,6 +176,7 @@ class ReservationListProperty(generics.ListAPIView):
 class PendingReservationListView(generics.ListAPIView):
     serializer_class = ReservationSerializer
     permissions_classes = [permissions.IsAuthenticated]
+    pagination_class = PropertyPagination
 
     def get_queryset(self):
         return Reservation.objects.filter(

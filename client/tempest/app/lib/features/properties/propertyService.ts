@@ -32,7 +32,7 @@ const getReservationList = async ({ page = 1, pageSize = 10 } = {}) => {
   const response = await api.get<Paginated<Reservation>>(
     LIST_CREATE_RESERVATION_URL,
     {
-      params: { page, page_size: pageSize }, // pass as query params
+      params: { page, page_size: pageSize },
     }
   );
   return response.data;
@@ -45,9 +45,12 @@ const getReservationPropertyList = async (propertyId: string) => {
   return response.data;
 };
 
-const getReservationRequestsList = async () => {
-  const response = await api.get<Reservation[]>(
-    `${GET_RESERVATION_REQUESTS_LIST_URL}`
+const getReservationRequestsList = async ({ page = 1, pageSize = 10 } = {}) => {
+  const response = await api.get<Paginated<Reservation>>(
+    GET_RESERVATION_REQUESTS_LIST_URL,
+    {
+      params: { page, page_size: pageSize },
+    }
   );
   return response.data;
 };
