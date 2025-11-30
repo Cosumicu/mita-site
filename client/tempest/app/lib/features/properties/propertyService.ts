@@ -69,7 +69,7 @@ const declineReservation = async (reservationId: string) => {
   return response.data;
 };
 
-const createProperty = async (formData: Property) => {
+const createProperty = async (formData: FormData) => {
   const response = await api.post(`${PROPERTY_BASE_URL}/create/`, formData);
   return response.data;
 };
@@ -81,15 +81,16 @@ const getPropertyDetail = async (propertyId: string) => {
   return response.data;
 };
 
-const updateProperty = async (propertyId: string) => {
-  const response = await api.get<Property>(
-    `${PROPERTY_BASE_URL}/${propertyId}/update/`
+const updateProperty = async (propertyId: string, formData: FormData) => {
+  const response = await api.patch<Property>(
+    `${PROPERTY_BASE_URL}/${propertyId}/update/`,
+    formData
   );
   return response.data;
 };
 
 const deleteProperty = async (propertyId: string) => {
-  const response = await api.get<Property>(
+  const response = await api.delete<Property>(
     `${PROPERTY_BASE_URL}/${propertyId}/delete/`
   );
   return response.data;

@@ -15,6 +15,7 @@ import {
   getPropertyList,
   resetCreateProperty,
   resetPropertyList,
+  updateProperty,
 } from "@/app/lib/features/properties/propertySlice";
 import { toast } from "react-toastify";
 
@@ -155,7 +156,17 @@ function PropertyForm({ mode, initialValues, onSuccess }: PropertyFormProps) {
     if (values.image && values.image[0]?.originFileObj) {
       formData.append("image", values.image[0].originFileObj);
     }
-    dispatch(createProperty(formData as any));
+
+    if (mode === "edit") {
+      dispatch(
+        updateProperty({
+          propertyId: initialValues.id,
+          formData,
+        })
+      );
+    } else {
+      dispatch(createProperty(formData));
+    }
   };
 
   return (

@@ -73,7 +73,7 @@ const items1: MenuItem[] = [
   { type: "divider" },
 
   {
-    key: "user-section",
+    key: "guest-section",
     label: "Guest",
     type: "group",
     children: [
@@ -86,7 +86,7 @@ const items1: MenuItem[] = [
   },
   { type: "divider" },
   {
-    key: "user-section",
+    key: "host-section",
     label: "Host",
     type: "group",
     children: [

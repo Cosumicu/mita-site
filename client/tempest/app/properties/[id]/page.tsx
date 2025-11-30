@@ -2,11 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
-import { getPropertyDetail } from "@/app/lib/features/properties/propertySlice";
+import {
+  deleteProperty,
+  getPropertyDetail,
+} from "@/app/lib/features/properties/propertySlice";
 import { Avatar, Button, Modal } from "antd";
 import CreateReservationForm from "@/app/components/forms/CreateReservationForm";
 import UpdatePropertyModal from "@/app/components/modals/UpdatePropertyModal";
 import Link from "next/link";
+import { handleClientScriptLoad } from "next/script";
 
 function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
@@ -38,6 +42,10 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     );
   }
 
+  const handleDelete = (propertyId: string) => {
+    dispatch(deleteProperty(propertyId));
+  };
+
   return (
     <div className="max-w-[1100px] mx-auto">
       <div className="flex items-center">
@@ -47,7 +55,12 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
             <Button onClick={() => setIsUpdatePropertyModalOpen(true)}>
               Edit
             </Button>
-            <Button onClick={() => setIsDeletePropertyModalOpen(true)}>
+            <Button
+              onClick={() => {
+                setIsDeletePropertyModalOpen(true);
+                handleDelete(property.id);
+              }}
+            >
               Delete
             </Button>
           </div>

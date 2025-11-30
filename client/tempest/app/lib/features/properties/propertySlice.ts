@@ -91,20 +91,26 @@ const initialState: PropertyState = {
 };
 
 export const getPropertyList = createAsyncThunk<
-  Paginated<Property>, // returns
-  { filters: PropertyFilterParams; pagination: PaginationParams }, // accepts
-  { rejectValue: string } // reject with value
->("property/getPropertyList", async ({ filters, pagination }, thunkAPI) => {
-  try {
-    const response = await propertyService.getPropertyList(filters, pagination);
-    return response;
-  } catch (err) {
-    const error = err as AxiosError<{ message?: string }>;
-    return thunkAPI.rejectWithValue(
-      error.response?.data?.message || error.message
-    );
+  Paginated<Property>,
+  { filters?: PropertyFilterParams; pagination?: PaginationParams } | void,
+  { rejectValue: string }
+>(
+  "property/getPropertyList",
+  async ({ filters = {}, pagination = {} } = {}, thunkAPI) => {
+    try {
+      const response = await propertyService.getPropertyList(
+        filters,
+        pagination
+      );
+      return response;
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
   }
-});
+);
 
 export const getUserPropertyList = createAsyncThunk<
   Paginated<Property>,
@@ -127,7 +133,7 @@ export const getUserPropertyList = createAsyncThunk<
 
 export const createProperty = createAsyncThunk<
   Property,
-  Property,
+  FormData,
   { rejectValue: string }
 >("property/createProperty", async (formData, thunkAPI) => {
   try {
@@ -159,11 +165,11 @@ export const getPropertyDetail = createAsyncThunk<
 
 export const updateProperty = createAsyncThunk<
   Property,
-  string,
+  { propertyId: string; formData: FormData },
   { rejectValue: string }
->("property/updateProperty", async (propertyId, thunkAPI) => {
+>("property/updateProperty", async ({ propertyId, formData }, thunkAPI) => {
   try {
-    const response = await propertyService.updateProperty(propertyId);
+    const response = await propertyService.updateProperty(propertyId, formData);
     return response;
   } catch (err) {
     const error = err as AxiosError<{ message?: string }>;
