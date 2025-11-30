@@ -164,7 +164,7 @@ class ReservationListCreateView(generics.ListCreateAPIView):
 class ReservationListProperty(generics.ListAPIView):
     serializer_class = ReservationSerializer
     permission_classes = [permissions.AllowAny]
-    lookup_url_kwarg = 'reservation_id'
+    lookup_url_kwarg = 'id'
 
     def get_queryset(self):
         return Reservation.objects.filter(

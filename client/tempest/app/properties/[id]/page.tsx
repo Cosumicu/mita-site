@@ -11,6 +11,7 @@ import CreateReservationForm from "@/app/components/forms/CreateReservationForm"
 import UpdatePropertyModal from "@/app/components/modals/UpdatePropertyModal";
 import Link from "next/link";
 import { handleClientScriptLoad } from "next/script";
+import DeletePropertyConfirmationModal from "@/app/components/modals/DeletePropertyConfirmationModal";
 
 function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
@@ -142,6 +143,27 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
         <UpdatePropertyModal
           property={property}
           onSuccess={() => setIsUpdatePropertyModalOpen(false)}
+        />
+      </Modal>
+
+      <Modal
+        title={
+          <div style={{ textAlign: "center", width: "100%" }}>
+            Delete Property?
+          </div>
+        }
+        open={isDeletePropertyModalOpen}
+        footer={null}
+        onCancel={() => {
+          setIsDeletePropertyModalOpen(false);
+        }}
+        width={1100}
+        centered
+        destroyOnHidden
+      >
+        <DeletePropertyConfirmationModal
+          propertyId={property.id}
+          onSuccess={() => setIsDeletePropertyModalOpen(false)}
         />
       </Modal>
     </div>

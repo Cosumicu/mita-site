@@ -40,7 +40,7 @@ const getReservationList = async (pagination: PaginationParams) => {
 
 const getReservationPropertyList = async (propertyId: string) => {
   const response = await api.get<Reservation[]>(
-    `${RESERVATION_BASE_URL}p/${propertyId}`
+    `${RESERVATION_BASE_URL}/p/${propertyId}`
   );
   return response.data;
 };
@@ -57,14 +57,14 @@ const getReservationRequestsList = async ({ page = 1, pageSize = 10 } = {}) => {
 
 const approveReservation = async (reservationId: string) => {
   const response = await api.post(
-    `${RESERVATION_BASE_URL}/requests/${reservationId}/approve/`
+    `${RESERVATION_BASE_URL}/${reservationId}/approve/`
   );
   return response.data;
 };
 
 const declineReservation = async (reservationId: string) => {
   const response = await api.post(
-    `${RESERVATION_BASE_URL}/requests/${reservationId}/decline/`
+    `${RESERVATION_BASE_URL}/${reservationId}/decline/`
   );
   return response.data;
 };

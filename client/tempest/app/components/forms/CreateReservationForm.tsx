@@ -36,6 +36,7 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
   const [form] = Form.useForm();
   const [nights, setNights] = useState<number>(0);
   const [totalPrice, setTotalPrice] = useState<number>(0);
+
   useEffect(() => {
     dispatch(getReservationPropertyList(property.id));
   }, [dispatch, property.id]);
