@@ -43,10 +43,6 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     );
   }
 
-  const handleDelete = (propertyId: string) => {
-    dispatch(deleteProperty(propertyId));
-  };
-
   return (
     <div className="max-w-[1100px] mx-auto">
       <div className="flex items-center">
@@ -59,7 +55,6 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
             <Button
               onClick={() => {
                 setIsDeletePropertyModalOpen(true);
-                handleDelete(property.id);
               }}
             >
               Delete

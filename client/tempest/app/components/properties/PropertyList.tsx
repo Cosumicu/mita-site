@@ -13,47 +13,21 @@ import useApp from "antd/es/app/useApp";
 
 type PropertyListProps = {
   label: string;
-  location?: string;
+  properties: any;
+  loading: boolean;
 };
 
-const PropertyList = ({ label, location }: PropertyListProps) => {
+const PropertyList = ({ label, properties, loading }: PropertyListProps) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.user);
   const { data: propertyList, loading: propertyListLoading } = useAppSelector(
     (state) => state.property.propertyList
   );
 
-  // Local state for properties
-  const [properties, setProperties] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
   // State to track if horizontal scroll is possible
   const [isScrollable, setIsScrollable] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Fetch properties
-  useEffect(() => {
-    const fetchProperties = async () => {
-      setLoading(true);
-      try {
-        const filters = location ? { location } : undefined;
-        const response = await dispatch(
-          getPropertyList({
-            filters: { location },
-            pagination: { page: 1, page_size: 10 },
-          })
-        ).unwrap();
-        setProperties(response.results);
-      } catch (error: any) {
-        toast.error(error || "Failed to fetch properties");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperties();
-  }, [dispatch, location]);
 
   // Check if the list is scrollable
   useEffect(() => {
@@ -96,14 +70,6 @@ const PropertyList = ({ label, location }: PropertyListProps) => {
     e.stopPropagation();
 
     dispatch(toggleFavorite(propertyId));
-
-    // Optimistically update local state
-    // This is a temporary solution to toggle like
-    // cons: when 2 identical properties are in the page,
-    //       they are out of sync
-    setProperties((prev) =>
-      prev.map((p) => (p.id === propertyId ? { ...p, liked: !p.liked } : p))
-    );
   };
 
   return (

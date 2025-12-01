@@ -36,6 +36,9 @@ type PropertyState = {
 
   // PAGINATED LIST
   propertyList: PaginatedAsyncState<Property>;
+  propertyList1: PaginatedAsyncState<Property>;
+  propertyList2: PaginatedAsyncState<Property>;
+  propertyList3: PaginatedAsyncState<Property>;
   userPropertyList: PaginatedAsyncState<Property>;
   reservationList: PaginatedAsyncState<Reservation>;
   likedList: AsyncState<Property[]>;
@@ -74,6 +77,9 @@ const initialPaginatedAsyncState = <T>(): PaginatedAsyncState<T> => ({
 
 const initialState: PropertyState = {
   propertyList: initialPaginatedAsyncState(),
+  propertyList1: initialPaginatedAsyncState(),
+  propertyList2: initialPaginatedAsyncState(),
+  propertyList3: initialPaginatedAsyncState(),
   userPropertyList: initialPaginatedAsyncState(),
   reservationList: initialPaginatedAsyncState(),
   reservationPropertyList: initialAsyncState([]),
@@ -99,6 +105,72 @@ export const getPropertyList = createAsyncThunk<
   async ({ filters = {}, pagination = {} } = {}, thunkAPI) => {
     try {
       const response = await propertyService.getPropertyList(
+        filters,
+        pagination
+      );
+      return response;
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
+  }
+);
+
+export const getPropertyList1 = createAsyncThunk<
+  Paginated<Property>,
+  { filters?: PropertyFilterParams; pagination?: PaginationParams } | void,
+  { rejectValue: string }
+>(
+  "property/getPropertyList1",
+  async ({ filters = {}, pagination = {} } = {}, thunkAPI) => {
+    try {
+      const response = await propertyService.getPropertyList1(
+        filters,
+        pagination
+      );
+      return response;
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
+  }
+);
+
+export const getPropertyList2 = createAsyncThunk<
+  Paginated<Property>,
+  { filters?: PropertyFilterParams; pagination?: PaginationParams } | void,
+  { rejectValue: string }
+>(
+  "property/getPropertyList2",
+  async ({ filters = {}, pagination = {} } = {}, thunkAPI) => {
+    try {
+      const response = await propertyService.getPropertyList2(
+        filters,
+        pagination
+      );
+      return response;
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
+  }
+);
+
+export const getPropertyList3 = createAsyncThunk<
+  Paginated<Property>,
+  { filters?: PropertyFilterParams; pagination?: PaginationParams } | void,
+  { rejectValue: string }
+>(
+  "property/getPropertyList3",
+  async ({ filters = {}, pagination = {} } = {}, thunkAPI) => {
+    try {
+      const response = await propertyService.getPropertyList3(
         filters,
         pagination
       );
@@ -346,6 +418,11 @@ export const propertySlice = createSlice({
     resetPropertyList: (state) => {
       state.propertyList = initialPaginatedAsyncState();
     },
+    resetPropertyListHome: (state) => {
+      state.propertyList1 = initialPaginatedAsyncState();
+      state.propertyList2 = initialPaginatedAsyncState();
+      state.propertyList3 = initialPaginatedAsyncState();
+    },
     resetUserPropertyList: (state) => {
       state.userPropertyList = initialPaginatedAsyncState();
     },
@@ -395,6 +472,66 @@ export const propertySlice = createSlice({
         state.propertyList.loading = false;
         state.propertyList.error = true;
         state.propertyList.message = action.payload as string;
+      })
+      // GET PROPERTY LIST
+      .addCase(getPropertyList1.pending, (state) => {
+        state.propertyList1.loading = true;
+      })
+      .addCase(
+        getPropertyList1.fulfilled,
+        (state, action: PayloadAction<Paginated<Property>>) => {
+          state.propertyList1.loading = false;
+          state.propertyList1.success = true;
+          state.propertyList1.data = action.payload.results;
+          state.propertyList1.count = action.payload.count;
+          state.propertyList1.next = action.payload.next;
+          state.propertyList1.previous = action.payload.previous;
+        }
+      )
+      .addCase(getPropertyList1.rejected, (state, action) => {
+        state.propertyList1.loading = false;
+        state.propertyList1.error = true;
+        state.propertyList1.message = action.payload as string;
+      })
+      // GET PROPERTY LIST
+      .addCase(getPropertyList2.pending, (state) => {
+        state.propertyList2.loading = true;
+      })
+      .addCase(
+        getPropertyList2.fulfilled,
+        (state, action: PayloadAction<Paginated<Property>>) => {
+          state.propertyList2.loading = false;
+          state.propertyList2.success = true;
+          state.propertyList2.data = action.payload.results;
+          state.propertyList2.count = action.payload.count;
+          state.propertyList2.next = action.payload.next;
+          state.propertyList2.previous = action.payload.previous;
+        }
+      )
+      .addCase(getPropertyList2.rejected, (state, action) => {
+        state.propertyList2.loading = false;
+        state.propertyList2.error = true;
+        state.propertyList2.message = action.payload as string;
+      })
+      // GET PROPERTY LIST
+      .addCase(getPropertyList3.pending, (state) => {
+        state.propertyList3.loading = true;
+      })
+      .addCase(
+        getPropertyList3.fulfilled,
+        (state, action: PayloadAction<Paginated<Property>>) => {
+          state.propertyList3.loading = false;
+          state.propertyList3.success = true;
+          state.propertyList3.data = action.payload.results;
+          state.propertyList3.count = action.payload.count;
+          state.propertyList3.next = action.payload.next;
+          state.propertyList3.previous = action.payload.previous;
+        }
+      )
+      .addCase(getPropertyList3.rejected, (state, action) => {
+        state.propertyList3.loading = false;
+        state.propertyList3.error = true;
+        state.propertyList3.message = action.payload as string;
       })
       // GET USER PROPERTY LIST
       .addCase(getUserPropertyList.pending, (state) => {
@@ -604,6 +741,7 @@ export const propertySlice = createSlice({
 
 export const {
   resetPropertyList,
+  resetPropertyListHome,
   resetUserPropertyList,
   resetReservationList,
   resetReservationPropertyList,

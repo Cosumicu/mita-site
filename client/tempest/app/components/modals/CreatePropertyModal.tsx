@@ -12,9 +12,7 @@ import {
 import { useAppSelector, useAppDispatch } from "@/app/lib/hooks";
 import {
   createProperty,
-  getPropertyList,
   resetCreateProperty,
-  resetPropertyList,
 } from "@/app/lib/features/properties/propertySlice";
 import { toast } from "react-toastify";
 
@@ -95,8 +93,6 @@ function CreatePropertyModal({ onSuccess }: CreatePropertyModalProps) {
   useEffect(() => {
     if (createPropertySuccess) {
       toast.success("Property created successfully");
-      dispatch(getPropertyList());
-      dispatch(resetPropertyList());
       dispatch(resetCreateProperty());
       if (onSuccess) onSuccess(); // close modal
     }

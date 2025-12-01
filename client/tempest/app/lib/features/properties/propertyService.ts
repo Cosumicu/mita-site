@@ -21,6 +21,36 @@ const getPropertyList = async (
 };
 // usage: getPropertyList({ location: "Manila" }, { page: 1, page_size: 10 });
 
+const getPropertyList1 = async (
+  filters: PropertyFilterParams,
+  pagination: PaginationParams
+) => {
+  const response = await api.get<Paginated<Property>>(PROPERTY_BASE_URL, {
+    params: { ...filters, ...pagination },
+  });
+  return response.data;
+};
+
+const getPropertyList2 = async (
+  filters: PropertyFilterParams,
+  pagination: PaginationParams
+) => {
+  const response = await api.get<Paginated<Property>>(PROPERTY_BASE_URL, {
+    params: { ...filters, ...pagination },
+  });
+  return response.data;
+};
+
+const getPropertyList3 = async (
+  filters: PropertyFilterParams,
+  pagination: PaginationParams
+) => {
+  const response = await api.get<Paginated<Property>>(PROPERTY_BASE_URL, {
+    params: { ...filters, ...pagination },
+  });
+  return response.data;
+};
+
 const getUserPropertyList = async (
   userId: string,
   pagination: PaginationParams
@@ -115,6 +145,9 @@ const toggleFavorite = async (propertyId: string) => {
 
 const propertyService = {
   getReservationList,
+  getPropertyList1,
+  getPropertyList2,
+  getPropertyList3,
   getReservationPropertyList,
   getUserPropertyList,
   getPropertyList,
