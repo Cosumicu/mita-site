@@ -402,15 +402,6 @@ export const toggleFavorite = createAsyncThunk<
   }
 });
 
-// propertyList: initialAsyncState([]),
-// userPropertyList: initialAsyncState([]),
-// reservationList: initialAsyncState([]),
-// reservationPropertyList: initialAsyncState([]),
-// propertyDetail: initialAsyncState(null),
-
-// createProperty: initialAsyncState(null),
-// createReservation: initialAsyncState(null)
-
 export const propertySlice = createSlice({
   name: "property",
   initialState,
@@ -449,6 +440,10 @@ export const propertySlice = createSlice({
     },
     resetReservationRequestList: (state) => {
       state.deleteProperty = initialAsyncState(null);
+    },
+    resetReservationRequestActions: (state) => {
+      state.approveReservation = initialAsyncState(null);
+      state.declineReservation = initialAsyncState(null);
     },
   },
   extraReducers: (builder) => {
@@ -697,6 +692,32 @@ export const propertySlice = createSlice({
         state.reservationRequestsList.error = true;
         state.reservationRequestsList.message = action.payload as string;
       })
+      // APPROVE RESERVATION REQUEST
+      .addCase(approveReservation.pending, (state) => {
+        state.approveReservation.loading = true;
+      })
+      .addCase(approveReservation.fulfilled, (state) => {
+        state.approveReservation.loading = false;
+        state.approveReservation.success = true;
+      })
+      .addCase(approveReservation.rejected, (state, action) => {
+        state.approveReservation.loading = false;
+        state.approveReservation.error = true;
+        state.approveReservation.message = action.payload as string;
+      })
+      // DECLINE RESERVATION REQUEST
+      .addCase(declineReservation.pending, (state) => {
+        state.declineReservation.loading = true;
+      })
+      .addCase(declineReservation.fulfilled, (state) => {
+        state.declineReservation.loading = false;
+        state.declineReservation.success = true;
+      })
+      .addCase(declineReservation.rejected, (state, action) => {
+        state.declineReservation.loading = false;
+        state.declineReservation.error = true;
+        state.declineReservation.message = action.payload as string;
+      })
       // GET USER FAVORITES
       .addCase(getUserLikesList.pending, (state) => {
         state.likedList.loading = true;
@@ -748,6 +769,7 @@ export const {
   resetPropertyDetail,
   resetCreateProperty,
   resetCreateReservation,
+  resetReservationRequestActions,
 } = propertySlice.actions;
 
 export default propertySlice.reducer;

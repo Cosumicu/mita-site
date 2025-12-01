@@ -6,6 +6,7 @@ import {
   getReservationRequestsList,
   approveReservation,
   declineReservation,
+  resetReservationRequestActions,
 } from "@/app/lib/features/properties/propertySlice";
 import { List, Button, Spin, Empty, Divider, Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
@@ -20,13 +21,31 @@ export default function ReservationRequestListPage() {
     loading,
     error,
   } = useAppSelector((state) => state.property.reservationRequestsList);
+  const {
+    loading: approveReservationLoading,
+    success: approveReservationSuccess,
+    error: approveReservationError,
+    message: approveReservationMessage,
+  } = useAppSelector((state) => state.property.approveReservation);
+  const {
+    loading: declineReservationLoading,
+    success: declineReservationSuccess,
+    error: declineReservationError,
+    message: declineReservationMessage,
+  } = useAppSelector((state) => state.property.declineReservation);
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     dispatch(getReservationRequestsList({ page, pageSize }));
-  }, [dispatch, page, pageSize]);
+  }, [
+    dispatch,
+    approveReservationSuccess,
+    declineReservationSuccess,
+    page,
+    pageSize,
+  ]);
 
   useEffect(() => {
     if (error) toast.error(error);
@@ -144,14 +163,20 @@ export default function ReservationRequestListPage() {
               <div className="flex justify-end gap-2 mt-4">
                 <Button
                   type="primary"
-                  onClick={() => dispatch(approveReservation(item.id))}
+                  onClick={() => {
+                    dispatch(approveReservation(item.id));
+                    dispatch(resetReservationRequestActions());
+                  }}
                 >
                   Approve
                 </Button>
 
                 <Button
                   danger
-                  onClick={() => dispatch(declineReservation(item.id))}
+                  onClick={() => {
+                    dispatch(declineReservation(item.id));
+                    dispatch(resetReservationRequestActions());
+                  }}
                 >
                   Decline
                 </Button>
