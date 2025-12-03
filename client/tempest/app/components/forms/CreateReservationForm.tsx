@@ -151,7 +151,7 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
         className="flex flex-col space-y-5"
       >
         <div className="text-left text-2xl font-semibold text-gray-800">
-          ₱{property.price_per_night}
+          ₱{Number(property.price_per_night).toLocaleString()}
           <span className="text-gray-500 text-base font-normal"> / night</span>
         </div>
 
@@ -322,7 +322,7 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
             )}
 
             {/* Total */}
-            <div className="flex justify-between text-lg font-semibold text-pink-600 border-t pt-2">
+            <div className="flex justify-between text-lg font-semibold border-t pt-2">
               <div>Total</div>
               <div>₱{Number(totalPrice).toLocaleString()}</div>
             </div>
