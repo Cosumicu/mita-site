@@ -123,78 +123,68 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
           <span className="text-gray-500 text-base font-normal"> / night</span>
         </div>
 
-        <Form.Item
-          name="dates"
-          label="Select Dates"
-          rules={[
-            { required: true, message: "Please select a date range" },
-            {
-              validator: (_, value) => {
-                if (!value || value.length !== 2) return Promise.resolve();
+        <div className="p-4 border border-gray-300 rounded-lg">
+          <Form.Item
+            name="dates"
+            label="Select Dates"
+            rules={[
+              { required: true, message: "Please select a date range" },
+              {
+                validator: (_, value) => {
+                  if (!value || value.length !== 2) return Promise.resolve();
 
-                const [start, end] = value;
-                if (dayjs(start).isSame(dayjs(end), "day")) {
-                  return Promise.reject(
-                    new Error(
-                      "Check-out date must be at least one day after check-in."
-                    )
+                  const [start, end] = value;
+                  if (dayjs(start).isSame(dayjs(end), "day")) {
+                    return Promise.reject(
+                      new Error(
+                        "Check-out date must be at least one day after check-in."
+                      )
+                    );
+                  }
+
+                  // Check for overlap with existing reservations
+                  const hasOverlap = reservedRanges.some(
+                    (range) =>
+                      dayjs(start).isBefore(range.end.add(1, "day")) &&
+                      dayjs(end).isAfter(range.start.subtract(1, "day"))
                   );
-                }
 
-                // Check for overlap with existing reservations
-                const hasOverlap = reservedRanges.some(
-                  (range) =>
-                    dayjs(start).isBefore(range.end.add(1, "day")) &&
-                    dayjs(end).isAfter(range.start.subtract(1, "day"))
-                );
+                  if (hasOverlap) {
+                    return Promise.reject(
+                      new Error(
+                        "Selected dates overlap with existing reservations."
+                      )
+                    );
+                  }
 
-                if (hasOverlap) {
-                  return Promise.reject(
-                    new Error(
-                      "Selected dates overlap with existing reservations."
-                    )
-                  );
-                }
-
-                return Promise.resolve();
+                  return Promise.resolve();
+                },
               },
-            },
-          ]}
-        >
-          <RangePicker
-            className="w-full"
-            onChange={handleDateChange}
-            disabledDate={disabledDate} // keeps existing visual greying
-          />
-        </Form.Item>
+            ]}
+          >
+            <RangePicker
+              className="w-full"
+              onChange={handleDateChange}
+              disabledDate={disabledDate} // keeps existing visual greying
+            />
+          </Form.Item>
 
-        <Form.Item
-          name="guests"
-          label="Guests"
-          initialValue={1}
-          rules={[
-            { required: true, message: "Please select number of guests" },
-          ]}
-        >
-          <InputNumber
-            min={1}
-            max={property.guests}
-            step={1}
-            className="w-full"
-          />
-        </Form.Item>
-
-        {nights > 0 && (
-          <div className="text-right text-gray-700 border-t pt-3 space-y-1">
-            <div>
-              ₱{property.price_per_night} × {nights}{" "}
-              {nights === 1 ? "night" : "nights"}
-            </div>
-            <div className="text-lg font-semibold text-pink-600">
-              Total: ₱{totalPrice.toLocaleString()}
-            </div>
-          </div>
-        )}
+          <Form.Item
+            name="guests"
+            label="Guests"
+            initialValue={1}
+            rules={[
+              { required: true, message: "Please select number of guests" },
+            ]}
+          >
+            <InputNumber
+              min={1}
+              max={property.guests}
+              step={1}
+              className="w-full"
+            />
+          </Form.Item>
+        </div>
 
         <Button
           type="primary"
@@ -202,8 +192,94 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
           loading={reservationPropertyListLoading}
           className="!text-lg"
         >
-          Reserve
+          <p className="text-base">Reserve</p>
         </Button>
+
+        {nights > 0 && (
+          <div className="text-right text-gray-700 space-y-1 border-t pt-3">
+            {/* Subtotal */}
+            <div>
+              ₱{property.price_per_night.toLocaleString()} × {nights}{" "}
+              {nights === 1 ? "night" : "nights"} = ₱
+              {(property.price_per_night * nights).toLocaleString()}
+            </div>
+
+            {/* Long-stay discount */}
+            {nights >= 28 && property.monthly_discount_rate > 0 && (
+              <div>
+                Monthly discount (
+                {(property.monthly_discount_rate * 100).toFixed(0)}%): -₱
+                {Math.round(
+                  property.price_per_night *
+                    nights *
+                    property.monthly_discount_rate
+                ).toLocaleString()}
+              </div>
+            )}
+            {nights >= 7 &&
+              nights < 28 &&
+              property.weekly_discount_rate > 0 && (
+                <div>
+                  Weekly discount (
+                  {(property.weekly_discount_rate * 100).toFixed(0)}%): -₱
+                  {Math.round(
+                    property.price_per_night *
+                      nights *
+                      property.weekly_discount_rate
+                  ).toLocaleString()}
+                </div>
+              )}
+
+            {/* Cleaning fee */}
+            {property.cleaning_fee > 0 && (
+              <div>
+                Cleaning fee: ₱{Number(property.cleaning_fee).toLocaleString()}
+              </div>
+            )}
+
+            {/* Service fee */}
+            {property.service_fee_rate > 0 && (
+              <div>
+                Service fee ({(property.service_fee_rate * 100).toFixed(0)}%): ₱
+                {Math.round(
+                  property.price_per_night *
+                    nights *
+                    (nights >= 28
+                      ? property.monthly_discount_rate
+                      : nights >= 7
+                      ? property.weekly_discount_rate
+                      : 0) *
+                    property.service_fee_rate
+                ).toLocaleString()}
+              </div>
+            )}
+
+            {/* Tax */}
+            {property.tax_rate > 0 && (
+              <div>
+                Tax ({(property.tax_rate * 100).toFixed(0)}%): ₱
+                {Math.round(
+                  (property.price_per_night *
+                    nights *
+                    (1 -
+                      (nights >= 28
+                        ? property.monthly_discount_rate
+                        : nights >= 7
+                        ? property.weekly_discount_rate
+                        : 0)) +
+                    Number(property.cleaning_fee || 0)) *
+                    (1 + property.service_fee_rate) *
+                    property.tax_rate
+                ).toLocaleString()}
+              </div>
+            )}
+
+            {/* Total */}
+            <div className="text-lg font-semibold text-pink-600">
+              Total: ₱{totalPrice.toLocaleString()}
+            </div>
+          </div>
+        )}
       </Form>
     </div>
   );

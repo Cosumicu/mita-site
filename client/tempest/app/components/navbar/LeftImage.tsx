@@ -1,16 +1,16 @@
 import React from "react";
-import Link from "next/link";
 
 function LeftImage() {
   return (
     <div className="hidden sm:inline-block">
-      <Link href="/">
+      <a href="/">
         <div className="text-2xl whitespace-nowrap">
           <span className="text-2xl">
             Mita{" "}
             <span
               style={{
-                backgroundImage: "linear-gradient(135deg, black 50%, #7289DA 50%)",
+                backgroundImage:
+                  "linear-gradient(135deg, black 50%, #7289DA 50%)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 color: "transparent",
@@ -20,7 +20,7 @@ function LeftImage() {
             </span>
           </span>
         </div>
-      </Link>
+      </a>
     </div>
   );
 }

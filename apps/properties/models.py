@@ -71,7 +71,8 @@ class Reservation(TimeStampedUUIDModel):
         choices=ReservationStatus.choices,
         default=ReservationStatus.PENDING
     )
-
+    
+    price_per_night = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'))
     long_stay_discount = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.00'))
     cleaning_fee = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('0.00'))
     service_fee_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.10'))

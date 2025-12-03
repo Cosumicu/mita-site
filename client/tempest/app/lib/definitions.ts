@@ -59,6 +59,12 @@ export interface Property {
   liked: string;
   image: string;
   views: number;
+  status: string;
+  weekly_discount_rate: number;
+  monthly_discount_rate: number;
+  cleaning_fee: number;
+  service_fee_rate: number;
+  tax_rate: number;
   created_at: string;
 }
 
@@ -71,6 +77,11 @@ export interface Reservation {
   end_date: string;
   number_of_nights: number;
   guests: number;
+  status: string;
+  long_stay_discount: number;
+  cleaning_fee: number;
+  service_fee_rate: number;
+  tax_rate: number;
   total_amount: number;
   created_at: string;
 }

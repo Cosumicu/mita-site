@@ -60,14 +60,14 @@ export default function ReservationListPage() {
       title: "Price / Night",
       dataIndex: "price_per_night",
       render: (_: any, record: any) =>
-        `₱${Number(record.property.price_per_night).toLocaleString()}`,
+        `₱${Number(record.price_per_night).toLocaleString()}`,
     },
     {
       title: "Total Amount",
       dataIndex: "total_amount",
       render: (_: any, record: any) =>
         `₱${(
-          record.property.price_per_night * record.number_of_nights
+          record.price_per_night * record.number_of_nights
         ).toLocaleString()}`,
     },
     {

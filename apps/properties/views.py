@@ -144,6 +144,8 @@ class ReservationListCreateView(generics.ListCreateAPIView):
         start_date_ = datetime.strptime(start_date, "%Y-%m-%d").date()
         end_date_ = datetime.strptime(end_date, "%Y-%m-%d").date()
         number_of_nights = (end_date_ - start_date_).days
+        
+        price_per_night = property.price_per_night
 
         if number_of_nights >= 28:
             long_stay_discount = property.monthly_discount_rate
@@ -165,6 +167,7 @@ class ReservationListCreateView(generics.ListCreateAPIView):
         reservation = serializer.save(
             user=self.request.user,
             property=property,
+            price_per_night=price_per_night,
             number_of_nights=number_of_nights,
             long_stay_discount=long_stay_discount,
             cleaning_fee=cleaning_fee, 
