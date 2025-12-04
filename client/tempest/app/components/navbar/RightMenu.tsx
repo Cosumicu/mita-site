@@ -184,7 +184,7 @@ function RightMenu() {
 
       case "dashboard":
         setOpenMain(false);
-        router.push(`/hostdashboard`);
+        router.push(`/host-dashboard`);
         break;
 
       case "properties":

@@ -74,8 +74,10 @@ export default function ReservationListPage() {
       render: (status: string) => {
         const colorMap: any = {
           PENDING: "gold",
-          ACCEPTED: "green",
+          APPROVED: "green",
           DECLINED: "red",
+          ONGOING: "green",
+          COMPLETED: "blue",
           CANCELLED: "gray",
         };
         return <Tag color={colorMap[status] || "blue"}>{status}</Tag>;

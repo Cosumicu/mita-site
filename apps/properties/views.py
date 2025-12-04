@@ -201,7 +201,7 @@ class ReservationListProperty(generics.ListAPIView):
     def get_queryset(self):
         return Reservation.objects.filter(
             property__id=self.kwargs.get(self.lookup_url_kwarg),
-            status=ReservationStatus.APPROVED
+            status__in=[ReservationStatus.APPROVED, ReservationStatus.ONGOING]
         ).order_by("-created_at")
 
 

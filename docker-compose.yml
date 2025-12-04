@@ -52,6 +52,21 @@ services:
     networks:
       - booking-site
 
+  celery-beat:
+    build:
+      context: .
+      dockerfile: ./docker/local/django/Dockerfile
+    command: /start-celerybeat
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+    networks:
+      - booking-site
+
   flower:
     build:
       context: .

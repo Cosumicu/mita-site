@@ -11,3 +11,12 @@ app = Celery("booking_site")
 app.config_from_object("booking_site.settings", namespace="CELERY"),
 
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+
+from celery.schedules import crontab
+
+app.conf.beat_schedule = {
+    "complete-reservations-daily": {
+        "task": "apps.properties.tasks.update_reservations_status_task",
+        "schedule": crontab(minute="*"),  # every minute
+    },
+}
