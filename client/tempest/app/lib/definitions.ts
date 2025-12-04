@@ -63,8 +63,6 @@ export interface Property {
   weekly_discount_rate: number;
   monthly_discount_rate: number;
   cleaning_fee: number;
-  service_fee_rate: number;
-  tax_rate: number;
   created_at: string;
 }
 
@@ -80,7 +78,8 @@ export interface Reservation {
   status: string;
   long_stay_discount: number;
   cleaning_fee: number;
-  service_fee_rate: number;
+  guest_service_fee_rate: number;
+  host_service_fee_rate: number;
   tax_rate: number;
   total_amount: number;
   created_at: string;

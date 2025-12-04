@@ -17,6 +17,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
             'guests',
             'image_url',
             'liked',
+            'status',
             'views_count',
             'likes_count',
             'reservations_count',
@@ -55,6 +56,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             'location',
             'category',
             'image_url',
+            'status',
             'liked',
             'views_count',
             'likes_count',
@@ -62,8 +64,6 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             'weekly_discount_rate',
             'monthly_discount_rate',
             'cleaning_fee',
-            'service_fee_rate',
-            'tax_rate',
             'created_at',
             'updated_at',
         ]
@@ -88,6 +88,9 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
             'location',
             'category',
             'image',
+            # 'weekly_discount_rate',
+            # 'monthly_discount_rate',
+            # 'cleaning_fee',
         ]
     # Use field 'image' for creating instance of property
         
@@ -109,9 +112,11 @@ class ReservationSerializer(serializers.ModelSerializer):
             'long_stay_discount',
             'price_per_night',
             'cleaning_fee',
-            'service_fee_rate',
+            'guest_service_fee_rate',
+            'host_service_fee_rate',
             'tax_rate',
             'total_amount',
+            'host_pay',
             'created_at',
             'updated_at',
         ]
@@ -121,7 +126,8 @@ class ReservationSerializer(serializers.ModelSerializer):
             'number_of_nights',
             'long_stay_discount',
             'cleaning_fee',
-            'service_fee_rate',
+            'guest_service_fee_rate',
+            'host_service_fee_rate',
             'tax_rate',
             'total_amount',
             'status',

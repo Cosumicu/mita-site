@@ -51,6 +51,10 @@ class PropertyFilter(django_filters.FilterSet):
             )
         return queryset
 
+class ReservationFilter(django_filters.FilterSet):
+    status = django_filters.CharFilter(field_name='status')
+
+
 class PropertyListView(generics.ListAPIView):
     queryset = Property.objects.all().order_by('-created_at')
     serializer_class = PropertyListSerializer
@@ -128,9 +132,11 @@ class ReservationListCreateView(generics.ListCreateAPIView):
     serializer_class = ReservationSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = PropertyPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ReservationFilter
+
 
     def get_queryset(self):
-        print("Current user:", self.request.user)
         return Reservation.objects.filter(user=self.request.user).order_by('-created_at')
     
     def perform_create(self, serializer):
@@ -144,8 +150,6 @@ class ReservationListCreateView(generics.ListCreateAPIView):
         start_date_ = datetime.strptime(start_date, "%Y-%m-%d").date()
         end_date_ = datetime.strptime(end_date, "%Y-%m-%d").date()
         number_of_nights = (end_date_ - start_date_).days
-        
-        price_per_night = property.price_per_night
 
         if number_of_nights >= 28:
             long_stay_discount = property.monthly_discount_rate
@@ -154,15 +158,20 @@ class ReservationListCreateView(generics.ListCreateAPIView):
         else:
             long_stay_discount = Decimal("0.00")
         
+        price_per_night = property.price_per_night
         cleaning_fee = property.cleaning_fee
-        service_fee_rate = property.service_fee_rate
-        tax_rate = property.tax_rate
+        guest_service_fee_rate = Decimal("0.10")
+        host_service_fee_rate = Decimal("0.02")
+        tax_rate = Decimal("0.03")
 
-        subtotal = property.price_per_night * number_of_nights
+        subtotal = price_per_night * number_of_nights
         discounted_subtotal = subtotal - (subtotal * long_stay_discount)
-        service_fee = discounted_subtotal * service_fee_rate
-        tax = (discounted_subtotal + cleaning_fee + service_fee) * tax_rate
-        total_amount = discounted_subtotal + cleaning_fee + service_fee + tax
+        guest_service_fee = discounted_subtotal * guest_service_fee_rate
+        tax = (discounted_subtotal + cleaning_fee + guest_service_fee) * tax_rate
+        total_amount = discounted_subtotal + cleaning_fee + guest_service_fee + tax
+
+        host_service_fee = discounted_subtotal * host_service_fee_rate
+        host_pay = (discounted_subtotal + cleaning_fee) - host_service_fee
 
         reservation = serializer.save(
             user=self.request.user,
@@ -171,9 +180,11 @@ class ReservationListCreateView(generics.ListCreateAPIView):
             number_of_nights=number_of_nights,
             long_stay_discount=long_stay_discount,
             cleaning_fee=cleaning_fee, 
-            service_fee_rate=service_fee_rate,
+            guest_service_fee_rate=guest_service_fee_rate,
+            host_service_fee_rate=host_service_fee_rate,
             tax_rate=tax_rate,
             total_amount=total_amount,
+            host_pay=host_pay
         )
 
         Conversation.objects.create(
@@ -181,9 +192,6 @@ class ReservationListCreateView(generics.ListCreateAPIView):
             guest=self.request.user,
             landlord=property.user
         )
-
-        property.reservations_count = property.reservations.count()
-        property.save(update_fields=["reservations_count"])
 
 class ReservationListProperty(generics.ListAPIView):
     serializer_class = ReservationSerializer
@@ -223,6 +231,9 @@ class ApproveReservationView(APIView):
 
         reservation.status = ReservationStatus.APPROVED
         reservation.save()
+
+        reservation.property.reservations_count = reservation.property.reservations.count()
+        reservation.property.save(update_fields=["reservations_count"])
 
         # TODO: send notification to guest
 

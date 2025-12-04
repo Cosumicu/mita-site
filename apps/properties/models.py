@@ -49,8 +49,7 @@ class Property(TimeStampedUUIDModel):
     weekly_discount_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.10'))
     monthly_discount_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.20'))
     cleaning_fee = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('0.00'))
-    service_fee_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.10'))
-    tax_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.03'))
+
 
     def image_url(self):
         return f'{settings.WEBSITE_URL}{self.image.url}'
@@ -65,7 +64,7 @@ class Reservation(TimeStampedUUIDModel):
     start_date = models.DateField()
     end_date = models.DateField()
     number_of_nights = models.IntegerField()
-    guests = models.IntegerField()
+    guests = models.PositiveIntegerField()
     status = models.CharField(
         max_length=20,
         choices=ReservationStatus.choices,
@@ -75,9 +74,12 @@ class Reservation(TimeStampedUUIDModel):
     price_per_night = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'))
     long_stay_discount = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.00'))
     cleaning_fee = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('0.00'))
-    service_fee_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.10'))
+    guest_service_fee_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.10'))
+    host_service_fee_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.02'))
     tax_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.03'))
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+
+    host_pay = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
 
 class PropertyView(TimeStampedUUIDModel):
     property = models.ForeignKey(Property, related_name="views", on_delete=models.CASCADE)

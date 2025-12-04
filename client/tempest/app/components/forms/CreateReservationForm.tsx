@@ -16,7 +16,10 @@ import { Property } from "@/app/lib/definitions";
 interface CreateReservationFormProps {
   property: Property;
 }
+
 const { RangePicker } = DatePicker;
+const GUEST_SERVICE_FEE_RATE = 0.1;
+const TAX_RATE = 0.03;
 
 function CreateReservationForm({ property }: CreateReservationFormProps) {
   const dispatch = useAppDispatch();
@@ -107,8 +110,8 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
     const cleaning = Number(property.cleaning_fee || 0);
     const weekly = Number(property.weekly_discount_rate || 0);
     const monthly = Number(property.monthly_discount_rate || 0);
-    const service = Number(property.service_fee_rate || 0);
-    const tax = Number(property.tax_rate || 0);
+    const guest_service = GUEST_SERVICE_FEE_RATE;
+    const tax = TAX_RATE;
 
     const subtotal = price * nights;
 
@@ -119,7 +122,7 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
 
     const afterCleaning = afterDiscount + cleaning;
 
-    const serviceFee = afterCleaning * service;
+    const serviceFee = afterCleaning * guest_service;
 
     const afterService = afterCleaning + serviceFee;
 
@@ -287,11 +290,10 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
             )}
 
             {/* Service fee */}
-            {Number(property.service_fee_rate) > 0 && (
+            {GUEST_SERVICE_FEE_RATE > 0 && (
               <div className="flex justify-between">
                 <div>
-                  Service fee (
-                  {(Number(property.service_fee_rate) * 100).toFixed(0)}%)
+                  Service fee ({(GUEST_SERVICE_FEE_RATE * 100).toFixed(0)}%)
                 </div>
                 <div>
                   ₱
@@ -307,16 +309,16 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
                           Number(property.weekly_discount_rate)
                         : 0) +
                       Number(property.cleaning_fee)) *
-                    Number(property.service_fee_rate)
+                    GUEST_SERVICE_FEE_RATE
                   ).toLocaleString()}
                 </div>
               </div>
             )}
 
             {/* Tax */}
-            {Number(property.tax_rate) > 0 && (
+            {TAX_RATE > 0 && (
               <div className="flex justify-between">
-                <div>Tax ({(Number(property.tax_rate) * 100).toFixed(0)}%)</div>
+                <div>Tax ({(TAX_RATE * 100).toFixed(0)}%)</div>
                 <div>₱{Number(taxAmount).toLocaleString()}</div>
               </div>
             )}
