@@ -1,20 +1,12 @@
 import PropertyForm from "@/app/components/forms/PropertyForm";
 import { Property } from "@/app/lib/definitions";
 
-interface UpdatePropertyModalProps {
-  property: Property;
+interface CreatePropertyModalProps {
   onSuccess?: () => void;
 }
 
-export default function UpdatePropertyModal({
-  property,
+export default function CreatePropertyModal({
   onSuccess,
-}: UpdatePropertyModalProps) {
-  return (
-    <PropertyForm
-      mode="create"
-      initialValues={property}
-      onSuccess={onSuccess}
-    />
-  );
+}: CreatePropertyModalProps) {
+  return <PropertyForm mode="create" onSuccess={onSuccess} />;
 }

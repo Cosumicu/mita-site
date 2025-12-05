@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
-import { formatCurrency } from "@/app/lib/utils/format";
+import { formatCurrency, formatDate } from "@/app/lib/utils/format";
 import { getReservationList } from "@/app/lib/features/properties/propertySlice";
-import { Table, Spin, Image, Tag } from "antd";
+import { Table, Spin, Image, Tag, Button } from "antd";
 import { useRouter } from "next/navigation";
 
 export default function ReservationListPage() {
@@ -34,10 +34,13 @@ export default function ReservationListPage() {
 
   const columns = [
     {
-      title: "Property",
+      title: "Listing",
       dataIndex: "property",
       render: (_: any, record: any) => (
-        <div className="flex items-center gap-3">
+        <div
+          className="flex items-center gap-3 cursor-pointer"
+          onClick={() => router.push(`/properties/${record.property.id}`)}
+        >
           <Image
             src={record.property.image_url}
             alt={record.property.title}
@@ -53,16 +56,28 @@ export default function ReservationListPage() {
         </div>
       ),
     },
-    { title: "Start Date", dataIndex: "start_date" },
-    { title: "End Date", dataIndex: "end_date" },
-    { title: "Nights", dataIndex: "number_of_nights", align: "center" },
-    { title: "Guests", dataIndex: "guests", align: "center" },
     {
-      title: "Price / Night",
-      dataIndex: "price_per_night",
-      render: (_: any, record: any) =>
-        `₱${formatCurrency(Number(record.price_per_night))}`,
+      title: "Check-in",
+      dataIndex: "start_date",
+      render: (value: string) => formatDate(value),
     },
+    {
+      title: "Checkout",
+      dataIndex: "end_date",
+      render: (value: string) => formatDate(value),
+    },
+    {
+      title: "Booked",
+      dataIndex: "created_at",
+      render: (value: string) => formatDate(value),
+    },
+    { title: "Guests", dataIndex: "guests", align: "center" },
+    // {
+    //   title: "Price / Night",
+    //   dataIndex: "price_per_night",
+    //   render: (_: any, record: any) =>
+    //     `₱${formatCurrency(Number(record.price_per_night))}`,
+    // },
     {
       title: "Total Amount",
       dataIndex: "total_amount",
@@ -84,6 +99,48 @@ export default function ReservationListPage() {
         return <Tag color={colorMap[status] || "blue"}>{status}</Tag>;
       },
     },
+    {
+      title: "",
+      key: "action",
+      align: "center",
+      render: (_: any, record: any) => (
+        <div className="flex gap-4">
+          <Button
+            variant="outlined"
+            size="small"
+            type="primary"
+            onClick={() => {
+              // setIsDeletePropertyModalOpen(true);
+            }}
+          >
+            <p className="text-xs">Details</p>
+          </Button>
+          <button
+            onClick={() => {
+              console.log("");
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="icon icon-tabler icons-tabler-outline icon-tabler-dots"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+              <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+              <path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+            </svg>
+          </button>
+        </div>
+      ),
+    },
   ];
 
   const tableData = reservationList?.map((item: any) => ({
@@ -98,7 +155,7 @@ export default function ReservationListPage() {
 
   return (
     <div className="px-4 sm:px-10">
-      <h2 className="font-bold my-4 text-lg sm:text-xl">My Reservations</h2>
+      <p className="my-4 text-lg sm:text-xl">Guest Reservations</p>
 
       <Table
         columns={columns}
@@ -108,10 +165,6 @@ export default function ReservationListPage() {
           pageSize,
           total: count,
         }}
-        rowClassName="cursor-pointer"
-        onRow={(record) => ({
-          onClick: () => router.push(`/properties/${record.property.id}`),
-        })}
         onChange={handleTableChange}
       />
     </div>

@@ -6,14 +6,12 @@ import type { MenuProps } from "antd";
 import {
   MenuOutlined,
   QuestionCircleOutlined,
-  HomeOutlined,
   UserOutlined,
   MailOutlined,
   SettingOutlined,
   LogoutOutlined,
   GiftOutlined,
   PlusOutlined,
-  HeartOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import RegisterForm from "../forms/RegisterForm";
@@ -78,10 +76,10 @@ const items1: MenuItem[] = [
     type: "group",
     children: [
       {
-        key: "reservations",
-        label: "My Reservations",
+        key: "guest-reservations",
+        label: "Reservations",
       },
-      { key: "favorites", label: "My Favorites" },
+      { key: "guest-favorites", label: "Favorites" },
     ],
   },
   { type: "divider" },
@@ -90,10 +88,11 @@ const items1: MenuItem[] = [
     label: "Host",
     type: "group",
     children: [
-      { key: "dashboard", label: "Dashboard" },
-      { key: "properties", label: "My Properties" },
+      { key: "host-dashboard", label: "Dashboard" },
+      { key: "host-properties", label: "Listings" },
+      { key: "host-reservations", label: "Reservations" },
       {
-        key: "requests",
+        key: "host-requests",
         label: "Reservation Requests",
       },
     ],
@@ -182,29 +181,34 @@ function RightMenu() {
         router.push(`/messages`);
         break;
 
-      case "dashboard":
+      case "host-dashboard":
         setOpenMain(false);
-        router.push(`/host-dashboard`);
+        router.push(`/host/dashboard`);
         break;
 
-      case "properties":
+      case "host-properties":
         setOpenMain(false);
-        router.push(`/myproperties`);
+        router.push(`/host/myproperties`);
         break;
 
-      case "requests":
+      case "host-requests":
         setOpenMain(false);
-        router.push(`/requests`);
+        router.push(`/host/requests`);
         break;
 
-      case "favorites":
+      case "guest-favorites":
         setOpenMain(false);
-        router.push(`/liked`);
+        router.push(`/guest/liked`);
         break;
 
-      case "reservations":
+      case "guest-reservations":
         setOpenMain(false);
-        router.push(`/reservations`);
+        router.push(`/guest/reservations`);
+        break;
+
+      case "host-reservations":
+        setOpenMain(false);
+        router.push(`/host/reservations`);
         break;
 
       case "logout":
@@ -228,11 +232,10 @@ function RightMenu() {
           {" "}
           <Button
             type="primary"
-            icon={<HomeOutlined />}
             onClick={() => setIsCreatePropertyModalOpen(true)}
             className="px-6 py-2 !rounded-full tracking-wide"
           >
-            <div className="hidden sm:inline-block">Host Property </div>
+            <div className="hidden sm:inline-block">Become a host</div>
           </Button>
           <Link href={`/users/profile/${user.id}`}>
             <Avatar
@@ -309,7 +312,7 @@ function RightMenu() {
       <Modal
         title={
           <div style={{ textAlign: "center", width: "100%" }}>
-            Create Property
+            Create Listing
           </div>
         }
         open={isCreatePropertyModalOpen}

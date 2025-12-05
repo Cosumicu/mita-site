@@ -11,6 +11,7 @@ import {
 import { List, Button, Spin, Empty, Divider, Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
+import { formatCurrency } from "@/app/lib/utils/format";
 
 export default function ReservationRequestListPage() {
   const dispatch = useAppDispatch();
@@ -128,7 +129,7 @@ export default function ReservationRequestListPage() {
                 <p>{item.guests} Guests</p>
                 <span>•</span>
                 <p className="text-black">
-                  ₱{Number(item.total_amount).toLocaleString()}
+                  ₱{formatCurrency(Number(item.total_amount))}
                 </p>
               </div>
             </div>
