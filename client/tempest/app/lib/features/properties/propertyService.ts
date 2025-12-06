@@ -75,6 +75,29 @@ const getReservationPropertyList = async (propertyId: string) => {
   return response.data;
 };
 
+const getHostReservationList = async (pagination: PaginationParams) => {
+  const response = await api.get<Paginated<Reservation>>(
+    `${RESERVATION_BASE_URL}/host`,
+    {
+      params: { ...pagination },
+    }
+  );
+  return response.data;
+};
+
+const getHostReservationPropertyList = async (
+  propertyId: string,
+  pagination: PaginationParams
+) => {
+  const response = await api.get<Paginated<Reservation>>(
+    `${PROPERTY_BASE_URL}/${propertyId}/reservation`,
+    {
+      params: { propertyId, ...pagination },
+    }
+  );
+  return response.data;
+};
+
 const getReservationRequestsList = async ({ page = 1, pageSize = 10 } = {}) => {
   const response = await api.get<Paginated<Reservation>>(
     `${RESERVATION_BASE_URL}/requests`,
@@ -149,6 +172,8 @@ const propertyService = {
   getPropertyList2,
   getPropertyList3,
   getReservationPropertyList,
+  getHostReservationList,
+  getHostReservationPropertyList,
   getUserPropertyList,
   getPropertyList,
   createProperty,

@@ -16,6 +16,7 @@ import {
   resetCreateProperty,
   resetPropertyList,
   updateProperty,
+  resetUpdateProperty,
 } from "@/app/lib/features/properties/propertySlice";
 import { toast } from "react-toastify";
 
@@ -122,6 +123,8 @@ function PropertyForm({ mode, initialValues, onSuccess }: PropertyFormProps) {
           : "Property updated successfully"
       );
 
+      dispatch(resetUpdateProperty());
+      dispatch(resetCreateProperty());
       dispatch(getPropertyList());
       dispatch(resetPropertyList());
 
@@ -158,8 +161,10 @@ function PropertyForm({ mode, initialValues, onSuccess }: PropertyFormProps) {
           formData,
         })
       );
+      // dispatch(resetUpdateProperty());
     } else {
       dispatch(createProperty(formData));
+      // dispatch(resetCreateProperty());
     }
   };
 

@@ -156,7 +156,7 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
       <Modal
         title={
           <div style={{ textAlign: "center", width: "100%" }}>
-            Delete Property?
+            Delete this property?
           </div>
         }
         open={isDeletePropertyModalOpen}

@@ -48,6 +48,9 @@ export interface Property {
   slug: string;
   description: string;
   price_per_night: number;
+  checkin_time: string;
+  checkout_time: string;
+  is_instant_booking: boolean;
   bedrooms: number;
   beds: number;
   bathrooms: number;
@@ -73,6 +76,9 @@ export interface Reservation {
   property_id: string;
   start_date: string;
   end_date: string;
+  checkin_time: string;
+  checkout_time: string;
+  is_instant_booking: boolean;
   number_of_nights: number;
   guests: number;
   status: string;
@@ -82,6 +88,7 @@ export interface Reservation {
   host_service_fee_rate: number;
   tax_rate: number;
   total_amount: number;
+  confirmation_code: string;
   created_at: string;
 }
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import { formatCurrency, formatDate } from "@/app/lib/utils/format";
-import { getReservationList } from "@/app/lib/features/properties/propertySlice";
+import { getHostReservationList } from "@/app/lib/features/properties/propertySlice";
 import { Table, Spin, Image, Tag, Button } from "antd";
 import { useRouter } from "next/navigation";
 
@@ -12,19 +12,21 @@ export default function ReservationListPage() {
   const router = useRouter();
 
   const {
-    data: reservationList,
+    data: hostReservationList,
     count,
-    loading: reservationListLoading,
-  } = useAppSelector((state) => state.property.reservationList);
+    loading: hostReservationListLoading,
+  } = useAppSelector((state) => state.property.hostReservationList);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
-    dispatch(getReservationList({ page: currentPage, page_size: pageSize }));
+    dispatch(
+      getHostReservationList({ page: currentPage, page_size: pageSize })
+    );
   }, [dispatch, currentPage, pageSize]);
 
-  if (reservationListLoading) {
+  if (hostReservationListLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
@@ -72,6 +74,10 @@ export default function ReservationListPage() {
       render: (value: string) => formatDate(value),
     },
     { title: "Guests", dataIndex: "guests", align: "center" },
+    {
+      title: "Confirmation Code",
+      dataIndex: "confirmation_code",
+    },
     // {
     //   title: "Price / Night",
     //   dataIndex: "price_per_night",
@@ -127,9 +133,9 @@ export default function ReservationListPage() {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               className="icon icon-tabler icons-tabler-outline icon-tabler-dots"
             >
               <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -143,7 +149,7 @@ export default function ReservationListPage() {
     },
   ];
 
-  const tableData = reservationList?.map((item: any) => ({
+  const tableData = hostReservationList?.map((item: any) => ({
     key: item.id,
     ...item,
   }));

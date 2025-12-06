@@ -43,6 +43,8 @@ type PropertyState = {
   reservationList: PaginatedAsyncState<Reservation>;
   likedList: AsyncState<Property[]>;
   reservationRequestsList: PaginatedAsyncState<Reservation>;
+  hostReservationList: PaginatedAsyncState<Reservation>;
+  hostReservationPropertyList: PaginatedAsyncState<Reservation>;
 
   // POST
   createProperty: AsyncState<Property | null>;
@@ -86,6 +88,8 @@ const initialState: PropertyState = {
   propertyDetail: initialAsyncState(null),
   likedList: initialAsyncState([]),
   reservationRequestsList: initialPaginatedAsyncState(),
+  hostReservationList: initialPaginatedAsyncState(),
+  hostReservationPropertyList: initialPaginatedAsyncState(),
 
   createProperty: initialAsyncState(null),
   createReservation: initialAsyncState(null),
@@ -316,6 +320,44 @@ export const getReservationPropertyList = createAsyncThunk<
   }
 });
 
+export const getHostReservationList = createAsyncThunk<
+  Paginated<Reservation>,
+  PaginationParams,
+  { rejectValue: string }
+>("property/getHostReservationList", async (pagination, thunkAPI) => {
+  try {
+    const response = await propertyService.getHostReservationList(pagination);
+    return response;
+  } catch (err) {
+    const error = err as AxiosError<{ message?: string }>;
+    return thunkAPI.rejectWithValue(
+      error.response?.data?.message || error.message
+    );
+  }
+});
+
+export const getHostReservationPropertyList = createAsyncThunk<
+  Paginated<Reservation>,
+  { propertyId: string; pagination: PaginationParams },
+  { rejectValue: string }
+>(
+  "property/getHostReservationPropertyList",
+  async ({ propertyId, pagination }, thunkAPI) => {
+    try {
+      const response = await propertyService.getHostReservationPropertyList(
+        propertyId,
+        pagination
+      );
+      return response;
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
+  }
+);
+
 export const getReservationRequestsList = createAsyncThunk<
   Paginated<Reservation>, // return type
   { page?: number; pageSize?: number }, // argument type
@@ -419,6 +461,12 @@ export const propertySlice = createSlice({
     },
     resetReservationList: (state) => {
       state.reservationList = initialPaginatedAsyncState();
+    },
+    resetHostReservationList: (state) => {
+      state.hostReservationList = initialPaginatedAsyncState();
+    },
+    resetHostReservationPropertyList: (state) => {
+      state.hostReservationPropertyList = initialPaginatedAsyncState();
     },
     resetReservationPropertyList: (state) => {
       state.reservationPropertyList = initialAsyncState([]);
@@ -634,7 +682,6 @@ export const propertySlice = createSlice({
         state.createReservation.message = action.payload as string;
       })
       // GET RESERVATION LIST
-      // GET RESERVATION LIST
       .addCase(getReservationList.pending, (state) => {
         state.reservationList.loading = true;
       })
@@ -654,7 +701,46 @@ export const propertySlice = createSlice({
         state.reservationList.error = true;
         state.reservationList.message = action.payload as string;
       })
-
+      // GET HOST RESERVATION LIST
+      .addCase(getHostReservationList.pending, (state) => {
+        state.hostReservationList.loading = true;
+      })
+      .addCase(
+        getHostReservationList.fulfilled,
+        (state, action: PayloadAction<Paginated<Reservation>>) => {
+          state.hostReservationList.loading = false;
+          state.hostReservationList.success = true;
+          state.hostReservationList.data = action.payload.results;
+          state.hostReservationList.count = action.payload.count;
+          state.hostReservationList.next = action.payload.next;
+          state.hostReservationList.previous = action.payload.previous;
+        }
+      )
+      .addCase(getHostReservationList.rejected, (state, action) => {
+        state.hostReservationList.loading = false;
+        state.hostReservationList.error = true;
+        state.hostReservationList.message = action.payload as string;
+      })
+      // GET HOST RESERVATION PROPERTY LIST
+      .addCase(getHostReservationPropertyList.pending, (state) => {
+        state.hostReservationPropertyList.loading = true;
+      })
+      .addCase(
+        getHostReservationPropertyList.fulfilled,
+        (state, action: PayloadAction<Paginated<Reservation>>) => {
+          state.hostReservationPropertyList.loading = false;
+          state.hostReservationPropertyList.success = true;
+          state.hostReservationPropertyList.data = action.payload.results;
+          state.hostReservationPropertyList.count = action.payload.count;
+          state.hostReservationPropertyList.next = action.payload.next;
+          state.hostReservationPropertyList.previous = action.payload.previous;
+        }
+      )
+      .addCase(getHostReservationPropertyList.rejected, (state, action) => {
+        state.hostReservationPropertyList.loading = false;
+        state.hostReservationPropertyList.error = true;
+        state.hostReservationPropertyList.message = action.payload as string;
+      })
       // GET RESERVATION PROPERTY LIST
       .addCase(getReservationPropertyList.pending, (state) => {
         state.reservationPropertyList.loading = true;
@@ -765,8 +851,13 @@ export const {
   resetPropertyListHome,
   resetUserPropertyList,
   resetReservationList,
+  resetHostReservationList,
+  resetHostReservationPropertyList,
   resetReservationPropertyList,
   resetPropertyDetail,
+  resetUpdateProperty,
+  resetDeleteProperty,
+  resetReservationRequestList,
   resetCreateProperty,
   resetCreateReservation,
   resetReservationRequestActions,

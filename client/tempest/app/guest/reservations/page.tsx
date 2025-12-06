@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import { formatCurrency, formatDate } from "@/app/lib/utils/format";
 import { getReservationList } from "@/app/lib/features/properties/propertySlice";
-import { Table, Spin, Image, Tag, Button } from "antd";
+import { Table, Spin, Image, Tag, Button, Drawer } from "antd";
 import { useRouter } from "next/navigation";
+import ReservationDetailsDrawer from "@/app/components/drawer/ReservationDetailsDrawer";
 
 export default function ReservationListPage() {
   const dispatch = useAppDispatch();
@@ -16,6 +17,10 @@ export default function ReservationListPage() {
     count,
     loading: reservationListLoading,
   } = useAppSelector((state) => state.property.reservationList);
+
+  const [isReservationDetailsDrawerOpen, setIsReservationDetailsDrawerOpen] =
+    useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<any>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -72,6 +77,10 @@ export default function ReservationListPage() {
       render: (value: string) => formatDate(value),
     },
     { title: "Guests", dataIndex: "guests", align: "center" },
+    {
+      title: "Confirmation Code",
+      dataIndex: "confirmation_code",
+    },
     // {
     //   title: "Price / Night",
     //   dataIndex: "price_per_night",
@@ -110,7 +119,8 @@ export default function ReservationListPage() {
             size="small"
             type="primary"
             onClick={() => {
-              // setIsDeletePropertyModalOpen(true);
+              setSelectedReservation(record); // store the clicked reservation
+              setIsReservationDetailsDrawerOpen(true); // open drawer
             }}
           >
             <p className="text-xs">Details</p>
@@ -157,16 +167,32 @@ export default function ReservationListPage() {
     <div className="px-4 sm:px-10">
       <p className="my-4 text-lg sm:text-xl">Guest Reservations</p>
 
-      <Table
-        columns={columns}
-        dataSource={tableData}
-        pagination={{
-          current: currentPage,
-          pageSize,
-          total: count,
-        }}
-        onChange={handleTableChange}
-      />
+      <div className="overflow-x-auto">
+        {" "}
+        <Table
+          columns={columns}
+          dataSource={tableData}
+          pagination={{
+            current: currentPage,
+            pageSize,
+            total: count,
+          }}
+          onChange={handleTableChange}
+        />
+      </div>
+      <Drawer
+        title="Reservation Details"
+        placement="right"
+        width={500}
+        onClose={() => setIsReservationDetailsDrawerOpen(false)}
+        open={isReservationDetailsDrawerOpen}
+      >
+        {selectedReservation ? (
+          <ReservationDetailsDrawer reservation={selectedReservation} />
+        ) : (
+          <Spin />
+        )}
+      </Drawer>
     </div>
   );
 }
