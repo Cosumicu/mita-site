@@ -1,24 +1,66 @@
 from celery import shared_task
 from django.utils import timezone
+from datetime import datetime, timedelta
 from .models import Reservation, ReservationStatus
+
 
 @shared_task
 def update_reservations_status_task():
-    today = timezone.now().date()
+    now = timezone.now()
 
-    # Complete reservations that have ended
-    completed_reservations = Reservation.objects.filter(
-        status__in=[ReservationStatus.APPROVED, ReservationStatus.ONGOING, ReservationStatus.APPROVED],
-        end_date__lt=today
+    # ------------------------------------
+    # 1. COMPLETE RESERVATIONS
+    # ------------------------------------
+    completed = []
+
+    for r in Reservation.objects.filter(
+        status__in=[ReservationStatus.APPROVED, ReservationStatus.ONGOING]
+    ):
+        checkout_dt = timezone.make_aware(
+            datetime.combine(r.end_date, r.checkout_time)
+        )
+
+        if now > checkout_dt:
+            completed.append(r.id)
+
+    Reservation.objects.filter(id__in=completed).update(
+        status=ReservationStatus.COMPLETED
     )
-    completed_count = completed_reservations.update(status=ReservationStatus.COMPLETED)
 
-    # Update ongoing reservations
-    ongoing_reservations = Reservation.objects.filter(
-        status__in=[ReservationStatus.APPROVED, ReservationStatus.APPROVED],
-        start_date__lte=today,
-        end_date__gte=today
+    # ------------------------------------
+    # 2. MARK ONGOING
+    # ------------------------------------
+    ongoing = []
+
+    for r in Reservation.objects.filter(
+        status=ReservationStatus.APPROVED
+    ):
+        checkin_dt = timezone.make_aware(
+            datetime.combine(r.start_date, r.checkin_time)
+        )
+        checkout_dt = timezone.make_aware(
+            datetime.combine(r.end_date, r.checkout_time)
+        )
+
+        if checkin_dt <= now <= checkout_dt:
+            ongoing.append(r.id)
+
+    Reservation.objects.filter(id__in=ongoing).update(
+        status=ReservationStatus.ONGOING
     )
-    ongoing_count = ongoing_reservations.update(status=ReservationStatus.ONGOING)
 
-    return f"Completed {completed_count} reservations, marked {ongoing_count} as ongoing"
+    # ------------------------------------
+    # 3. EXPIRE PENDING > 24 HOURS
+    # ------------------------------------
+    expiration_time = now - timedelta(hours=24)
+
+    expired_count = Reservation.objects.filter(
+        status=ReservationStatus.PENDING,
+        created_at__lt=expiration_time
+    ).update(status=ReservationStatus.EXPIRED)
+
+    return (
+        f"Completed {len(completed)}, "
+        f"Marked {len(ongoing)} Ongoing, "
+        f"Expired {expired_count}"
+    )

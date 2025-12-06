@@ -7,7 +7,7 @@ from .views import (
     PropertyUpdateView,
     PropertyDeleteView,
     ReservationListCreateView,
-    ApprovedReservationListProperty,
+    ReservationListProperty,
     ReservationHostListView,
     PendingReservationListView,
     ApproveReservationView,
@@ -28,6 +28,6 @@ urlpatterns = [
     path('reservation/<uuid:reservation_id>/approve/', ApproveReservationView.as_view(), name='reservation-approve'),
     path('reservation/<uuid:reservation_id>/decline/', DeclineReservationView.as_view(), name='reservation-decline'),
     path('likes/', UserFavoritesView.as_view(), name='user-favorites-list'),
-    path('reservation/p/<uuid:id>', ApprovedReservationListProperty.as_view(), name='reservation-list-property'),
+    path('reservation/p/<uuid:id>', ReservationListProperty.as_view(), name='reservation-list-property'),
     path('<uuid:id>/toggle-favorite/', ToggleFavoriteView.as_view(), name='toggle-favorite'),
 ]

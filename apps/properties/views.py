@@ -151,6 +151,10 @@ class ReservationListCreateView(generics.ListCreateAPIView):
         end_date_ = datetime.strptime(end_date, "%Y-%m-%d").date()
         number_of_nights = (end_date_ - start_date_).days
 
+        checkin_time = property.checkin_time
+        checkout_time = property.checkout_time
+        is_instant_booking = property.is_instant_booking
+
         if number_of_nights >= 28:
             long_stay_discount = property.monthly_discount_rate
         elif number_of_nights >= 7:
@@ -173,10 +177,21 @@ class ReservationListCreateView(generics.ListCreateAPIView):
         host_service_fee = discounted_subtotal * host_service_fee_rate
         host_pay = (discounted_subtotal + cleaning_fee) - host_service_fee
 
+        if property.is_instant_booking:
+            status = ReservationStatus.APPROVED
+        else:
+            status = ReservationStatus.PENDING
+
         reservation = serializer.save(
             user=self.request.user,
             property=property,
+            status=status,
             price_per_night=price_per_night,
+            start_date=start_date,
+            end_date=end_date,
+            checkin_time = checkin_time,
+            checkout_time = checkout_time,
+            is_instant_booking = is_instant_booking,
             number_of_nights=number_of_nights,
             long_stay_discount=long_stay_discount,
             cleaning_fee=cleaning_fee, 
@@ -193,7 +208,7 @@ class ReservationListCreateView(generics.ListCreateAPIView):
             landlord=property.user
         )
 
-class ApprovedReservationListProperty(generics.ListAPIView):
+class ReservationListProperty(generics.ListAPIView):
     serializer_class = ReservationSerializer
     permission_classes = [permissions.AllowAny]
     lookup_url_kwarg = 'id'
@@ -201,13 +216,14 @@ class ApprovedReservationListProperty(generics.ListAPIView):
     def get_queryset(self):
         return Reservation.objects.filter(
             property__id=self.kwargs.get(self.lookup_url_kwarg),
-            status__in=[ReservationStatus.APPROVED, ReservationStatus.ONGOING]
+            status__in=[ReservationStatus.PENDING, ReservationStatus.APPROVED, ReservationStatus.ONGOING]
         ).order_by("-created_at")
 
 class ReservationHostListView(generics.ListAPIView):
     serializer_class = ReservationSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_url_kwarg = 'id'
+    pagination_class = PropertyPagination
 
     def get_queryset(self):
         queryset = Reservation.objects.filter(property__user=self.request.user)

@@ -5,10 +5,16 @@ from autoslug import AutoSlugField
 from django_countries.fields import CountryField
 from decimal import Decimal
 from datetime import datetime
+import string
+import random
 
 from apps.common.models import TimeStampedUUIDModel
 
 User = get_user_model()
+
+def generate_confirmation_code(length=8):
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=length))
 
 class PropertyStatus(models.TextChoices):
     ACTIVE = "ACTIVE", "Active"
@@ -20,6 +26,7 @@ class ReservationStatus(models.TextChoices):
     PENDING = "PENDING", "Pending"
     APPROVED = "APPROVED", "Approved"
     DECLINED = "DECLINED", "Declined"
+    EXPIRED = "EXPIRED", "Expired"
     ONGOING = "ONGOING", "Ongoing"
     COMPLETED = "COMPLETED", "Completed"
     CANCELLED = "CANCELLED", "Cancelled"
@@ -46,6 +53,11 @@ class Property(TimeStampedUUIDModel):
     reservations_count = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to='uploads/properties', default='/uploads/properties/default_property.png')
 
+    # I want to sleep...zzz
+    is_instant_booking = models.BooleanField(default=False)
+    checkin_time = models.TimeField(default="15:00")
+    checkout_time = models.TimeField(default="11:00")
+
     weekly_discount_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.10'))
     monthly_discount_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.20'))
     cleaning_fee = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('0.00'))
@@ -63,6 +75,8 @@ class Reservation(TimeStampedUUIDModel):
     property = models.ForeignKey(Property, related_name='reservations', on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
+    checkin_time = models.TimeField(default="15:00")
+    checkout_time = models.TimeField(default="11:00")
     number_of_nights = models.IntegerField()
     guests = models.PositiveIntegerField()
     status = models.CharField(
@@ -70,6 +84,7 @@ class Reservation(TimeStampedUUIDModel):
         choices=ReservationStatus.choices,
         default=ReservationStatus.PENDING
     )
+    is_instant_booking = models.BooleanField(default=False)
     
     price_per_night = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'))
     long_stay_discount = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.00'))
@@ -80,6 +95,24 @@ class Reservation(TimeStampedUUIDModel):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
 
     host_pay = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    
+    confirmation_code = models.CharField(
+        max_length=16,
+        unique=True,
+        blank=True,
+        editable=False
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.confirmation_code:
+            code = generate_confirmation_code()
+
+            while Reservation.objects.filter(confirmation_code=code).exists():
+                code = generate_confirmation_code()
+
+            self.confirmation_code = code
+
+        super().save(*args, **kwargs)
 
 class PropertyView(TimeStampedUUIDModel):
     property = models.ForeignKey(Property, related_name="views", on_delete=models.CASCADE)
