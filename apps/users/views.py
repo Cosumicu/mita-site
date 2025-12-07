@@ -25,14 +25,14 @@ class LoginView(APIView):
             response.set_cookie(key="access_token", 
                                 value=access_token,
                                 httponly=True,
-                                secure=True,
+                                secure=False,
                                 samesite="Strict",
                                 max_age=timedelta(minutes=1))
             
             response.set_cookie(key="refresh_token",
                                 value=str(refresh),
                                 httponly=True,
-                                secure=True,
+                                secure=False,
                                 samesite="Strict",
                                 max_age=timedelta(days=1))
             return response
@@ -72,10 +72,13 @@ class CookieTokenRefreshView(TokenRefreshView):
             response.set_cookie(key="access_token", 
                                 value=access_token,
                                 httponly=True,
-                                secure=True,
+                                secure=False,
                                 samesite="Strict",
                                 max_age=timedelta(minutes=1))
             return response
         
         except InvalidToken:
             return Response({"error":"Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+# Secure=True, https, set t False if http
