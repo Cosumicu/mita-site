@@ -10,10 +10,10 @@ from datetime import datetime
 import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Property, Reservation, PropertyView, PropertyLike, ReservationStatus
+from .models import Property, Reservation, PropertyView, PropertyLike, ReservationStatus, PropertyTag
 from .pagination import PropertyPagination
 from apps.chat.models import Conversation
-from .serializers import PropertyListSerializer, PropertyDetailSerializer, PropertyCreateSerializer, ReservationSerializer
+from .serializers import PropertyListSerializer, PropertyDetailSerializer, PropertyCreateSerializer, ReservationSerializer, PropertyTagSerializer
 
 class PropertyFilter(django_filters.FilterSet):
     user = django_filters.UUIDFilter(field_name='user__id')
@@ -316,3 +316,8 @@ class ToggleFavoriteView(APIView):
             {"is_liked": liked},
             status=status.HTTP_200_OK,
         )
+
+class PropertyTagListView(generics.ListAPIView):
+    queryset = PropertyTag.objects.all()
+    serializer_class = PropertyTagSerializer
+    permission_classes = [permissions.AllowAny]

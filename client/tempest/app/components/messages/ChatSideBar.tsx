@@ -4,7 +4,7 @@ import { useAppSelector, useAppDispatch } from "@/app/lib/hooks";
 import { getConversationList } from "@/app/lib/features/messages/messageSlice";
 import { useEffect } from "react";
 import { Avatar } from "antd";
-import { formatTime } from "@/app/lib/utils/format";
+import { formatTimeV2 } from "@/app/lib/utils/format";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Props = {
@@ -29,7 +29,7 @@ export default function ChatSidebar({
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 bg-white shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-800">Chats</h2>
+        <p className="text-lg sm:text-xl">Inbox</p>
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -69,7 +69,7 @@ export default function ChatSidebar({
                     <div className="ml-auto">
                       <p className="text-sm text-gray-500">
                         {conv.last_message?.created_at &&
-                          formatTime(conv.last_message.created_at)}
+                          formatTimeV2(conv.last_message.created_at)}
                       </p>
                     </div>
                   </div>

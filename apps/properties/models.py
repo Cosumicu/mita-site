@@ -31,6 +31,10 @@ class ReservationStatus(models.TextChoices):
     COMPLETED = "COMPLETED", "Completed"
     CANCELLED = "CANCELLED", "Cancelled"
 
+class PropertyTag(TimeStampedUUIDModel):
+    name = models.CharField(max_length=50, unique=True)
+    description = models.CharField(max_length=255, null=True, blank=True)
+
 class Property(TimeStampedUUIDModel):
     user = models.ForeignKey(User, related_name='properties', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
@@ -48,6 +52,7 @@ class Property(TimeStampedUUIDModel):
         choices=PropertyStatus.choices,
         default=PropertyStatus.ACTIVE
     )
+    tags = models.ManyToManyField(PropertyTag, related_name="properties", blank=True)
     views_count = models.PositiveIntegerField(default=0)
     likes_count = models.PositiveIntegerField(default=0)
     reservations_count = models.PositiveIntegerField(default=0)

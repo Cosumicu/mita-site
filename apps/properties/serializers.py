@@ -1,8 +1,16 @@
 from rest_framework import serializers
 
-from .models import Property, Reservation, PropertyLike
+from .models import Property, Reservation, PropertyLike, PropertyTag
 
 from apps.profiles.serializers import ProfileSerializer
+
+class PropertyTagSerializer(serializers.ModelSerializer):
+    value = serializers.IntegerField(source="pkid")
+    label = serializers.CharField(source="name")
+
+    class Meta:
+        model = PropertyTag
+        fields = ["value", "label", "description"]
 
 class PropertyListSerializer(serializers.ModelSerializer):
     liked = serializers.SerializerMethodField()
@@ -40,7 +48,14 @@ class PropertyListSerializer(serializers.ModelSerializer):
 class PropertyDetailSerializer(serializers.ModelSerializer):
     user = ProfileSerializer(source="user.profile")
     liked = serializers.SerializerMethodField()
-    
+    tag_ids = serializers.PrimaryKeyRelatedField(
+        many=True,
+        write_only=True,
+        queryset=PropertyTag.objects.all(),
+        source="tags"
+    )
+    tags = PropertyTagSerializer(many=True, read_only=True)
+
     class Meta:
         model = Property
         fields = [
@@ -60,6 +75,8 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             'is_instant_booking',
             'image_url',
             'status',
+            'tag_ids',
+            'tags',
             'liked',
             'views_count',
             'likes_count',

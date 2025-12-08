@@ -30,3 +30,20 @@ export function formatTime(timeString: string): string {
     return `${hour}:${minute.toString().padStart(2, "0")}${ampm}`;
   }
 }
+
+export function formatTimeV2(isoString: string) {
+  if (!isoString) return "";
+
+  const date = new Date(isoString);
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours === 0 ? 12 : hours; // convert 0 to 12 for 12 AM/PM
+
+  const minutesStr = minutes.toString().padStart(2, "0");
+
+  return `${hours}:${minutesStr} ${ampm}`;
+}

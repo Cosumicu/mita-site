@@ -5,11 +5,11 @@ import { useAppSelector, useAppDispatch } from "@/app/lib/hooks";
 import {
   getConversationList,
   getConversationMessages,
-  resetMessageList,
 } from "@/app/lib/features/messages/messageSlice";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Avatar, Button } from "antd";
 import ChatReservationDetailsDrawer from "./ChatReservationDetailsDrawer";
+import { formatTimeV2 } from "@/app/lib/utils/format";
 
 type Props = {
   conversation: any | null;
@@ -184,13 +184,18 @@ export default function ChatWindow({ conversation, onBack }: Props) {
                   <Avatar size="large" src={msg.sender.profile_picture_url} />
                 )}
                 <div
-                  className={`px-4 py-2 rounded-2xl max-w-xs shadow-sm text-sm ${
+                  className={`px-4 py-2 rounded-2xl max-w-xs shadow-sm text-sm break-words ${
                     isMe
                       ? "bg-primary text-white rounded-tr-none"
                       : "bg-gray-200 text-gray-900 rounded-tl-none"
                   }`}
                 >
-                  {msg.text}
+                  <div className="flex flex-col">
+                    <span>{msg.text}</span>
+                    <span className="text-[10px] text-white mt-1 self-end">
+                      {formatTimeV2(msg.created_at)}
+                    </span>
+                  </div>
                 </div>
                 <div className="mb-auto">
                   {isMe && (
