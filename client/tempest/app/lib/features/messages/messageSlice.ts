@@ -110,35 +110,9 @@ export const messageSlice = createSlice({
         (state, action: PayloadAction<Conversation[]>) => {
           state.conversationList.loading = false;
           state.conversationList.success = true;
-
-          const updatedData = [...state.conversationList.data];
-
-          action.payload.forEach((conv) => {
-            const index = updatedData.findIndex((c) => c.id === conv.id);
-
-            if (index !== -1) {
-              // Update last_message immutably
-              updatedData[index] = {
-                ...updatedData[index],
-                last_message: conv.last_message,
-              };
-            } else {
-              // New conversation: add to array
-              updatedData.push(conv);
-            }
-          });
-
-          // Sort by last_message.created_at descending
-          updatedData.sort(
-            (a, b) =>
-              new Date(b.last_message?.created_at || 0).getTime() -
-              new Date(a.last_message?.created_at || 0).getTime()
-          );
-
-          state.conversationList.data = updatedData;
+          state.conversationList.data = action.payload;
         }
       )
-
       .addCase(getConversationList.rejected, (state, action) => {
         state.conversationList.loading = false;
         state.conversationList.error = true;
