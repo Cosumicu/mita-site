@@ -245,7 +245,7 @@ you would use depends on the service itsself.
 """
 
 SITE_NAME = "Mita Site"
-DOMAIN="152.42.195.164:3000"
+DOMAIN="localhost:3000"
 
 EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
 EMAIL_USE_TLS = True
