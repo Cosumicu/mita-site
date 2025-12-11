@@ -213,21 +213,15 @@ DJOSER = {
 # ==============================#
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8000',
-    'http://localhost:8080',
-    'http://localhost:3000',
+    'http://152.42.195.164:8080',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',
-    'http://localhost:8080',
-    'http://localhost:3000',
+    'http://152.42.195.164:8080',
 ]
 
 CORS_ORIGINS_WHITELIST = [
-    'http://localhost:8000',
-    'http://localhost:8080',
-    'http://localhost:3000',
+    'http://152.42.195.164:8080',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
