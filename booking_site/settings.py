@@ -168,7 +168,7 @@ TIME_ZONE = "Asia/Manila"
 
 SITE_ID = 1
 
-WEBSITE_URL = 'http://localhost:8080'
+WEBSITE_URL = 'http://152.42.195.164:8080'
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
@@ -245,7 +245,7 @@ you would use depends on the service itsself.
 """
 
 SITE_NAME = "Mita Site"
-DOMAIN="localhost:3000"
+DOMAIN="152.42.195.164:3000"
 
 EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
 EMAIL_USE_TLS = True
