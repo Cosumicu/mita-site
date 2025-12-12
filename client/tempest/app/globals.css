@@ -30,6 +30,7 @@ body {
   color: var(--foreground);
   /* font-family: Arial, Helvetica, sans-serif; */
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  margin-top: 7rem;
 }
 
 .ant-modal {
@@ -93,4 +94,8 @@ body {
     scrollbar-width: thin;
     scrollbar-color: #6d7c77 #cfd7c7;
   }
+}
+
+.ant-picker-panels {
+  flex-direction: column !important;
 }
