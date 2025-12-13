@@ -95,7 +95,3 @@ body {
     scrollbar-color: #6d7c77 #cfd7c7;
   }
 }
-
-.ant-picker-panels {
-  flex-direction: column !important;
-}

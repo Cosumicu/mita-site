@@ -7,6 +7,7 @@ import {
   Paginated,
   PropertyFilterParams,
   PaginationParams,
+  PropertyTag,
 } from "../../definitions";
 
 type AsyncState<T> = {
@@ -33,6 +34,7 @@ type PropertyState = {
   // GET
   propertyDetail: AsyncState<Property | null>;
   reservationPropertyList: AsyncState<Reservation[]>;
+  propertyTagList: AsyncState<PropertyTag[]>;
 
   // PAGINATED LIST
   propertyList: PaginatedAsyncState<Property>;
@@ -90,6 +92,7 @@ const initialState: PropertyState = {
   reservationRequestsList: initialPaginatedAsyncState(),
   hostReservationList: initialPaginatedAsyncState(),
   hostReservationPropertyList: initialPaginatedAsyncState(),
+  propertyTagList: initialAsyncState([]),
 
   createProperty: initialAsyncState(null),
   createReservation: initialAsyncState(null),
@@ -307,10 +310,25 @@ export const getReservationPropertyList = createAsyncThunk<
   { rejectValue: string }
 >("property/getReservationPropertyList", async (propertyId, thunkAPI) => {
   try {
-    console.log("workingasdasdasd");
     const response = await propertyService.getReservationPropertyList(
       propertyId
     );
+    return response;
+  } catch (err) {
+    const error = err as AxiosError<{ message?: string }>;
+    return thunkAPI.rejectWithValue(
+      error.response?.data?.message || error.message
+    );
+  }
+});
+
+export const getPropertyTags = createAsyncThunk<
+  PropertyTag[],
+  void,
+  { rejectValue: string }
+>("property/getPropertyTags", async (_, thunkAPI) => {
+  try {
+    const response = await propertyService.getPropertyTags();
     return response;
   } catch (err) {
     const error = err as AxiosError<{ message?: string }>;
@@ -492,6 +510,9 @@ export const propertySlice = createSlice({
     resetReservationRequestActions: (state) => {
       state.approveReservation = initialAsyncState(null);
       state.declineReservation = initialAsyncState(null);
+    },
+    resetPropertyTagList: (state) => {
+      state.propertyTagList = initialAsyncState([]);
     },
   },
   extraReducers: (builder) => {
@@ -821,6 +842,23 @@ export const propertySlice = createSlice({
         state.likedList.error = true;
         state.likedList.message = action.payload as string;
       })
+      // GET PROPERTY TAGS
+      .addCase(getPropertyTags.pending, (state) => {
+        state.propertyTagList.loading = true;
+      })
+      .addCase(
+        getPropertyTags.fulfilled,
+        (state, action: PayloadAction<PropertyTag[]>) => {
+          state.propertyTagList.loading = false;
+          state.propertyTagList.success = true;
+          state.propertyTagList.data = action.payload;
+        }
+      )
+      .addCase(getPropertyTags.rejected, (state, action) => {
+        state.propertyTagList.loading = false;
+        state.propertyTagList.error = true;
+        state.propertyTagList.message = action.payload as string;
+      })
       // TOGGLE LIKE
       .addCase(toggleFavorite.fulfilled, (state, action) => {
         const { propertyId } = action.payload;
@@ -860,6 +898,7 @@ export const {
   resetReservationRequestList,
   resetCreateProperty,
   resetCreateReservation,
+  resetPropertyTagList,
   resetReservationRequestActions,
 } = propertySlice.actions;
 

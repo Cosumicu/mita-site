@@ -50,6 +50,7 @@ export interface Property {
   price_per_night: number;
   checkin_time: string;
   checkout_time: string;
+  tags: string[];
   is_instant_booking: boolean;
   bedrooms: number;
   beds: number;
@@ -129,4 +130,10 @@ export interface PropertyFilterParams {
 export interface PaginationParams {
   page?: number;
   page_size?: number;
+}
+
+export interface PropertyTag {
+  value: number;
+  label: string;
+  description: string;
 }

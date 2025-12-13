@@ -108,9 +108,11 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
             'location',
             'category',
             'image',
-            # 'weekly_discount_rate',
-            # 'monthly_discount_rate',
-            # 'cleaning_fee',
+            'tags',
+            'is_instant_booking',
+            'weekly_discount_rate',
+            'monthly_discount_rate',
+            'cleaning_fee',
         ]
     # Use field 'image' for creating instance of property
         

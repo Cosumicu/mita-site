@@ -2,7 +2,7 @@ import React from "react";
 
 function LeftImage() {
   return (
-    <div className="hidden sm:inline-block">
+    <div className="">
       <a href="/">
         <div className="text-2xl whitespace-nowrap">
           <span className="text-2xl">

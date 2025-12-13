@@ -5,6 +5,7 @@ import {
   Paginated,
   PropertyFilterParams,
   PaginationParams,
+  PropertyTag,
 } from "../../definitions";
 
 const PROPERTY_BASE_URL = `${process.env.NEXT_PUBLIC_API_HOST}/properties`;
@@ -154,6 +155,11 @@ const createReservation = async (formData: Reservation) => {
   return response.data;
 };
 
+const getPropertyTags = async () => {
+  const response = await api.get<PropertyTag[]>(`${PROPERTY_BASE_URL}/tags`);
+  return response.data;
+};
+
 const getUserLikesList = async () => {
   const response = await api.get<Property[]>(`${PROPERTY_BASE_URL}/likes`);
   return response.data;
@@ -184,6 +190,7 @@ const propertyService = {
   getReservationRequestsList,
   approveReservation,
   declineReservation,
+  getPropertyTags,
   getUserLikesList,
   toggleFavorite,
 };

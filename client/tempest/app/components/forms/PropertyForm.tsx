@@ -8,7 +8,11 @@ import {
   Upload,
   Steps,
   theme,
+  Select,
+  Divider,
+  Switch,
 } from "antd";
+import type { SelectProps } from "antd";
 import { useAppSelector, useAppDispatch } from "@/app/lib/hooks";
 import {
   createProperty,
@@ -17,11 +21,11 @@ import {
   resetPropertyList,
   updateProperty,
   resetUpdateProperty,
+  getPropertyTags,
 } from "@/app/lib/features/properties/propertySlice";
 import { toast } from "react-toastify";
-import { div } from "framer-motion/client";
-import Navbar from "../navbar/Navbar";
 import LeftImage from "../navbar/LeftImage";
+import { useRouter } from "next/navigation";
 
 const { TextArea } = Input;
 
@@ -31,7 +35,12 @@ type PropertyFormProps = {
   onSuccess?: () => void;
 };
 
+const options: SelectProps["options"] = [];
+
 const steps = [
+  {
+    title: "",
+  },
   {
     title: "",
   },
@@ -58,7 +67,23 @@ function PropertyForm({ mode, initialValues, onSuccess }: PropertyFormProps) {
       ? state.property.createProperty
       : state.property.updateProperty
   );
+  const {
+    data: propertyTagList,
+    error: propertyTagListError,
+    loading: propertyTagListLoading,
+    success: propertyTagListSuccess,
+  } = useAppSelector((state) => state.property.propertyTagList);
   const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  useEffect(() => {
+    dispatch(getPropertyTags());
+  }, [dispatch]);
+
+  const options: SelectProps["options"] = propertyTagList.map((ptag) => ({
+    value: ptag.value,
+    label: ptag.label,
+  }));
 
   const next = async () => {
     try {
@@ -75,9 +100,12 @@ function PropertyForm({ mode, initialValues, onSuccess }: PropertyFormProps) {
           fieldsToValidate = ["price_per_night"];
           break;
         case 3:
-          fieldsToValidate = ["location"];
+          fieldsToValidate = [];
           break;
         case 4:
+          fieldsToValidate = ["location"];
+          break;
+        case 5:
           fieldsToValidate = ["image"];
           break;
         default:
@@ -142,6 +170,10 @@ function PropertyForm({ mode, initialValues, onSuccess }: PropertyFormProps) {
   const onFinish = (values: any) => {
     const formData = new FormData();
 
+    // convert weekly/monthly discounts to rates
+    const weeklyRate = values.weekly_discount_rate / 100;
+    const monthlyRate = values.monthly_discount_rate / 100;
+
     formData.append("category", values.category);
     formData.append("title", values.title);
     formData.append("description", values.description);
@@ -150,6 +182,14 @@ function PropertyForm({ mode, initialValues, onSuccess }: PropertyFormProps) {
     formData.append("bathrooms", values.bathrooms);
     formData.append("guests", values.guests);
     formData.append("price_per_night", values.price_per_night);
+    values.tags?.forEach((tagValue: string) =>
+      formData.append("tags", tagValue)
+    );
+    // formdata doesnt accept numbers
+    formData.append("weekly_discount_rate", weeklyRate.toString());
+    formData.append("monthly_discount_rate", monthlyRate.toString());
+    formData.append("cleaning_fee", values.cleaning_fee);
+    formData.append("is_instant_booking", values.is_instant_booking);
     formData.append("location", values.location);
     formData.append("image", values.image?.[0]?.originFileObj); // do this if using antd upload
 
@@ -173,9 +213,14 @@ function PropertyForm({ mode, initialValues, onSuccess }: PropertyFormProps) {
 
   return (
     <>
-      <nav className="w-full h-25 fixed top-0 left-0 z-10 bg-secondary">
-        <div className="flex gap-2 justify-between mx-2 sm:mx-4 md:mx-6 lg:mx-8 items-center h-full">
+      <nav className="w-full h-16 fixed top-0 left-0 z-10 bg-secondary">
+        <div className="flex justify-between items-center gap-2 mx-2 sm:mx-4 md:mx-6 lg:mx-8 h-full">
+          {/* Left content */}
           <LeftImage />
+          <div className="flex gap-4 px-4">
+            <button>Help</button>{" "}
+            <button onClick={() => router.push("/")}>Exit</button>
+          </div>
         </div>
       </nav>
       <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -326,10 +371,109 @@ function PropertyForm({ mode, initialValues, onSuccess }: PropertyFormProps) {
                     </Form.Item>
                   </div>
                 </div>
+                <Divider />
+                <Form.Item
+                  name="tags"
+                  label="Amenities"
+                  rules={[{ required: false }]}
+                >
+                  <Select
+                    mode="multiple"
+                    allowClear
+                    style={{ width: "100%" }}
+                    placeholder="Select property tags"
+                    options={options}
+                    loading={propertyTagListLoading}
+                  />
+                </Form.Item>
               </div>
             </div>
           </div>
+
           <div style={{ display: current === 3 ? "block" : "none" }}>
+            <p className="text-2xl font-bold">
+              Add discounts, miscellaneous fees, etc.
+            </p>
+            <div className="flex justify-center items-center">
+              <div className="w-[75%] py-10">
+                <div className="flex items-center">
+                  <label>Weekly Discount</label>
+                  <div className="ml-auto my-4">
+                    <Form.Item
+                      name="weekly_discount_rate"
+                      initialValue={0}
+                      required={false}
+                      noStyle
+                    >
+                      <InputNumber
+                        min={0}
+                        max={100}
+                        step={1}
+                        prefix="%"
+                        style={{ width: 100 }}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+
+                <div className="flex items-center">
+                  <label>Monthly Discount</label>
+                  <div className="ml-auto my-4">
+                    <Form.Item
+                      name="monthly_discount_rate"
+                      initialValue={0}
+                      required={false}
+                      noStyle
+                    >
+                      <InputNumber
+                        min={0}
+                        max={100}
+                        step={1}
+                        prefix="%"
+                        style={{ width: 100 }}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+
+                <div className="flex items-center">
+                  <label>Cleaning Fee</label>
+                  <div className="ml-auto my-4">
+                    <Form.Item
+                      name="cleaning_fee"
+                      initialValue={0}
+                      required={false}
+                      noStyle
+                    >
+                      <InputNumber
+                        min={0}
+                        step={1}
+                        prefix="₱"
+                        style={{ width: 150 }}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+
+                <div className="flex items-center">
+                  <label>Instant Booking</label>
+                  <div className="ml-auto my-4">
+                    <Form.Item
+                      name="is_instant_booking"
+                      valuePropName="checked"
+                      initialValue={false}
+                      required={false}
+                      noStyle
+                    >
+                      <Switch />
+                    </Form.Item>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: current === 4 ? "block" : "none" }}>
             <p className="text-2xl font-bold">Where's your place located?</p>
             <div className="flex justify-center items-center">
               <div className="flex flex-col w-[90%] py-10">
@@ -344,7 +488,7 @@ function PropertyForm({ mode, initialValues, onSuccess }: PropertyFormProps) {
               </div>
             </div>
           </div>
-          <div style={{ display: current === 4 ? "block" : "none" }}>
+          <div style={{ display: current === 5 ? "block" : "none" }}>
             <p className="text-2xl font-bold">Attach an image</p>
             <div className="flex justify-center items-center h-[250px]">
               <Form.Item
