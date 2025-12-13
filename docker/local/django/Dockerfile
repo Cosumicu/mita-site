@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
@@ -8,13 +8,18 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
      gettext \
+     build-essential \
+     python3-dev \
+     libblas-dev \
+     liblapack-dev \
+     gfortran \
   && rm -rf /var/lib/apt/lists/*
 
 COPY ./requirements.txt .
 
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# COPY . .
+COPY . .
 
 COPY ./docker/local/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint

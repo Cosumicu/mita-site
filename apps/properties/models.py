@@ -120,11 +120,24 @@ class Reservation(TimeStampedUUIDModel):
         super().save(*args, **kwargs)
 
 class PropertyView(TimeStampedUUIDModel):
-    property = models.ForeignKey(Property, related_name="views", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User,
+        related_name="views",
+        null=True, blank=True,
+        on_delete=models.SET_NULL
+    )
+    property = models.ForeignKey(
+        Property,
+        related_name="views",
+        on_delete=models.CASCADE
+    )
     ip_address = models.GenericIPAddressField()
 
     class Meta:
-        unique_together = ("property", "ip_address")
+        indexes = [
+            models.Index(fields=["user", "property"]),
+            models.Index(fields=["ip_address", "property"]),
+        ]
 
 class PropertyLike(TimeStampedUUIDModel):
     user = models.ForeignKey(User, related_name="likes", on_delete=models.CASCADE)

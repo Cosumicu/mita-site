@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'apps.ratings',
     'apps.inquiries',
     'apps.chat',
+    'apps.recommendations',
 ]
 
 MIDDLEWARE = [

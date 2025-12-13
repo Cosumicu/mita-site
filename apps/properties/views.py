@@ -1,12 +1,13 @@
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, F
 from rest_framework.response import Response
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.parsers import MultiPartParser, FormParser
 from decimal import Decimal
-from datetime import datetime
+from django.utils import timezone
+from datetime import datetime, timedelta
 import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -74,16 +75,38 @@ class PropertyDetailView(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         property = self.get_object()
         ip = self.get_client_ip(request)
+        user = request.user if request.user.is_authenticated else None
 
-        view, created = PropertyView.objects.get_or_create(
-            property=property, ip_address=ip
+        # 1 view per 15 minutes per user/IP
+        fifteen_minutes_ago = timezone.now() - timedelta(minutes=15)
+
+        already_viewed = PropertyView.objects.filter(
+            property=property,
+            ip_address=ip,
+            created_at__gte=fifteen_minutes_ago
         )
 
-        if created:
-            property.views_count = property.views.count()
-            property.save(update_fields=["views_count"])
+        if user:
+            already_viewed = already_viewed | PropertyView.objects.filter(
+                property=property,
+                user=user,
+                created_at__gte=fifteen_minutes_ago
+            )
 
-        serializer = self.get_serializer(property, context={"request": request})
+        if not already_viewed.exists():
+            # create view
+            PropertyView.objects.create(
+                property=property,
+                user=user,
+                ip_address=ip
+            )
+
+            # increment view count
+            Property.objects.filter(id=property.id).update(
+                views_count=F("views_count") + 1
+            )
+
+        serializer = self.get_serializer(property)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_client_ip(self, request):

@@ -18,6 +18,10 @@ app.conf.beat_scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
 app.conf.beat_schedule = {
     "complete-reservations-daily": {
         "task": "apps.properties.tasks.update_reservations_status_task",
-        "schedule": crontab(minute="*"),
+        "schedule": crontab(minute=0),
+    },
+    "retrain-cf-model-nightly": {
+        "task": "apps.recommendations.tasks.retrain_cf_model",
+        "schedule": crontab(hour=3, minute=0),  # run every day at 2:00 AM
     },
 }

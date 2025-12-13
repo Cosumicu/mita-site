@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Property, Reservation, PropertyTag
+from .models import Property, Reservation, PropertyTag, PropertyLike, PropertyView
 
 class PropertyAdmin(admin.ModelAdmin):
     list_display = ["id", "title", "location", "category", "price_per_night"]
@@ -13,3 +13,5 @@ class PropertyTagAdmin(admin.ModelAdmin):
 admin.site.register(Property, PropertyAdmin)
 admin.site.register(Reservation)
 admin.site.register(PropertyTag, PropertyTagAdmin)
+admin.site.register(PropertyLike)
+admin.site.register(PropertyView)
