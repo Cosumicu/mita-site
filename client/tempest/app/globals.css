@@ -95,3 +95,10 @@ body {
     scrollbar-color: #6d7c77 #cfd7c7;
   }
 }
+
+/* fix antd date picker on mobile view/small screens */
+@media (max-width: 640px) {
+  .ant-picker-panels {
+    flex-direction: column !important;
+  }
+}

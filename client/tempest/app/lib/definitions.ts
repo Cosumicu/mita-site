@@ -50,7 +50,7 @@ export interface Property {
   price_per_night: number;
   checkin_time: string;
   checkout_time: string;
-  tags: string[];
+  tags: PropertyTag[];
   is_instant_booking: boolean;
   bedrooms: number;
   beds: number;

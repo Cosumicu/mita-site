@@ -127,18 +127,24 @@ function PropertyForm({ mode, initialValues, onSuccess }: PropertyFormProps) {
   const items = steps.map((item) => ({ key: item.title, title: item.title }));
 
   // SLIDER CODE END
-
   useEffect(() => {
     if (mode === "edit" && initialValues) {
       form.setFieldsValue({
         ...initialValues,
+
+        weekly_discount_rate: initialValues.weekly_discount_rate
+          ? initialValues.weekly_discount_rate * 100
+          : 0,
+        monthly_discount_rate: initialValues.monthly_discount_rate
+          ? initialValues.monthly_discount_rate * 100
+          : 0,
         image: initialValues.image
           ? [
               {
                 uid: "-1",
                 name: "current-image.jpg",
                 status: "done",
-                url: initialValues.image, // <-- IMPORTANT
+                url: initialValues.image,
               },
             ]
           : [],

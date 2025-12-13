@@ -51,8 +51,8 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <div className="max-w-[1100px] mx-auto">
-      <div className="flex items-center">
-        <p className="text-2xl my-4 px-2">{property.title}</p>
+      <div className="flex items-center px-6">
+        <p className="text-2xl font-semibold my-6">{property.title}</p>
         {property.user.id === user?.id && (
           <div className="flex gap-1 ml-auto px-2">
             <Button
@@ -77,7 +77,6 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
         )}
       </div>
 
-      {/* Image section */}
       <div className="w-full h-[250px] sm:h-[450px] rounded-xl flex justify-center items-center">
         <img
           src={property.image_url}
@@ -86,16 +85,14 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
         />
       </div>
 
-      {/* Details + Reservation */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-start gap-8 mt-6">
-        {/* Left column (details) */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-start gap-8 mt-6 px-6">
         <div className="w-full sm:flex-1 py-4">
           <div className="text-center sm:text-left">
-            <p className="text-lg">{`${property.category} in ${property.location}`}</p>
+            <p className="text-xl font-semibold">{`${property.category} in ${property.location}`}</p>
           </div>
 
           <div className="flex sm:block justify-center text-center">
-            <ol className="flex space-x-2 text-gray-700 text-sm">
+            <ol className="flex space-x-2 text-gray-700 text-sm md:text-base">
               <li>
                 {property.guests} {property.guests === 1 ? "guest" : "guests"} •
               </li>
@@ -114,19 +111,39 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           </div>
 
           <div className="w-full text-center border border-gray-200 rounded-lg my-4 py-4">
-            reviews
+            Reviews
           </div>
 
           <div className="flex items-center justify-center sm:justify-start w-full py-4">
             <Link href={`/users/profile/${property.user.id}`}>
-              <Avatar size="large" src={property.user.profile_picture_url} />
+              <Avatar size={48} src={property.user.profile_picture_url} />
             </Link>
             <div className="ml-2">
               <p>{`Hosted by ${property.user.username}`}</p>
             </div>
           </div>
 
-          <div className="py-4 px-6 sm:px-0">{property.description}</div>
+          <div className="py-4 sm:px-0">{property.description}</div>
+
+          <div className="py-4">
+            <p className="font-semibold mb-2 text-xl">Amenities</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {property.tags?.length > 0 ? (
+                property.tags.map((tag) => (
+                  <div
+                    key={tag.value}
+                    className="flex items-center gap-2 text-gray-700"
+                  >
+                    <span>{tag.label}</span>
+                  </div>
+                ))
+              ) : (
+                <span className="text-gray-500 text-sm">
+                  No amenities listed
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Right column (reservation form) */}
@@ -134,7 +151,7 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           <CreateReservationForm property={property} />
         </div>
       </div>
-      <Modal
+      {/* <Modal
         title={
           <div style={{ textAlign: "center", width: "100%" }}>
             Update Listing
@@ -153,7 +170,7 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           property={property}
           onSuccess={() => setIsUpdatePropertyModalOpen(false)}
         />
-      </Modal>
+      </Modal> */}
 
       <Modal
         title={
