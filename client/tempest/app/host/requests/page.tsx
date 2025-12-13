@@ -8,7 +8,7 @@ import {
   declineReservation,
   resetReservationRequestActions,
 } from "@/app/lib/features/properties/propertySlice";
-import { List, Button, Spin, Empty, Divider, Avatar } from "antd";
+import { List, Button, Spin, Empty, Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { formatCurrency } from "@/app/lib/utils/format";
@@ -63,7 +63,7 @@ export default function ReservationRequestListPage() {
   if (!reservations || reservations.length === 0) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <Empty description="No reservation requests" />
+        <p className="text-gray-400">No reservation requests</p>
       </div>
     );
   }
@@ -77,9 +77,7 @@ export default function ReservationRequestListPage() {
 
   return (
     <div className="px-4 sm:px-10">
-      <h2 className="font-bold my-4 text-lg sm:text-xl">
-        Reservation Requests
-      </h2>
+      <p className="my-4 font-semibold sm:text-xl">Reservation Requests</p>
 
       <List
         itemLayout="vertical"

@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import { formatCurrency, formatDate } from "@/app/lib/utils/format";
 import { getHostReservationList } from "@/app/lib/features/properties/propertySlice";
-import { Table, Spin, Image, Tag, Button } from "antd";
+import { Table, Spin, Image, Tag, Button, Drawer } from "antd";
 import { useRouter } from "next/navigation";
+import ReservationDetailsDrawer from "@/app/components/drawer/ReservationDetailsDrawer";
 
 export default function ReservationListPage() {
   const dispatch = useAppDispatch();
@@ -19,6 +20,9 @@ export default function ReservationListPage() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [isReservationDetailsDrawerOpen, setIsReservationDetailsDrawerOpen] =
+    useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<any>(null);
 
   useEffect(() => {
     dispatch(
@@ -116,7 +120,8 @@ export default function ReservationListPage() {
             size="small"
             type="primary"
             onClick={() => {
-              // setIsDeletePropertyModalOpen(true);
+              setSelectedReservation(record); // store the clicked reservation
+              setIsReservationDetailsDrawerOpen(true); // open drawer
             }}
           >
             <p className="text-xs">Details</p>
@@ -161,18 +166,34 @@ export default function ReservationListPage() {
 
   return (
     <div className="px-4 sm:px-10">
-      <p className="my-4 text-lg sm:text-xl">Host Reservations</p>
+      <p className="my-4 font-semibold sm:text-xl">Host Reservations</p>
 
-      <Table
-        columns={columns}
-        dataSource={tableData}
-        pagination={{
-          current: currentPage,
-          pageSize,
-          total: count,
-        }}
-        onChange={handleTableChange}
-      />
+      <div className="overflow-x-auto">
+        {" "}
+        <Table
+          columns={columns}
+          dataSource={tableData}
+          pagination={{
+            current: currentPage,
+            pageSize,
+            total: count,
+          }}
+          onChange={handleTableChange}
+        />
+      </div>
+      <Drawer
+        title="Reservation Details"
+        placement="right"
+        width={500}
+        onClose={() => setIsReservationDetailsDrawerOpen(false)}
+        open={isReservationDetailsDrawerOpen}
+      >
+        {selectedReservation ? (
+          <ReservationDetailsDrawer reservation={selectedReservation} />
+        ) : (
+          <Spin />
+        )}
+      </Drawer>
     </div>
   );
 }

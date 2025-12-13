@@ -182,19 +182,20 @@ export default function MyPropertiesPage() {
 
   return (
     <div className="px-4 sm:px-10">
-      <p className="my-4 text-lg sm:text-xl">Listings</p>
-
-      <Table
-        columns={columns}
-        dataSource={tableData}
-        loading={userPropertyListLoading}
-        pagination={{
-          current: currentPage,
-          pageSize,
-          total: count,
-        }}
-        onChange={handleTableChange}
-      />
+      <p className="my-4 font-semibold sm:text-xl">Listings</p>
+      <div className="overflow-x-auto">
+        <Table
+          columns={columns}
+          dataSource={tableData}
+          loading={userPropertyListLoading}
+          pagination={{
+            current: currentPage,
+            pageSize,
+            total: count,
+          }}
+          onChange={handleTableChange}
+        />
+      </div>
     </div>
   );
 }
