@@ -62,12 +62,15 @@ export interface Property {
   image_url: string;
   liked: boolean;
   image: string;
-  views: number;
+  likes_count: number;
+  views_count: number;
+  reservations_count: number;
   status: string;
   weekly_discount_rate: number;
   monthly_discount_rate: number;
   cleaning_fee: number;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Reservation {

@@ -1,5 +1,4 @@
 import PropertyForm from "@/app/components/forms/PropertyForm";
-import { Property } from "@/app/lib/definitions";
 
 interface CreatePropertyModalProps {
   onSuccess?: () => void;

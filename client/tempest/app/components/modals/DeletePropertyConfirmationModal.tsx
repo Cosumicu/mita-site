@@ -34,7 +34,7 @@ const DeletePropertyConfirmationModal = ({
     <>
       <Space wrap style={{ justifyContent: "center", display: "flex" }}>
         <Button type="primary" onClick={onSuccess}>
-          Not Yet
+          Not yet
         </Button>
         <Button type="primary" danger onClick={handleDelete}>
           Delete

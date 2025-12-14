@@ -3,12 +3,10 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import { formatCurrency, formatDate } from "@/app/lib/utils/format";
-import {
-  getUserPropertyList,
-  toggleFavorite,
-} from "@/app/lib/features/properties/propertySlice";
-import { Table, Spin, Image, Tag, Switch, Button } from "antd";
+import { getUserPropertyList } from "@/app/lib/features/properties/propertySlice";
+import { Table, Spin, Image, Tag, Switch, Button, Drawer } from "antd";
 import { useRouter } from "next/navigation";
+import PropertyDetailsDrawer from "@/app/components/drawer/PropertyDetailsDrawer";
 
 export default function MyPropertiesPage() {
   const dispatch = useAppDispatch();
@@ -22,6 +20,9 @@ export default function MyPropertiesPage() {
 
   const { user } = useAppSelector((state) => state.user);
 
+  const [isPropertyDetailsDrawerOpen, setIsPropertyDetailsDrawerOpen] =
+    useState(false);
+  const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -50,20 +51,27 @@ export default function MyPropertiesPage() {
       dataIndex: "property",
       render: (_: any, record: any) => (
         <div
-          className="flex items-center gap-3 cursor-pointer"
-          onClick={() => router.push(`/properties/${record.id}`)}
+          className="flex items-center gap-3 cursor-pointer w-[300px]"
+          onClick={() => router.push(`/properties/${record.property.id}`)}
         >
-          <Image
-            src={record.image_url}
-            alt={record.title}
-            width={80}
-            height={60}
-            className="rounded-md object-cover"
-            preview={false}
-          />
           <div>
-            <p className="font-semibold">{record.title}</p>
-            <p className="text-gray-500 text-sm">{record.location}</p>
+            <Image
+              src={record.property.image_url}
+              alt={record.property.title}
+              width={80}
+              height={60}
+              className="rounded-md object-cover"
+              preview={false}
+            />
+          </div>
+          <div className="min-w-0">
+            {" "}
+            <p className="font-semibold truncate">
+              {record.property.title}
+            </p>{" "}
+            <p className="text-gray-500 text-sm truncate">
+              {record.property.location}
+            </p>
           </div>
         </div>
       ),
@@ -137,7 +145,8 @@ export default function MyPropertiesPage() {
             size="small"
             type="primary"
             onClick={() => {
-              // setIsDeletePropertyModalOpen(true);
+              setSelectedProperty(record);
+              setIsPropertyDetailsDrawerOpen(true);
             }}
           >
             <p className="text-xs">Details</p>
@@ -196,6 +205,19 @@ export default function MyPropertiesPage() {
           onChange={handleTableChange}
         />
       </div>
+      <Drawer
+        title="Listing Details"
+        placement="right"
+        width={500}
+        onClose={() => setIsPropertyDetailsDrawerOpen(false)}
+        open={isPropertyDetailsDrawerOpen}
+      >
+        {selectedProperty ? (
+          <PropertyDetailsDrawer propertyId={selectedProperty.id} />
+        ) : (
+          <Spin />
+        )}
+      </Drawer>
     </div>
   );
 }

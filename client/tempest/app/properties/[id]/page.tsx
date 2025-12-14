@@ -3,15 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
-import {
-  deleteProperty,
-  getPropertyDetail,
-} from "@/app/lib/features/properties/propertySlice";
+import { getPropertyDetail } from "@/app/lib/features/properties/propertySlice";
 import { Avatar, Button, Modal } from "antd";
 import CreateReservationForm from "@/app/components/forms/CreateReservationForm";
-import UpdatePropertyModal from "@/app/components/modals/UpdatePropertyModal";
 import Link from "next/link";
-import { handleClientScriptLoad } from "next/script";
 import DeletePropertyConfirmationModal from "@/app/components/modals/DeletePropertyConfirmationModal";
 
 function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -50,95 +45,125 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   }
 
   return (
-    <div className="max-w-[1100px] mx-auto">
-      <div className="flex items-center px-6">
-        <p className="text-2xl font-semibold my-6">{property.title}</p>
+    <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
+      {/* Header with title and action buttons */}
+      <div className="flex items-center my-6">
+        <div className="flex-1 min-w-0">
+          <p className="text-2xl font-semibold break-words overflow-wrap-break-word">
+            {property.title}
+          </p>
+        </div>
         {property.user.id === user?.id && (
-          <div className="flex gap-1 ml-auto px-2">
+          <div className="flex gap-2">
             <Button
               color="primary"
               variant="outlined"
               size="small"
               onClick={() => router.push(`/host/update-listing/${property.id}`)}
             >
-              <p className="text-xs">Edit</p>
+              Edit
             </Button>
             <Button
               variant="outlined"
               size="small"
               danger
-              onClick={() => {
-                setIsDeletePropertyModalOpen(true);
-              }}
+              onClick={() => setIsDeletePropertyModalOpen(true)}
             >
-              <p className="text-xs">Delete</p>
+              Delete
             </Button>
           </div>
         )}
       </div>
 
-      <div className="w-full h-[250px] sm:h-[450px] rounded-xl flex justify-center items-center">
+      {/* Main image */}
+      <div className="w-full h-[250px] sm:h-[450px] rounded-xl overflow-hidden bg-gray-100 flex justify-center items-center mb-8">
         <img
           src={property.image_url}
           alt={property.title}
-          className="h-full w-auto object-contain rounded-xl"
+          className="h-full w-auto object-contain"
         />
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-start gap-8 mt-6 px-6">
-        <div className="w-full sm:flex-1 py-4">
-          <div className="text-center sm:text-left">
-            <p className="text-xl font-semibold">{`${property.category} in ${property.location}`}</p>
-          </div>
+      {/* Grid layout for main content and reservation form */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        {/* Main content column (2/3 width on large screens) */}
+        <div className="lg:col-span-2">
+          {/* Property type and location */}
+          <div className="mb-6">
+            <div className="max-w-full">
+              <h2 className="text-xl font-semibold break-words overflow-wrap-break-word">
+                {property.category} in {property.location}
+              </h2>
+            </div>
 
-          <div className="flex sm:block justify-center text-center">
-            <ol className="flex space-x-2 text-gray-700 text-sm md:text-base">
-              <li>
-                {property.guests} {property.guests === 1 ? "guest" : "guests"} •
-              </li>
-              <li>
-                {property.bedrooms}{" "}
-                {property.bedrooms === 1 ? "bedroom" : "bedrooms"} •
-              </li>
-              <li>
-                {property.beds} {property.beds === 1 ? "bed" : "beds"} •
-              </li>
-              <li>
-                {property.bathrooms}{" "}
-                {property.bathrooms === 1 ? "bathroom" : "bathrooms"}
-              </li>
-            </ol>
-          </div>
-
-          <div className="w-full text-center border border-gray-200 rounded-lg my-4 py-4">
-            Reviews
-          </div>
-
-          <div className="flex items-center justify-center sm:justify-start w-full py-4">
-            <Link href={`/users/profile/${property.user.id}`}>
-              <Avatar size={48} src={property.user.profile_picture_url} />
-            </Link>
-            <div className="ml-2">
-              <p>{`Hosted by ${property.user.username}`}</p>
+            {/* Property specs */}
+            <div className="mt-3">
+              <ol className="flex flex-wrap gap-2 text-gray-700 text-sm md:text-base">
+                <li>
+                  {property.guests} {property.guests === 1 ? "guest" : "guests"}
+                </li>
+                <li>•</li>
+                <li>
+                  {property.bedrooms}{" "}
+                  {property.bedrooms === 1 ? "bedroom" : "bedrooms"}
+                </li>
+                <li>•</li>
+                <li>
+                  {property.beds} {property.beds === 1 ? "bed" : "beds"}
+                </li>
+                <li>•</li>
+                <li>
+                  {property.bathrooms}{" "}
+                  {property.bathrooms === 1 ? "bathroom" : "bathrooms"}
+                </li>
+              </ol>
             </div>
           </div>
 
-          <div className="py-4 sm:px-0">{property.description}</div>
+          {/* Reviews placeholder */}
+          <div className="w-full border border-gray-200 rounded-lg mb-8 py-6 text-center text-gray-500">
+            Reviews Section
+          </div>
 
-          <div className="py-4">
-            <p className="font-semibold mb-2 text-xl">Amenities</p>
+          {/* Host info */}
+          <div className="flex items-center mb-8">
+            <Link
+              href={`/users/profile/${property.user.id}`}
+              className="flex items-center gap-3"
+            >
+              <Avatar size={56} src={property.user.profile_picture_url} />
+              <div>
+                <p className="font-medium">
+                  Hosted by {property.user.username}
+                </p>
+                <p className="text-sm text-gray-600">{property.user.email}</p>
+              </div>
+            </Link>
+          </div>
+
+          <div className="mb-8">
+            <h3 className="font-semibold text-xl mb-4">Description</h3>
+            <div className="whitespace-pre-line text-gray-700 leading-relaxed break-words overflow-wrap-break-word word-break-break-word">
+              {property.description}
+            </div>
+          </div>
+
+          {/* Amenities */}
+          <div>
+            <h3 className="font-semibold text-xl mb-4">Amenities & Features</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {property.tags?.length > 0 ? (
                 property.tags.map((tag) => (
                   <div
                     key={tag.value}
-                    className="flex items-center gap-2 text-gray-700"
+                    className="flex items-center gap-2 text-gray-700 py-2"
                   >
+                    <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
                     <span>{tag.label}</span>
                   </div>
                 ))
               ) : (
-                <span className="text-gray-500 text-sm">
+                <span className="text-gray-500 text-sm col-span-2">
                   No amenities listed
                 </span>
               )}
@@ -146,43 +171,31 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           </div>
         </div>
 
-        {/* Right column (reservation form) */}
-        <div className="w-full sm:w-[350px] p-6 rounded-2xl shadow-xl border border-gray-100 self-start">
-          <CreateReservationForm property={property} />
+        {/* Reservation form column (1/3 width on large screens) */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-30">
+            <div className="p-6 rounded-2xl shadow-xl border border-gray-100 bg-white">
+              <CreateReservationForm property={property} />
+            </div>
+
+            {/* Additional info or call-to-action can go here */}
+            <div className="mt-6 p-4 border border-gray-200 rounded-xl text-center text-gray-400">
+              Ads
+            </div>
+          </div>
         </div>
       </div>
-      {/* <Modal
-        title={
-          <div style={{ textAlign: "center", width: "100%" }}>
-            Update Listing
-          </div>
-        }
-        open={isUpdatePropertyModalOpen}
-        footer={null}
-        onCancel={() => {
-          setIsUpdatePropertyModalOpen(false);
-        }}
-        width={1100}
-        centered
-        destroyOnHidden
-      >
-        <UpdatePropertyModal
-          property={property}
-          onSuccess={() => setIsUpdatePropertyModalOpen(false)}
-        />
-      </Modal> */}
 
+      {/* Delete Property Modal */}
       <Modal
         title={
-          <div style={{ textAlign: "center", width: "100%" }}>
+          <div className="text-center w-full font-medium">
             Delete this property?
           </div>
         }
         open={isDeletePropertyModalOpen}
         footer={null}
-        onCancel={() => {
-          setIsDeletePropertyModalOpen(false);
-        }}
+        onCancel={() => setIsDeletePropertyModalOpen(false)}
         width={400}
         centered
         destroyOnHidden

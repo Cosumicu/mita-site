@@ -44,20 +44,27 @@ export default function ReservationListPage() {
       dataIndex: "property",
       render: (_: any, record: any) => (
         <div
-          className="flex items-center gap-3 cursor-pointer"
+          className="flex items-center gap-3 cursor-pointer w-[300px]"
           onClick={() => router.push(`/properties/${record.property.id}`)}
         >
-          <Image
-            src={record.property.image_url}
-            alt={record.property.title}
-            width={80}
-            height={60}
-            className="rounded-md object-cover"
-            preview={false}
-          />
           <div>
-            <p className="font-semibold">{record.property.title}</p>
-            <p className="text-gray-500 text-sm">{record.property.location}</p>
+            <Image
+              src={record.property.image_url}
+              alt={record.property.title}
+              width={80}
+              height={60}
+              className="rounded-md object-cover"
+              preview={false}
+            />
+          </div>
+          <div className="min-w-0">
+            {" "}
+            <p className="font-semibold truncate">
+              {record.property.title}
+            </p>{" "}
+            <p className="text-gray-500 text-sm truncate">
+              {record.property.location}
+            </p>
           </div>
         </div>
       ),
@@ -120,8 +127,8 @@ export default function ReservationListPage() {
             size="small"
             type="primary"
             onClick={() => {
-              setSelectedReservation(record); // store the clicked reservation
-              setIsReservationDetailsDrawerOpen(true); // open drawer
+              setSelectedReservation(record);
+              setIsReservationDetailsDrawerOpen(true);
             }}
           >
             <p className="text-xs">Details</p>
