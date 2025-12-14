@@ -52,12 +52,12 @@ export default function MyPropertiesPage() {
       render: (_: any, record: any) => (
         <div
           className="flex items-center gap-3 cursor-pointer w-[300px]"
-          onClick={() => router.push(`/properties/${record.property.id}`)}
+          onClick={() => router.push(`/properties/${record.id}`)}
         >
           <div>
             <Image
-              src={record.property.image_url}
-              alt={record.property.title}
+              src={record.image_url}
+              alt={record.title}
               width={80}
               height={60}
               className="rounded-md object-cover"
@@ -66,12 +66,8 @@ export default function MyPropertiesPage() {
           </div>
           <div className="min-w-0">
             {" "}
-            <p className="font-semibold truncate">
-              {record.property.title}
-            </p>{" "}
-            <p className="text-gray-500 text-sm truncate">
-              {record.property.location}
-            </p>
+            <p className="font-semibold truncate">{record.title}</p>{" "}
+            <p className="text-gray-500 text-sm truncate">{record.location}</p>
           </div>
         </div>
       ),

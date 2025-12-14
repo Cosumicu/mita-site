@@ -9,7 +9,8 @@ const Footer: React.FC = () => {
 
   if (
     pathname === "/host/create-listing" ||
-    pathname.startsWith("/host/update-listing")
+    pathname.startsWith("/host/update-listing") ||
+    pathname.startsWith("/messages")
   ) {
     return null;
   }

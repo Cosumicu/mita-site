@@ -148,7 +148,7 @@ function RightMenu() {
     setOpenRegister(false);
   };
 
-  const onClick: MenuProps["onClick"] = (e) => {
+  const onClick: MenuProps["onClick"] = async (e) => {
     console.log("click ", e);
     setCurrent(e.key);
 
@@ -212,11 +212,10 @@ function RightMenu() {
         break;
 
       case "logout":
-        dispatch(logout());
-        router.push("/");
-        window.location.reload();
-        toast.success("Logout Successful");
+        await dispatch(logout()).unwrap(); // guarantees response arrived
         dispatch(resetAuth());
+        router.replace("/");
+        toast.success("Logout successful");
         break;
 
       default:
