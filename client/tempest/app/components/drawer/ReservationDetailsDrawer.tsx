@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Reservation } from "@/app/lib/definitions";
 import { formatCurrency, formatDate, formatTime } from "@/app/lib/utils/format";
-import { Tag, Avatar, Card, Row, Col, Divider, Badge } from "antd";
+import { Tag, Avatar, Card, Row, Col, Divider, Button, Modal } from "antd";
 import Link from "next/link";
 import {
   CalendarOutlined,
@@ -13,8 +13,9 @@ import {
   ClockCircleOutlined,
   TagOutlined,
   SafetyCertificateOutlined,
-  StarOutlined,
 } from "@ant-design/icons";
+import { useAppSelector } from "@/app/lib/hooks";
+import CreatePropertyReviewModal from "@/app/components/modals/CreatePropertyReviewModal";
 
 interface ReservationDetailsDrawerProps {
   reservation: Reservation;
@@ -51,6 +52,11 @@ function ReservationDetailsDrawer({
   const hostId = reservation.property?.user?.id || "";
   const hostProfilePicture =
     reservation.property?.user?.profile_picture_url || undefined;
+
+  const user = useAppSelector((state) => state.user);
+
+  const [isCreatePropertyReviewOpen, setCreatePropertyReviewOpen] =
+    useState(false);
 
   // Parse numeric values safely
   const longStayDiscount = parseFloat(
@@ -292,6 +298,52 @@ function ReservationDetailsDrawer({
           </Tag>
         </div>
       </Card>
+
+      {reservation.status === "COMPLETED" &&
+        !reservation.property.reviewed &&
+        user.user?.id !== reservation.property.user.id && (
+          <Card className="shadow-sm bg-gradient-to-r from-gray-50 to-gray-100">
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Review Property
+              </h3>
+              <Button
+                type="primary"
+                onClick={() => setCreatePropertyReviewOpen(true)}
+              >
+                Write a review
+              </Button>
+            </div>
+          </Card>
+        )}
+
+      {reservation.status === "COMPLETED" && reservation.property.reviewed && (
+        <Card className="shadow-sm bg-gradient-to-r from-gray-50 to-gray-100">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Review Property
+            </h3>
+            <span className="text-gray-400">Already reviewed</span>
+          </div>
+        </Card>
+      )}
+
+      <Modal
+        title={
+          <div className="text-center w-full font-medium">Write a review</div>
+        }
+        open={isCreatePropertyReviewOpen}
+        footer={null}
+        onCancel={() => setCreatePropertyReviewOpen(false)}
+        width={600}
+        centered
+        destroyOnHidden
+      >
+        <CreatePropertyReviewModal
+          propertyId={reservation.property.id}
+          onSuccess={() => setCreatePropertyReviewOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }

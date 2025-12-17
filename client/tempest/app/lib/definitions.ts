@@ -61,11 +61,13 @@ export interface Property {
   favorited: string;
   image_url: string;
   liked: boolean;
+  reviewed: boolean;
   image: string;
   likes_count: number;
   views_count: number;
   reservations_count: number;
   status: string;
+  average_rating: number;
   weekly_discount_rate: number;
   monthly_discount_rate: number;
   cleaning_fee: number;
@@ -94,6 +96,18 @@ export interface Reservation {
   total_amount: number;
   confirmation_code: string;
   created_at: string;
+}
+
+// REVIEWS TYPES
+
+export interface Review {
+  id: string;
+  user: User;
+  property_id: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+  update_at: string;
 }
 
 // CHAT TYPES

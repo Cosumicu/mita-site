@@ -6,6 +6,7 @@ import {
   PropertyFilterParams,
   PaginationParams,
   PropertyTag,
+  Review,
 } from "../../definitions";
 
 const PROPERTY_BASE_URL = `${process.env.NEXT_PUBLIC_API_HOST}/properties`;
@@ -165,6 +166,27 @@ const getUserLikesList = async () => {
   return response.data;
 };
 
+const getPropertyReviews = async (
+  propertyId: string,
+  pagination: PaginationParams
+) => {
+  const response = await api.get<Paginated<Review>>(
+    `${process.env.NEXT_PUBLIC_API_HOST}/reviews/${propertyId}`,
+    {
+      params: { propertyId, ...pagination },
+    }
+  );
+  return response.data;
+};
+
+const createPropertyReview = async (propertyId: string, formData: FormData) => {
+  const response = await api.post<void>(
+    `${process.env.NEXT_PUBLIC_API_HOST}/reviews/${propertyId}/`,
+    formData
+  );
+  return response.data;
+};
+
 const toggleFavorite = async (propertyId: string) => {
   const response = await api.post(
     `${PROPERTY_BASE_URL}/${propertyId}/toggle-favorite/`
@@ -192,6 +214,8 @@ const propertyService = {
   declineReservation,
   getPropertyTags,
   getUserLikesList,
+  getPropertyReviews,
+  createPropertyReview,
   toggleFavorite,
 };
 export default propertyService;

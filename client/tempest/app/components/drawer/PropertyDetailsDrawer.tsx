@@ -365,7 +365,7 @@ function PropertyDetailsDrawer({ propertyId }: PropertyDetailsDrawerProps) {
         onCancel={() => setIsDeletePropertyModalOpen(false)}
         width={400}
         centered
-        destroyOnClose
+        destroyOnHidden
       >
         <DeletePropertyConfirmationModal
           propertyId={property.id}

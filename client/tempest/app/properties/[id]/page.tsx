@@ -3,8 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
-import { getPropertyDetail } from "@/app/lib/features/properties/propertySlice";
-import { Avatar, Button, Modal } from "antd";
+import {
+  getPropertyDetail,
+  getPropertyReviews,
+} from "@/app/lib/features/properties/propertySlice";
+import { Avatar, Button, Modal, Divider } from "antd";
 import CreateReservationForm from "@/app/components/forms/CreateReservationForm";
 import Link from "next/link";
 import DeletePropertyConfirmationModal from "@/app/components/modals/DeletePropertyConfirmationModal";
@@ -27,13 +30,29 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     error: propertyDetailError,
     message: propertyDetailMessage,
   } = useAppSelector((state) => state.property.propertyDetail);
+  const {
+    data: propertyReviews,
+    loading: propertyReviewsLoading,
+    success: propertyReviewsSuccess,
+    error: propertyReviewsError,
+    message: propertyReviewsMessage,
+    count: propertyReviewsCount,
+  } = useAppSelector((state) => state.property.propertyReviews);
 
   const { success: updatePropertySuccess } = useAppSelector(
     (state) => state.property.updateProperty
   );
 
   useEffect(() => {
-    if (id) dispatch(getPropertyDetail(id));
+    if (id) {
+      dispatch(getPropertyDetail(id));
+      dispatch(
+        getPropertyReviews({
+          propertyId: id,
+          pagination: { page: 1, page_size: 10 },
+        })
+      );
+    }
   }, [dispatch, updatePropertySuccess, id]);
 
   const property = propertyDetail;
@@ -74,7 +93,6 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           </div>
         )}
       </div>
-
       {/* Main image */}
       <div className="w-full h-[250px] sm:h-[450px] rounded-xl overflow-hidden bg-gray-100 flex justify-center items-center mb-8">
         <img
@@ -83,7 +101,6 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           className="h-full w-auto object-contain"
         />
       </div>
-
       {/* Grid layout for main content and reservation form */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
         {/* Main content column (2/3 width on large screens) */}
@@ -121,8 +138,15 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           </div>
 
           {/* Reviews placeholder */}
-          <div className="w-full border border-gray-200 rounded-lg mb-8 py-6 text-center text-gray-500">
-            Reviews Section
+          <div className="flex w-full border border-gray-200 rounded-lg mb-8 py-4 text-center text-gray-700">
+            <div className="w-1/3 sm:w-[60%] py-2">Some title</div>
+            <div className="w-1/3 sm:w-[20%] py-2 border-l border-gray-200">
+              {propertyDetail.average_rating}{" "}
+              <span className="text-sm">Stars</span>
+            </div>
+            <div className="w-1/3 sm:w-[20%] py-2 border-l border-gray-200">
+              {propertyReviewsCount} <span className="text-sm">Reviews</span>
+            </div>
           </div>
 
           {/* Host info */}
@@ -149,7 +173,7 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           </div>
 
           {/* Amenities */}
-          <div>
+          <div className="mb-8">
             <h3 className="font-semibold text-xl mb-4">Amenities & Features</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {property.tags?.length > 0 ? (
@@ -158,7 +182,6 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
                     key={tag.value}
                     className="flex items-center gap-2 text-gray-700 py-2"
                   >
-                    <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
                     <span>{tag.label}</span>
                   </div>
                 ))
@@ -186,6 +209,64 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
         </div>
       </div>
 
+      <Divider className="border-gray-300 border-[1]" />
+
+      {/* Reviews Section */}
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold mb-4">
+          Reviews
+          {propertyReviews?.length > 0 && (
+            <span className="ml-2 text-gray-500 text-sm">
+              ({propertyReviewsCount})
+            </span>
+          )}
+        </h3>
+
+        {propertyReviewsLoading && (
+          <p className="text-gray-500">Loading reviews...</p>
+        )}
+
+        {!propertyReviewsLoading && propertyReviews?.length === 0 && (
+          <span className="text-gray-500 text-sm col-span-2">
+            No reviews yet
+          </span>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {propertyReviews?.map((review) => (
+            <div
+              key={review.id}
+              className="border border-gray-200 rounded-xl p-4"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Avatar size={40} src={review.user.profile_picture_url} />
+                <div>
+                  <p className="font-medium">{review.user.username}</p>
+                  <p className="text-xs text-gray-500">
+                    {new Date(review.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <div className="ml-auto text-sm ">
+                  {review.rating}
+                  <span className="text-yellow-400 text-xl px-1">★</span>
+                </div>
+              </div>
+              {review.comment && (
+                <p className="text-gray-700 leading-relaxed">
+                  {review.comment}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {propertyReviewsCount > 6 && (
+          <div className="my-4 ">
+            <Button>View all {propertyReviewsCount} reviews</Button>
+          </div>
+        )}
+      </div>
       {/* Delete Property Modal */}
       <Modal
         title={

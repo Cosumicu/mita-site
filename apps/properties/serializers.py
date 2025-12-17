@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Property, Reservation, PropertyLike, PropertyTag
 
 from apps.profiles.serializers import ProfileSerializer
+from apps.reviews.serializers import ReviewSerializer
 
 class PropertyTagSerializer(serializers.ModelSerializer):
     value = serializers.IntegerField(source="pkid")
@@ -10,7 +11,7 @@ class PropertyTagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PropertyTag
-        fields = ["value", "label", "description"]
+        fields = ["value", "label"]
 
 class PropertyListSerializer(serializers.ModelSerializer):
     liked = serializers.SerializerMethodField()
@@ -33,6 +34,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         ]
+        read_only_fields = ["__all__"]
 
     def get_image(self, obj):
         if obj.image:
@@ -47,14 +49,9 @@ class PropertyListSerializer(serializers.ModelSerializer):
 
 class PropertyDetailSerializer(serializers.ModelSerializer):
     user = ProfileSerializer(source="user.profile")
+    tags = PropertyTagSerializer(many=True)
     liked = serializers.SerializerMethodField()
-    tag_ids = serializers.PrimaryKeyRelatedField(
-        many=True,
-        write_only=True,
-        queryset=PropertyTag.objects.all(),
-        source="tags"
-    )
-    tags = PropertyTagSerializer(many=True, read_only=True)
+    reviewed = serializers.SerializerMethodField()
 
     class Meta:
         model = Property
@@ -75,9 +72,10 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             'is_instant_booking',
             'image_url',
             'status',
-            'tag_ids',
             'tags',
+            'average_rating',
             'liked',
+            'reviewed',
             'views_count',
             'likes_count',
             'reservations_count',
@@ -87,11 +85,18 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         ]
+        read_only_fields = ["__all__"]
 
     def get_liked(self, obj):
         user = self.context["request"].user
         if user.is_authenticated:
             return obj.likes.filter(user=user).exists()
+        return False
+
+    def get_reviewed(self, obj):
+        user = self.context["request"].user
+        if user.is_authenticated:
+            return obj.reviews.filter(user=user).exists()
         return False
 
 class PropertyCreateSerializer(serializers.ModelSerializer):

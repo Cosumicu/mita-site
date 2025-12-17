@@ -8,6 +8,7 @@ import {
   PropertyFilterParams,
   PaginationParams,
   PropertyTag,
+  Review,
 } from "../../definitions";
 
 type AsyncState<T> = {
@@ -47,12 +48,14 @@ type PropertyState = {
   reservationRequestsList: PaginatedAsyncState<Reservation>;
   hostReservationList: PaginatedAsyncState<Reservation>;
   hostReservationPropertyList: PaginatedAsyncState<Reservation>;
+  propertyReviews: PaginatedAsyncState<Review>;
 
   // POST
   createProperty: AsyncState<Property | null>;
   createReservation: AsyncState<Reservation | null>;
   approveReservation: AsyncState<Reservation | null>;
   declineReservation: AsyncState<Reservation | null>;
+  createPropertyReview: AsyncState<Review | null>;
 
   // UPDATE & DELETE
   updateProperty: AsyncState<Property | null>;
@@ -93,11 +96,13 @@ const initialState: PropertyState = {
   hostReservationList: initialPaginatedAsyncState(),
   hostReservationPropertyList: initialPaginatedAsyncState(),
   propertyTagList: initialAsyncState([]),
+  propertyReviews: initialPaginatedAsyncState(),
 
   createProperty: initialAsyncState(null),
   createReservation: initialAsyncState(null),
   approveReservation: initialAsyncState(null),
   declineReservation: initialAsyncState(null),
+  createPropertyReview: initialAsyncState(null),
 
   updateProperty: initialAsyncState(null),
   deleteProperty: initialAsyncState(null),
@@ -338,6 +343,50 @@ export const getPropertyTags = createAsyncThunk<
   }
 });
 
+export const getPropertyReviews = createAsyncThunk<
+  Paginated<Review>,
+  { propertyId: string; pagination: PaginationParams },
+  { rejectValue: string }
+>(
+  "property/getPropertyReviews",
+  async ({ propertyId, pagination }, thunkAPI) => {
+    try {
+      const response = await propertyService.getPropertyReviews(
+        propertyId,
+        pagination
+      );
+      return response;
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
+  }
+);
+
+export const createPropertyReview = createAsyncThunk<
+  void,
+  { propertyId: string; formData: FormData },
+  { rejectValue: string }
+>(
+  "property/createPropertyReview",
+  async ({ propertyId, formData }, thunkAPI) => {
+    try {
+      const response = await propertyService.createPropertyReview(
+        propertyId,
+        formData
+      );
+      return response;
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
+  }
+);
+
 export const getHostReservationList = createAsyncThunk<
   Paginated<Reservation>,
   PaginationParams,
@@ -513,6 +562,12 @@ export const propertySlice = createSlice({
     },
     resetPropertyTagList: (state) => {
       state.propertyTagList = initialAsyncState([]);
+    },
+    resetPropertyReviews: (state) => {
+      state.propertyReviews = initialPaginatedAsyncState();
+    },
+    resetCreatePropertyReview: (state) => {
+      state.createPropertyReview = initialAsyncState(null);
     },
   },
   extraReducers: (builder) => {
@@ -859,6 +914,43 @@ export const propertySlice = createSlice({
         state.propertyTagList.error = true;
         state.propertyTagList.message = action.payload as string;
       })
+      // GET PROPERTY REVIEWS
+      .addCase(getPropertyReviews.pending, (state) => {
+        state.propertyReviews.loading = true;
+      })
+      .addCase(
+        getPropertyReviews.fulfilled,
+        (state, action: PayloadAction<Paginated<Review>>) => {
+          state.propertyReviews.loading = false;
+          state.propertyReviews.success = true;
+          state.propertyReviews.data = action.payload.results;
+          state.propertyReviews.count = action.payload.count;
+          state.propertyReviews.next = action.payload.next;
+          state.propertyReviews.previous = action.payload.previous;
+        }
+      )
+      .addCase(getPropertyReviews.rejected, (state, action) => {
+        state.propertyReviews.loading = false;
+        state.propertyReviews.error = true;
+        state.propertyReviews.message = action.payload as string;
+      })
+      // CREATE PROPERTY REVIEW
+      .addCase(createPropertyReview.pending, (state) => {
+        state.createPropertyReview.loading = true;
+      })
+      .addCase(
+        createPropertyReview.fulfilled,
+        (state, action: PayloadAction<void>) => {
+          state.createPropertyReview.loading = false;
+          state.createPropertyReview.success = true;
+        }
+      )
+      .addCase(createPropertyReview.rejected, (state, action) => {
+        state.createPropertyReview.loading = false;
+        state.createPropertyReview.error = true;
+        state.createPropertyReview.message = action.payload as string;
+      })
+
       // TOGGLE LIKE
       .addCase(toggleFavorite.fulfilled, (state, action) => {
         const { propertyId } = action.payload;
@@ -901,6 +993,8 @@ export const {
   resetCreateProperty,
   resetCreateReservation,
   resetPropertyTagList,
+  resetPropertyReviews,
+  resetCreatePropertyReview,
   resetReservationRequestActions,
 } = propertySlice.actions;
 

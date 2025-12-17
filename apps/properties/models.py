@@ -55,6 +55,7 @@ class Property(TimeStampedUUIDModel):
     tags = models.ManyToManyField(PropertyTag, related_name="properties", blank=True)
     views_count = models.PositiveIntegerField(default=0)
     likes_count = models.PositiveIntegerField(default=0)
+    reviews_count = models.PositiveIntegerField(default=0)
     reservations_count = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to='uploads/properties', default='/uploads/properties/default_property.png')
 
@@ -67,6 +68,7 @@ class Property(TimeStampedUUIDModel):
     monthly_discount_rate = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.20'))
     cleaning_fee = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('0.00'))
 
+    average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=Decimal('0.00'))
 
     def image_url(self):
         return f'{settings.WEBSITE_URL}{self.image.url}'
