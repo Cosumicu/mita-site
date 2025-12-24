@@ -154,3 +154,16 @@ export interface PropertyTag {
   label: string;
   description: string;
 }
+
+// ANALYTICS
+
+export type HostCalendarEvent = {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  status: string;
+  property_id: string;
+  guest: string;
+  confirmation_code: string;
+};

@@ -31,7 +31,8 @@ urlpatterns = [
     path('api/v1/properties/', include('apps.properties.urls')),
     path('api/v1/reviews/', include('apps.reviews.urls')),
     path('api/v1/chat/', include('apps.chat.urls')),
-    # path('api/v1/recommendations/', include('apps.recommendations.urls')),
+    path('api/v1/recommendations/', include('apps.recommendations.urls')),
+    path('api/v1/analytics/', include('apps.analytics.urls')),
 
     path('silk/', include('silk.urls', namespace='silk'))
 ]
