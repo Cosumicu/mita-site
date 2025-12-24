@@ -20,8 +20,4 @@ app.conf.beat_schedule = {
         "task": "apps.properties.tasks.update_reservations_status_task",
         "schedule": crontab(minute=0),
     },
-    # "retrain-cf-model-nightly": {
-    #     "task": "apps.recommendations.tasks.retrain_cf_model",
-    #     "schedule": crontab(hour=3, minute=0),  # run every day at 2:00 AM
-    # },
 }
