@@ -1,6 +1,6 @@
-# from django.urls import path
-# from .views import RecommendationsListView
+from django.urls import path
+from .views import RecommendationView
 
-# urlpatterns = [
-#     path('recommendations/', RecommendationsListView.as_view(), name='recommendations'),
-# ]
+urlpatterns = [
+    path('', RecommendationView.as_view(), name='recommendations'),
+]
