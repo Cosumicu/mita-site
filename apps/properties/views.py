@@ -67,7 +67,7 @@ class PropertyListView(generics.ListAPIView):
 class PropertyDetailView(generics.RetrieveAPIView):
     serializer_class = PropertyDetailSerializer
     permission_classes = [permissions.AllowAny]
-    lookup_url_kwarg = "id"
+    lookup_url_kwarg = "property_id"
 
     def get_object(self):
         return get_object_or_404(Property, id=self.kwargs.get(self.lookup_url_kwarg))
@@ -131,7 +131,7 @@ class PropertyUpdateView(generics.UpdateAPIView):
     queryset = Property.objects.all()
     serializer_class = PropertyCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = "id"
+    lookup_field = "property_id"
 
     def get_object(self):
         obj = super().get_object()
@@ -143,7 +143,7 @@ class PropertyDeleteView(generics.DestroyAPIView):
     queryset = Property.objects.all()
     serializer_class = PropertyCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = "id"
+    lookup_field = "property_id"
 
     def get_object(self):
         obj = super().get_object()
@@ -231,10 +231,18 @@ class ReservationListCreateView(generics.ListCreateAPIView):
             landlord=property.user
         )
 
+class ReservationDetailView(generics.RetrieveAPIView):
+    serializer_class = ReservationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_url_kwarg = "reservation_id"
+
+    def get_object(self):
+        return get_object_or_404(Reservation, id=self.kwargs.get(self.lookup_url_kwarg))
+
 class ReservationListProperty(generics.ListAPIView):
     serializer_class = ReservationSerializer
     permission_classes = [permissions.AllowAny]
-    lookup_url_kwarg = 'id'
+    lookup_url_kwarg = 'property_id'
 
     def get_queryset(self):
         return Reservation.objects.filter(
@@ -245,7 +253,7 @@ class ReservationListProperty(generics.ListAPIView):
 class ReservationHostListView(generics.ListAPIView):
     serializer_class = ReservationSerializer
     permission_classes = [permissions.IsAuthenticated]
-    lookup_url_kwarg = 'id'
+    lookup_url_kwarg = 'property_id'
     pagination_class = PropertyPagination
 
     def get_queryset(self):
