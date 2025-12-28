@@ -34,6 +34,7 @@ type PaginatedAsyncState<T> = {
 type PropertyState = {
   // GET
   propertyDetail: AsyncState<Property | null>;
+  reservationDetail: AsyncState<Reservation | null>;
   reservationPropertyList: AsyncState<Reservation[]>;
   propertyTagList: AsyncState<PropertyTag[]>;
 
@@ -91,6 +92,7 @@ const initialState: PropertyState = {
   reservationList: initialPaginatedAsyncState(),
   reservationPropertyList: initialAsyncState([]),
   propertyDetail: initialAsyncState(null),
+  reservationDetail: initialAsyncState(null),
   likedList: initialAsyncState([]),
   reservationRequestsList: initialPaginatedAsyncState(),
   hostReservationList: initialPaginatedAsyncState(),
@@ -238,6 +240,22 @@ export const getPropertyDetail = createAsyncThunk<
 >("property/getPropertyDetail", async (propertyId, thunkAPI) => {
   try {
     const response = await propertyService.getPropertyDetail(propertyId);
+    return response;
+  } catch (err) {
+    const error = err as AxiosError<{ message?: string }>;
+    return thunkAPI.rejectWithValue(
+      error.response?.data?.message || error.message
+    );
+  }
+});
+
+export const getReservationDetail = createAsyncThunk<
+  Reservation,
+  string,
+  { rejectValue: string }
+>("property/getReservationDetail", async (reservationId, thunkAPI) => {
+  try {
+    const response = await propertyService.getReservationDetail(reservationId);
     return response;
   } catch (err) {
     const error = err as AxiosError<{ message?: string }>;
@@ -541,6 +559,9 @@ export const propertySlice = createSlice({
     resetPropertyDetail: (state) => {
       state.propertyDetail = initialAsyncState(null);
     },
+    resetReservationDetail: (state) => {
+      state.reservationDetail = initialAsyncState(null);
+    },
     resetCreateProperty: (state) => {
       state.createProperty = initialAsyncState(null);
     },
@@ -705,6 +726,23 @@ export const propertySlice = createSlice({
         state.propertyDetail.loading = false;
         state.propertyDetail.error = true;
         state.propertyDetail.message = action.payload as string;
+      })
+      // GET RESERVATION DETAIL
+      .addCase(getReservationDetail.pending, (state) => {
+        state.reservationDetail.loading = true;
+      })
+      .addCase(
+        getReservationDetail.fulfilled,
+        (state, action: PayloadAction<Reservation>) => {
+          state.reservationDetail.loading = false;
+          state.reservationDetail.success = true;
+          state.reservationDetail.data = action.payload;
+        }
+      )
+      .addCase(getReservationDetail.rejected, (state, action) => {
+        state.reservationDetail.loading = false;
+        state.reservationDetail.error = true;
+        state.reservationDetail.message = action.payload as string;
       })
       // UPDATE PROPERTY
       .addCase(updateProperty.pending, (state) => {
@@ -987,6 +1025,7 @@ export const {
   resetHostReservationPropertyList,
   resetReservationPropertyList,
   resetPropertyDetail,
+  resetReservationDetail,
   resetUpdateProperty,
   resetDeleteProperty,
   resetReservationRequestList,

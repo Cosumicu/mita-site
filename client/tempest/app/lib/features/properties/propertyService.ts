@@ -136,6 +136,13 @@ const getPropertyDetail = async (propertyId: string) => {
   return response.data;
 };
 
+const getReservationDetail = async (reservationId: string) => {
+  const response = await api.get<Reservation>(
+    `${RESERVATION_BASE_URL}/${reservationId}`
+  );
+  return response.data;
+};
+
 const updateProperty = async (propertyId: string, formData: FormData) => {
   const response = await api.patch<Property>(
     `${PROPERTY_BASE_URL}/${propertyId}/update/`,
@@ -206,6 +213,7 @@ const propertyService = {
   getPropertyList,
   createProperty,
   getPropertyDetail,
+  getReservationDetail,
   updateProperty,
   deleteProperty,
   createReservation,

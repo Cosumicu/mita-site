@@ -1,9 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
-import { Reservation } from "@/app/lib/definitions";
+import React, { useEffect, useState } from "react";
 import { formatCurrency, formatDate, formatTime } from "@/app/lib/utils/format";
-import { Tag, Avatar, Card, Row, Col, Divider, Button, Modal } from "antd";
+import {
+  Tag,
+  Avatar,
+  Card,
+  Row,
+  Col,
+  Divider,
+  Button,
+  Spin,
+  Alert,
+  Modal,
+} from "antd";
 import Link from "next/link";
 import {
   CalendarOutlined,
@@ -14,14 +24,15 @@ import {
   TagOutlined,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
-import { useAppSelector } from "@/app/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
+import { getReservationDetail } from "@/app/lib/features/properties/propertySlice";
 import CreatePropertyReviewModal from "@/app/components/modals/CreatePropertyReviewModal";
 
 interface ReservationDetailsDrawerProps {
-  reservation: Reservation;
+  reservationId: string;
 }
 
-const colorMap: Record<string, string> = {
+const statusColorMap: Record<string, string> = {
   PENDING: "gold",
   APPROVED: "green",
   DECLINED: "red",
@@ -30,19 +41,63 @@ const colorMap: Record<string, string> = {
   CANCELLED: "gray",
 };
 
-const statusTextMap: Record<string, string> = {
-  PENDING: "PENDING",
-  APPROVED: "APPROVED",
-  DECLINED: "DECLINED",
-  ONGOING: "ONGOING",
-  COMPLETED: "COMPLETED",
-  CANCELLED: "CANCELLED",
-};
-
 function ReservationDetailsDrawer({
-  reservation,
+  reservationId,
 }: ReservationDetailsDrawerProps) {
-  // Safe access to nested properties with fallbacks
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
+
+  const {
+    data: reservation,
+    loading,
+    error,
+    message,
+  } = useAppSelector((state) => state.property.reservationDetail);
+
+  const [isCreatePropertyReviewOpen, setCreatePropertyReviewOpen] =
+    useState(false);
+
+  // Fetch reservation details when component mounts or reservationId changes
+  useEffect(() => {
+    if (reservationId) {
+      dispatch(getReservationDetail(reservationId));
+    }
+  }, [dispatch, reservationId]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Alert
+        message="Error Loading Reservation"
+        description={message || "Failed to load reservation details"}
+        type="error"
+        showIcon
+      />
+    );
+  }
+
+  // No reservation found
+  if (!reservation) {
+    return (
+      <Alert
+        message="No Reservation Found"
+        description="The reservation details could not be loaded"
+        type="warning"
+        showIcon
+      />
+    );
+  }
+
+  // Safe access to nested properties
   const propertyTitle = reservation.property?.title || "Untitled Property";
   const propertyLocation =
     reservation.property?.location || "Location not specified";
@@ -53,12 +108,7 @@ function ReservationDetailsDrawer({
   const hostProfilePicture =
     reservation.property?.user?.profile_picture_url || undefined;
 
-  const user = useAppSelector((state) => state.user);
-
-  const [isCreatePropertyReviewOpen, setCreatePropertyReviewOpen] =
-    useState(false);
-
-  // Parse numeric values safely
+  // Parse numeric values
   const longStayDiscount = parseFloat(
     reservation.long_stay_discount?.toString() || "0"
   );
@@ -69,7 +119,7 @@ function ReservationDetailsDrawer({
   const cleaningFee = parseFloat(reservation.cleaning_fee?.toString() || "0");
   const totalAmount = parseFloat(reservation.total_amount?.toString() || "0");
 
-  // Calculate duration
+  // Duration calculation
   const startDate = reservation.start_date
     ? new Date(reservation.start_date)
     : null;
@@ -83,17 +133,22 @@ function ReservationDetailsDrawer({
 
   return (
     <div className="flex flex-col gap-4 p-2">
+      {/* Property Header */}
       <div>
-        <p className="font-bold text-xl">{reservation.property.title}</p>
-        <p className="text-gray-600">{reservation.property.location}</p>
+        <p className="font-bold text-xl">{propertyTitle}</p>
+        <p className="text-gray-600">{propertyLocation}</p>
       </div>
+
+      {/* Property Image */}
       <div className="w-full h-48 rounded-xl overflow-hidden flex justify-center items-center">
         <img
-          src={reservation.property.image_url}
-          alt={reservation.property.title}
+          src={propertyImage}
+          alt={propertyTitle}
           className="h-full w-full object-cover"
         />
       </div>
+
+      {/* Host Information */}
       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
         <div className="flex items-center">
           {hostId ? (
@@ -115,7 +170,8 @@ function ReservationDetailsDrawer({
           </div>
         </div>
       </div>
-      {/* Booking Details Grid */}
+
+      {/* Booking Details */}
       <Card title="Booking Details" className="shadow-sm">
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12}>
@@ -184,6 +240,7 @@ function ReservationDetailsDrawer({
           </Col>
         </Row>
       </Card>
+
       {/* Price Breakdown */}
       <Card title="Price Breakdown" className="shadow-sm">
         <div className="space-y-3">
@@ -249,56 +306,23 @@ function ReservationDetailsDrawer({
           </div>
         </div>
       </Card>
-      {/* Reservation Information */}
-      <Card title="Reservation Information" className="shadow-sm">
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12}>
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center mb-2">
-                <SafetyCertificateOutlined className="text-blue-500 mr-2" />
-                <span className="font-semibold text-gray-700">
-                  Confirmation Code
-                </span>
-              </div>
-              <p className="text-xl font-mono font-bold text-gray-800 tracking-wider">
-                {reservation.confirmation_code || "N/A"}
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                Use this code for reference
-              </p>
-            </div>
-          </Col>
-          <Col xs={24} sm={12}>
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center mb-2">
-                <CalendarOutlined className="text-green-500 mr-2" />
-                <span className="font-semibold text-gray-700">Booked On</span>
-              </div>
-              <p className="text-lg font-semibold text-gray-800">
-                {reservation.created_at
-                  ? formatDate(reservation.created_at)
-                  : "N/A"}
-              </p>
-              <p className="text-sm text-gray-500 mt-1">Reservation date</p>
-            </div>
-          </Col>
-        </Row>
-      </Card>
-      {/* Status Summary */}
+
+      {/* Reservation Status */}
       <Card className="shadow-sm bg-gradient-to-r from-gray-50 to-gray-100">
         <div className="text-center">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">
             Reservation Status
           </h3>
           <Tag
-            color={colorMap[reservation.status] || "blue"}
+            color={statusColorMap[reservation.status] || "blue"}
             className="text-base px-6 py-2 font-semibold"
           >
-            {statusTextMap[reservation.status] || reservation.status}
+            {reservation.status}
           </Tag>
         </div>
       </Card>
 
+      {/* Review Section */}
       {reservation.status === "COMPLETED" &&
         !reservation.property.reviewed &&
         user.user?.id !== reservation.property.user.id && (
