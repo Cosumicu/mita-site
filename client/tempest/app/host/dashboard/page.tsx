@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import api from "@/app/lib/features/axiosInstance";
+import { useCallback, useEffect, useState } from "react";
 import HostCalendar from "@/app/components/dashboard/HostCalendar";
-import { HostCalendarEvent } from "@/app/lib/definitions";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import { getHostCalendarData } from "@/app/lib/features/analytics/analyticsSlice";
 
@@ -12,30 +10,53 @@ const HostDashboard = () => {
   const { data: hostCalendarData } = useAppSelector(
     (state) => state.analytics.hostCalendarData
   );
+  const [currentRange, setCurrentRange] = useState<{
+    start: string;
+    end: string;
+  }>({ start: "", end: "" });
 
+  // Function to handle date range changes from calendar
+  const handleDatesSet = useCallback(
+    (start: string, end: string) => {
+      setCurrentRange({ start, end });
+      dispatch(getHostCalendarData({ start, end }));
+    },
+    [dispatch]
+  );
+
+  // Initial load - get current month
   useEffect(() => {
-    dispatch(getHostCalendarData({ start: "2025-12-01", end: "2026-01-31" }));
-  }, []);
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const formatDate = (date: Date) => {
+      return date.toISOString().split("T")[0];
+    };
+
+    setCurrentRange({
+      start: formatDate(start),
+      end: formatDate(end),
+    });
+
+    dispatch(
+      getHostCalendarData({
+        start: formatDate(start),
+        end: formatDate(end),
+      })
+    );
+  }, [dispatch]);
 
   return (
     <div className="m-4 space-y-6">
-      {/* Stats cards */}
-      <div className="flex justify-between gap-4 p-4 border border-gray-200 rounded-lg">
-        <div className="flex-1 bg-white rounded-xl p-4 border-l-4 border-l-primary shadow-lg">
-          <p>Total Monies</p>
-        </div>
-        <div className="flex-1 bg-white rounded-xl p-4 border-l-4 border-l-primary shadow-lg">
-          <p>Upcoming Reservations</p>
-        </div>
-        <div className="flex-1 bg-white rounded-xl p-4 border-l-4 border-l-primary shadow-lg">
-          <p>Pending Requests</p>
-        </div>
-        <div className="flex-1 bg-white rounded-xl p-4 border-l-4 border-l-primary shadow-lg">
-          <p>Ave. Nightly Rate</p>
-        </div>
-      </div>
-
-      <HostCalendar reservations={hostCalendarData} />
+      <HostCalendar
+        reservations={hostCalendarData}
+        onDatesSet={handleDatesSet}
+      />
+      {/* Optional: Display current range being shown */}
+      {/* <div className="text-sm text-gray-500">
+        Showing: {currentRange.start} to {currentRange.end}
+      </div> */}
     </div>
   );
 };
