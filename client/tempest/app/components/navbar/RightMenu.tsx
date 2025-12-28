@@ -234,7 +234,7 @@ function RightMenu() {
             onClick={() => router.push("/host/create-listing")}
             className="!hidden sm:!block px-6 py-2 !rounded-full tracking-wide"
           >
-            <div>Become a host</div>
+            <div>Hosting</div>
           </Button>
           <Link href={`/users/profile/${user.id}`}>
             <Avatar

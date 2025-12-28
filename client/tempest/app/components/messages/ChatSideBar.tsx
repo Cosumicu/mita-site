@@ -63,7 +63,7 @@ export default function ChatSidebar({
                 <Avatar size="large" src={other.profile_picture_url} />
                 <div className="flex-1 min-w-0">
                   <div className="flex">
-                    <p className="font-semibold text-gray-800 truncate">
+                    <p className="font-semibold text-gray-800 truncate max-w-[150]">
                       {other.username}
                     </p>
                     <div className="ml-auto">
