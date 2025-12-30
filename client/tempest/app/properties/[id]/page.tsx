@@ -8,7 +8,7 @@ import {
   getPropertyReviews,
   toggleFavorite,
 } from "@/app/lib/features/properties/propertySlice";
-import { Avatar, Button, Modal, Divider } from "antd";
+import { Avatar, Button, Modal, Divider, Spin } from "antd";
 import CreateReservationForm from "@/app/components/forms/CreateReservationForm";
 import Link from "next/link";
 import DeletePropertyConfirmationModal from "@/app/components/modals/DeletePropertyConfirmationModal";
@@ -61,7 +61,9 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
 
   if (!property || !property.id) {
     return (
-      <div className="text-center mt-10 text-gray-500">Property not found.</div>
+      <div className="h-screen text-center mt-10 text-gray-500">
+        Property not found.
+      </div>
     );
   }
 
@@ -295,7 +297,9 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
         </h3>
 
         {propertyReviewsLoading && (
-          <p className="text-gray-500">Loading reviews...</p>
+          <div className="flex h-full items-center justify-center">
+            <Spin size="large" />
+          </div>
         )}
 
         {!propertyReviewsLoading && propertyReviews?.length === 0 && (
