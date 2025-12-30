@@ -3,7 +3,7 @@
 import { useAppSelector, useAppDispatch } from "@/app/lib/hooks";
 import { getConversationList } from "@/app/lib/features/messages/messageSlice";
 import { useEffect } from "react";
-import { Avatar } from "antd";
+import { Avatar, Spin } from "antd";
 import { formatTimeV2 } from "@/app/lib/utils/format";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -18,13 +18,21 @@ export default function ChatSidebar({
 }: Props) {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.user);
-  const { data: conversationList } = useAppSelector(
+  const { data: conversationList, loading } = useAppSelector(
     (state) => state.message.conversationList
   );
 
   useEffect(() => {
     dispatch(getConversationList());
   }, [dispatch]);
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -33,12 +41,6 @@ export default function ChatSidebar({
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {conversationList.length === 0 && (
-          <div className="p-6 text-gray-500 text-center">
-            No conversations yet
-          </div>
-        )}
-
         <AnimatePresence initial={false}>
           {conversationList.map((conv) => {
             const isMe = conv.landlord.id === user?.id;

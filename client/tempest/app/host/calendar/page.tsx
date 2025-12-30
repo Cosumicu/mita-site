@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import HostCalendar from "@/app/components/dashboard/HostCalendar";
+import HostCalendar from "@/app/components/calendar/HostCalendar";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import { getHostCalendarData } from "@/app/lib/features/analytics/analyticsSlice";
 
-const HostDashboard = () => {
+const HostCalendarPage = () => {
   const dispatch = useAppDispatch();
   const { data: hostCalendarData } = useAppSelector(
     (state) => state.analytics.hostCalendarData
@@ -48,17 +48,16 @@ const HostDashboard = () => {
   }, [dispatch]);
 
   return (
-    <div className="m-4 space-y-6">
+    <div className="pb-10">
+      <div className="px-4 sm:px-10">
+        <p className="my-4 font-semibold sm:text-xl">Host Calendar</p>
+      </div>
       <HostCalendar
         reservations={hostCalendarData}
         onDatesSet={handleDatesSet}
       />
-      {/* Optional: Display current range being shown */}
-      {/* <div className="text-sm text-gray-500">
-        Showing: {currentRange.start} to {currentRange.end}
-      </div> */}
     </div>
   );
 };
 
-export default HostDashboard;
+export default HostCalendarPage;

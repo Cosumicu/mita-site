@@ -29,7 +29,7 @@ export default function HostCalendar({ reservations, onDatesSet }: Props) {
     () =>
       reservations.map((r) => ({
         id: r.id,
-        title: r.title,
+        title: r.guest,
         start: r.start,
         end: addOneDay(r.end),
         backgroundColor: getEventColor(r.status), // <-- Add this

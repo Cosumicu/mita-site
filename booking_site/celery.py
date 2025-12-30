@@ -18,6 +18,6 @@ app.conf.beat_scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
 app.conf.beat_schedule = {
     "complete-reservations-daily": {
         "task": "apps.properties.tasks.update_reservations_status_task",
-        "schedule": crontab(minute=0),
+        "schedule": crontab(minute="*"),
     },
 }

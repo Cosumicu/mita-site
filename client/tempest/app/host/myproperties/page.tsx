@@ -111,10 +111,10 @@ export default function MyPropertiesPage() {
       dataIndex: "status",
       render: (status: string) => {
         const colorMap: any = {
-          ACTIVE: "green",
-          INACTIVE: "gray",
-          PENDING: "gold",
-          SUSPENDED: "red",
+          ACTIVE: "#7cb305",
+          INACTIVE: "#8c8c8c",
+          PENDING: "#d4b106",
+          SUSPENDED: "#cf1322",
         };
         return <Tag color={colorMap[status] || "blue"}>{status}</Tag>;
       },

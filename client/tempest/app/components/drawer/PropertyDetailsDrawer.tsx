@@ -207,7 +207,24 @@ function PropertyDetailsDrawer({ propertyId }: PropertyDetailsDrawerProps) {
       {/* Property Details Grid */}
       <Row gutter={[16, 16]} className="mt-2">
         <Col xs={12} sm={8}>
-          <div className="text-center p-3 border border-gray-300 rounded-lg">
+          <div className="flex flex-col items-center p-3 border border-gray-300 rounded-lg text-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="icon icon-tabler icons-tabler-outline icon-tabler-door"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M14 12v.01" />
+              <path d="M3 21h18" />
+              <path d="M6 21v-16a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v16" />
+            </svg>
             <p className="font-semibold">{property.bedrooms || 0}</p>
             <p className="text-sm text-gray-500">
               {" "}
@@ -216,7 +233,25 @@ function PropertyDetailsDrawer({ propertyId }: PropertyDetailsDrawerProps) {
           </div>
         </Col>
         <Col xs={12} sm={8}>
-          <div className="text-center p-3 border border-gray-300 rounded-lg">
+          <div className="flex flex-col items-center p-3 border border-gray-300 rounded-lg text-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="icon icon-tabler icons-tabler-outline icon-tabler-bed"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M7 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+              <path d="M22 17v-3h-20" />
+              <path d="M2 8v9" />
+              <path d="M12 14h10v-2a3 3 0 0 0 -3 -3h-7v5z" />
+            </svg>
             <p className="font-semibold">{property.beds || 0}</p>
             <p className="text-sm text-gray-500">
               {property.beds === 1 ? "Bed" : "Beds"}
@@ -224,7 +259,25 @@ function PropertyDetailsDrawer({ propertyId }: PropertyDetailsDrawerProps) {
           </div>
         </Col>
         <Col xs={12} sm={8}>
-          <div className="text-center p-3 border border-gray-300 rounded-lg">
+          <div className="flex flex-col items-center p-3 border border-gray-300 rounded-lg text-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="icon icon-tabler icons-tabler-outline icon-tabler-bath"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M4 12h16a1 1 0 0 1 1 1v3a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4v-3a1 1 0 0 1 1 -1z" />
+              <path d="M6 12v-7a2 2 0 0 1 2 -2h3v2.25" />
+              <path d="M4 21l1 -1.5" />
+              <path d="M20 21l-1 -1.5" />
+            </svg>
             <p className="font-semibold">{property.bathrooms || 0}</p>
             <p className="text-sm text-gray-500">
               {property.bathrooms === 1 ? "Bathroom" : "Bathrooms"}
@@ -257,8 +310,8 @@ function PropertyDetailsDrawer({ propertyId }: PropertyDetailsDrawerProps) {
       </Row>
 
       {/* Pricing Information */}
-      <div className="p-4 bg-blue-50 rounded-lg">
-        <h3 className="font-bold text-lg mb-3">Pricing Details</h3>
+      <div>
+        <p className="font-bold text-lg mb-2">Pricing</p>
         <div className="space-y-2">
           <div className="flex justify-between">
             <span>Price per night:</span>
@@ -325,7 +378,10 @@ function PropertyDetailsDrawer({ propertyId }: PropertyDetailsDrawerProps) {
           <h3 className="font-bold text-lg mb-2">Amenities & Features</h3>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
-              <Tag key={tag.value || tag.label || `tag-${index}`} color="blue">
+              <Tag
+                key={tag.value || tag.label || `tag-${index}`}
+                color="#7289da"
+              >
                 {tag.label}
               </Tag>
             ))}

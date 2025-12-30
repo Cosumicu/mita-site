@@ -65,6 +65,17 @@ body {
   background: transparent;
 }
 
+.action-button-detail-2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: white;
+  transition: color 0.18s ease, transform 0.12s ease;
+  background: transparent;
+}
+
 .like-button:hover {
   color: #ff4d4f;
   transform: scale(1.08);

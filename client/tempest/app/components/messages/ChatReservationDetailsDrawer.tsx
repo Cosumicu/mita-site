@@ -12,12 +12,13 @@ interface ChatReservationDetailsDrawerProps {
 }
 
 const colorMap: Record<string, string> = {
-  PENDING: "gold",
-  APPROVED: "green",
-  DECLINED: "red",
-  ONGOING: "green",
-  COMPLETED: "blue",
-  CANCELLED: "gray",
+  PENDING: "#d4b106",
+  APPROVED: "#7cb305",
+  DECLINED: "#cf1322",
+  ONGOING: "#7cb305",
+  COMPLETED: "#7289da",
+  CANCELLED: "#cf1322",
+  EXPIRED: "#8c8c8c",
 };
 
 function ChatReservationDetailsDrawer({

@@ -6,11 +6,13 @@ import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import {
   getPropertyDetail,
   getPropertyReviews,
+  toggleFavorite,
 } from "@/app/lib/features/properties/propertySlice";
 import { Avatar, Button, Modal, Divider } from "antd";
 import CreateReservationForm from "@/app/components/forms/CreateReservationForm";
 import Link from "next/link";
 import DeletePropertyConfirmationModal from "@/app/components/modals/DeletePropertyConfirmationModal";
+import { div } from "framer-motion/client";
 
 function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
@@ -63,6 +65,13 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     );
   }
 
+  const handleToggleFavorite = (e: React.MouseEvent, propertyId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    dispatch(toggleFavorite(propertyId));
+  };
+
   return (
     <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
       {/* Header with title and action buttons */}
@@ -72,7 +81,7 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
             {property.title}
           </p>
         </div>
-        {property.user.id === user?.id && (
+        {/* {property.user.id === user?.id && (
           <div className="flex gap-2">
             <Button
               color="primary"
@@ -89,6 +98,69 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
               onClick={() => setIsDeletePropertyModalOpen(true)}
             >
               Delete
+            </Button>
+          </div>
+        )} */}
+
+        {user && (
+          <div className="flex gap-2 items-center">
+            <Button
+              type="default"
+              size="small"
+              className="flex items-center gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="gray"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="icon icon-tabler icon-tabler-share"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                <path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                <path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                <path d="M8.7 10.7l6.6 -3.4" />
+                <path d="M8.7 13.3l6.6 3.4" />
+              </svg>
+              <span className="text-xs font-medium">Share</span>
+            </Button>
+
+            <Button
+              type="default"
+              size="small"
+              onClick={(e) => handleToggleFavorite(e, property.id)}
+            >
+              <div
+                className={`action-button-detail-2 like-button ${
+                  property.liked ? "liked" : ""
+                }`}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="19"
+                  height="19"
+                  viewBox="0 0 24 24"
+                  fill={property.liked ? "currentColor" : "none"}
+                  stroke={property.liked ? "currentColor" : "gray"}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="icon icon-tabler icon-tabler-heart transition-transform duration-150"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+                </svg>
+              </div>
+              <span className="text-xs">
+                {" "}
+                {property.liked ? "Liked" : "Like"}{" "}
+              </span>
             </Button>
           </div>
         )}

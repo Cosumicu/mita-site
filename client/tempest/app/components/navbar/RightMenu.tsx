@@ -89,6 +89,7 @@ const items1: MenuItem[] = [
     type: "group",
     children: [
       { key: "host-dashboard", label: "Dashboard" },
+      { key: "host-calendar", label: "Calendar" },
       { key: "host-properties", label: "Listings" },
       { key: "host-reservations", label: "Reservations" },
       {
@@ -184,6 +185,11 @@ function RightMenu() {
       case "host-dashboard":
         setOpenMain(false);
         router.push(`/host/dashboard`);
+        break;
+
+      case "host-calendar":
+        setOpenMain(false);
+        router.push(`/host/calendar`);
         break;
 
       case "host-properties":

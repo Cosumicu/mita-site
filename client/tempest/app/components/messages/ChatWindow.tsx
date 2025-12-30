@@ -7,7 +7,7 @@ import {
   getConversationMessages,
 } from "@/app/lib/features/messages/messageSlice";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { Avatar, Button } from "antd";
+import { Avatar, Button, Spin } from "antd";
 import ChatReservationDetailsDrawer from "./ChatReservationDetailsDrawer";
 import { formatTimeV2 } from "@/app/lib/utils/format";
 
@@ -170,7 +170,11 @@ export default function ChatWindow({ conversation, onBack }: Props) {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {/* {messageListLoading && <p>Loading messages...</p>} */}
+          {messageListLoading && (
+            <div className="flex h-full items-center justify-center">
+              <Spin size="large" />
+            </div>
+          )}
           {messageList.map((msg) => {
             const isMe = msg.sender.id === user?.id;
             return (

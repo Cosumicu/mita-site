@@ -40,6 +40,7 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
   const [form] = Form.useForm();
   const [nights, setNights] = useState<number>(0);
   const [taxAmount, setTaxAmount] = useState<number>(0);
+  const [serviceFee, setServiceFee] = useState(0);
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
   useEffect(() => {
@@ -121,16 +122,15 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
 
     const afterDiscount = subtotal - discount;
 
-    const afterCleaning = afterDiscount + cleaning;
+    // cleaning is NOT discounted
+    const serviceFee = afterDiscount * guest_service;
+    setServiceFee(serviceFee);
 
-    const serviceFee = afterCleaning * guest_service;
+    const taxAmount = (afterDiscount + cleaning + serviceFee) * tax;
 
-    const afterService = afterCleaning + serviceFee;
-
-    const taxAmount = afterService * tax;
     setTaxAmount(taxAmount);
 
-    const finalTotal = afterService + taxAmount;
+    const finalTotal = afterDiscount + cleaning + serviceFee + taxAmount;
 
     setTotalPrice(finalTotal);
   }, [property, nights]);
@@ -313,29 +313,12 @@ function CreateReservationForm({ property }: CreateReservationFormProps) {
               </div>
             )}
 
-            {/* Service fee */}
             {GUEST_SERVICE_FEE_RATE > 0 && (
               <div className="flex justify-between">
                 <div>
                   Service fee ({(GUEST_SERVICE_FEE_RATE * 100).toFixed(0)}%)
                 </div>
-                <div>
-                  ₱
-                  {formatCurrency(
-                    (Number(property.price_per_night) * nights -
-                      (nights >= 28
-                        ? Number(property.price_per_night) *
-                          nights *
-                          Number(property.monthly_discount_rate)
-                        : nights >= 7
-                        ? Number(property.price_per_night) *
-                          nights *
-                          Number(property.weekly_discount_rate)
-                        : 0) +
-                      Number(property.cleaning_fee)) *
-                      GUEST_SERVICE_FEE_RATE
-                  )}
-                </div>
+                <div>₱{formatCurrency(serviceFee)}</div>
               </div>
             )}
 
