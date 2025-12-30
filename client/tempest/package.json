@@ -21,6 +21,7 @@
     "nprogress": "^0.2.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-fast-marquee": "^1.6.5",
     "react-redux": "^9.2.0",
     "react-toastify": "^11.0.5",
     "react-virtual-infinite-scroll-hook": "^1.0.0",
