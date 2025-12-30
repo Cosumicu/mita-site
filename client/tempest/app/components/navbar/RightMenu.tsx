@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import RegisterForm from "../forms/RegisterForm";
 import LoginForm from "../forms/LoginForm";
 import { logout, reset as resetAuth } from "../../lib/features/auth/authSlice";
+import { reset as resetUser } from "../../lib/features/users/userSlice";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { toast } from "react-toastify";
 import CreatePropertyModal from "../modals/CreatePropertyModal";
@@ -218,9 +219,9 @@ function RightMenu() {
         break;
 
       case "logout":
-        await dispatch(logout()).unwrap(); // guarantees response arrived
+        await dispatch(logout());
+        dispatch(resetUser());
         dispatch(resetAuth());
-        router.replace("/");
         toast.success("Logout successful");
         break;
 
