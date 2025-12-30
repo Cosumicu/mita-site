@@ -49,9 +49,6 @@ const HostCalendarPage = () => {
 
   return (
     <div className="pb-10">
-      <div className="px-4 sm:px-10">
-        <p className="my-4 font-semibold sm:text-xl">Host Calendar</p>
-      </div>
       <HostCalendar
         reservations={hostCalendarData}
         onDatesSet={handleDatesSet}

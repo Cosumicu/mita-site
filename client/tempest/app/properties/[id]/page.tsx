@@ -59,6 +59,14 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
 
   const property = propertyDetail;
 
+  if (propertyDetailLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   if (!property || !property.id) {
     return (
       <div className="h-screen text-center mt-10 text-gray-500">

@@ -121,7 +121,11 @@ function ReservationDetailsDrawer({
       {/* Property Header */}
       <div>
         <div className="flex justify-between items-start">
-          <p className="font-bold text-xl">{reservation.property.title}</p>
+          <Link href={`/properties/${reservation.property.id}`}>
+            <p className="font-bold text-xl text-black">
+              {reservation.property.title}
+            </p>
+          </Link>
           <div className="flex ml-auto gap-2">
             <Button type="primary" size="small">
               Print
@@ -161,10 +165,10 @@ function ReservationDetailsDrawer({
         </div>
       </div>
 
-      <p className="font-bold text-lg mb-2">Guests</p>
+      <p className="font-bold text-lg">Guest</p>
       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
         <div className="flex items-center">
-          <Link href={`/users/profile/${reservation.property.user.id}`}>
+          <Link href={`/users/profile/${reservation.user.id}`}>
             <Avatar size="large" src={reservation.user.profile_picture_url} />
           </Link>
 
