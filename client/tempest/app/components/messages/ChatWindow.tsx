@@ -114,14 +114,14 @@ export default function ChatWindow({ conversation, onBack }: Props) {
           )}
           {conversation && (
             <div className="flex gap-2 ml-auto">
-              <button>
+              <button className="bg-gray-100 rounded-[6px] p-1.5 hover:bg-gray-200 transition">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="var(--primary)"
+                  stroke="gray"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -135,15 +135,16 @@ export default function ChatWindow({ conversation, onBack }: Props) {
               </button>
               {!isChatReservationDetailsDrawerOpen && (
                 <button
+                  className="bg-gray-100 rounded-[6px] p-1.5 hover:bg-gray-200 transition"
                   onClick={() => setIsChatReservationDetailsDrawerOpen(true)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
+                    width="20"
+                    height="20"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="var(--primary)"
+                    stroke="gray"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -170,11 +171,11 @@ export default function ChatWindow({ conversation, onBack }: Props) {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messageListLoading && (
+          {/* {messageListLoading && (
             <div className="flex h-full items-center justify-center">
               <Spin size="large" />
             </div>
-          )}
+          )} */}
           {messageList.map((msg) => {
             const isMe = msg.sender.id === user?.id;
             return (

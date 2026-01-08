@@ -26,13 +26,13 @@ export default function ChatSidebar({
     dispatch(getConversationList());
   }, [dispatch]);
 
-  if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Spin size="large" />
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex h-full items-center justify-center">
+  //       <Spin size="large" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="flex flex-col h-full">
