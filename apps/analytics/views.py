@@ -3,6 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.utils.dateparse import parse_date
 
+from .services import get_host_dashboard
+
 from apps.properties.models import Reservation
 
 class HostCalendarAPIView(APIView):
@@ -41,3 +43,13 @@ class HostCalendarAPIView(APIView):
             }
             for r in reservations
         ])
+
+class HostDashboardAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        range = request.query_params.get("range", "month")
+        if range not in ["week", "month", "year"]:
+            range = "month"
+
+        return Response(get_host_dashboard(user=request.user, range=range))

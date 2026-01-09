@@ -173,3 +173,46 @@ export type HostCalendarEvent = {
   guest: string;
   confirmation_code: string;
 };
+
+export type DashboardRange = "week" | "month" | "year";
+
+export type HostDashboardResponse = {
+  meta?: {
+    range?: DashboardRange;
+    start?: string;
+    end?: string;
+    prev_start?: string;
+    prev_end?: string;
+  };
+
+  today?: {
+    checkins: number;
+    checkouts: number;
+    ongoing_stays: number;
+    occupancy_rate_today: number;
+  };
+
+  stats: {
+    total_income: number;
+    total_income_change_pct?: number;
+
+    occupancy_rate: number;
+    occupancy_rate_change_pct?: number;
+
+    adr: number;
+    adr_change_pct?: number;
+
+    revpar?: number;
+    revpar_change_pct?: number;
+
+    views: number;
+    likes: number;
+    reservations: number;
+    active_properties: number;
+  };
+
+  charts: {
+    bookings: { date: string; count: number }[];
+    revenue: { date: string; revenue: number }[];
+  };
+};

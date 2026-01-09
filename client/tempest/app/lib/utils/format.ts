@@ -47,3 +47,17 @@ export function formatTimeV2(isoString: string) {
 
   return `${hours}:${minutesStr} ${ampm}`;
 }
+
+export function formatPesoShort(value: number) {
+  const abs = Math.abs(value);
+
+  if (abs >= 1_000_000) {
+    return `₱${(value / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+  }
+
+  if (abs >= 1_000) {
+    return `₱${(value / 1_000).toFixed(0)}K`;
+  }
+
+  return `₱${value.toLocaleString()}`;
+}
