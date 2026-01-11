@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Property, Reservation, PropertyLike, PropertyTag
+from .models import Property, Reservation, PropertyLike, PropertyTag, PropertyStatus
 
 from apps.profiles.serializers import ProfileSerializer
 from apps.reviews.serializers import ReviewSerializer
@@ -176,3 +176,10 @@ class PropertyLikeSerializer(serializers.ModelSerializer):
 
     def get_id(self, obj):
         return str(obj.id)
+
+class PropertyStatusUpdateSerializer(serializers.ModelSerializer):
+    status = serializers.ChoiceField(choices=PropertyStatus.choices)
+
+    class Meta:
+        model = Property
+        fields = ["status"]

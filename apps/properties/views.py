@@ -11,10 +11,10 @@ from datetime import datetime, timedelta
 import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Property, Reservation, PropertyView, PropertyLike, ReservationStatus, PropertyTag
+from .models import Property, Reservation, PropertyView, PropertyLike, ReservationStatus, PropertyTag, PropertyStatus
 from .pagination import PropertyPagination
 from apps.chat.models import Conversation
-from .serializers import PropertyListSerializer, PropertyDetailSerializer, PropertyCreateSerializer, ReservationSerializer, PropertyTagSerializer
+from .serializers import PropertyListSerializer, PropertyDetailSerializer, PropertyCreateSerializer, ReservationSerializer, PropertyTagSerializer, PropertyStatusUpdateSerializer
 
 class PropertyFilter(django_filters.FilterSet):
     user = django_filters.UUIDFilter(field_name='user__id')
@@ -55,7 +55,6 @@ class PropertyFilter(django_filters.FilterSet):
 class ReservationFilter(django_filters.FilterSet):
     status = django_filters.CharFilter(field_name='status')
 
-
 class PropertyListView(generics.ListAPIView):
     queryset = Property.objects.all().order_by('-created_at')
     serializer_class = PropertyListSerializer
@@ -69,8 +68,23 @@ class PropertyDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.AllowAny]
     lookup_url_kwarg = "property_id"
 
+    def get_queryset(self):
+        qs = Property.objects.all()
+        user = self.request.user
+
+        if user.is_authenticated:
+            return qs.filter(
+                Q(status=PropertyStatus.ACTIVE) | Q(user=user)
+            )
+
+        return qs.filter(status=PropertyStatus.ACTIVE)
+
+
     def get_object(self):
-        return get_object_or_404(Property, id=self.kwargs.get(self.lookup_url_kwarg))
+        return get_object_or_404(
+            self.get_queryset(),
+            id=self.kwargs.get(self.lookup_url_kwarg)
+        )
 
     def retrieve(self, request, *args, **kwargs):
         property = self.get_object()
@@ -354,3 +368,18 @@ class PropertyTagListView(generics.ListAPIView):
     queryset = PropertyTag.objects.all()
     serializer_class = PropertyTagSerializer
     permission_classes = [permissions.AllowAny]
+
+class PropertyStatusUpdateView(generics.UpdateAPIView):
+    serializer_class = PropertyStatusUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["patch"]
+
+    def get_queryset(self):
+        # Only allow users to update THEIR properties
+        return Property.objects.filter(user=self.request.user)
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            id=self.kwargs["property_id"]
+        )

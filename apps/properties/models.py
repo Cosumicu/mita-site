@@ -17,6 +17,7 @@ def generate_confirmation_code(length=8):
     return ''.join(random.choices(chars, k=length))
 
 class PropertyStatus(models.TextChoices):
+    DRAFT = "DRAFT", "Draft"
     ACTIVE = "ACTIVE", "Active"
     INACTIVE = "INACTIVE", "Inactive"
     PENDING = "PENDING", "Pending"
@@ -50,7 +51,7 @@ class Property(TimeStampedUUIDModel):
     status = models.CharField(
         max_length=20,
         choices=PropertyStatus.choices,
-        default=PropertyStatus.ACTIVE
+        default=PropertyStatus.INACTIVE
     )
     tags = models.ManyToManyField(PropertyTag, related_name="properties", blank=True)
     views_count = models.PositiveIntegerField(default=0)

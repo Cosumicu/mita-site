@@ -16,9 +16,10 @@ from .views import (
     UserFavoritesView,
     ToggleFavoriteView,
     PropertyTagListView,
+    PropertyStatusUpdateView,
 )
 urlpatterns = [
-    path('', PropertyListView.as_view(), name='property_list'),
+    path('', PropertyListView.as_view(), name='property-list'),
     path('<uuid:property_id>/', PropertyDetailView.as_view(), name='property-details'),
     path('create/', PropertyCreateView.as_view(), name='property-create'),
     path('<uuid:property_id>/update/', PropertyUpdateView.as_view(), name='property-update'),
@@ -34,4 +35,5 @@ urlpatterns = [
     path('reservation/p/<uuid:property_id>', ReservationListProperty.as_view(), name='reservation-list-property'),
     path('<uuid:id>/toggle-favorite/', ToggleFavoriteView.as_view(), name='toggle-favorite'),
     path('tags/', PropertyTagListView.as_view(), name='tag-list'),
+    path("<uuid:property_id>/status/", PropertyStatusUpdateView.as_view(), name="property-status-update",),
 ]
