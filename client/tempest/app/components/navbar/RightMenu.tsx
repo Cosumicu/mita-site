@@ -82,7 +82,7 @@ const items1: MenuItem[] = [
         key: "guest-reservations",
         label: "Reservations",
       },
-      { key: "guest-favorites", label: "Favorites" },
+      { key: "saved", label: "Saved" },
     ],
   },
   { type: "divider" },
@@ -223,9 +223,9 @@ function RightMenu() {
         router.push(`/host/requests`);
         break;
 
-      case "guest-favorites":
+      case "saved":
         setOpenMain(false);
-        router.push(`/guest/liked`);
+        router.push(`/saved`);
         break;
 
       case "guest-reservations":
