@@ -107,6 +107,7 @@ const PropertyList = ({ label, properties, loading }: PropertyListProps) => {
           {loading
             ? Array.from({ length: 8 }).map((_, i) => (
                 <Card
+                  key={i}
                   styles={{ body: { padding: 0 } }}
                   variant="borderless"
                   className="!shadow-none"

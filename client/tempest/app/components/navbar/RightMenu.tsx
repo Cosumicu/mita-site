@@ -67,8 +67,9 @@ const items1: MenuItem[] = [
     label: "User",
     type: "group",
     children: [
-      { key: "profile", label: "Profile", icon: <UserOutlined /> },
-      { key: "inbox", label: "Inbox", icon: <MailOutlined /> },
+      { key: "profile", label: "Profile" },
+      { key: "inbox", label: "Inbox" },
+      { key: "saved", label: "Saved" },
     ],
   },
   { type: "divider" },
@@ -82,7 +83,6 @@ const items1: MenuItem[] = [
         key: "guest-reservations",
         label: "Reservations",
       },
-      { key: "saved", label: "Saved" },
     ],
   },
   { type: "divider" },
@@ -195,7 +195,7 @@ function RightMenu() {
 
       case "profile":
         setOpenMain(false);
-        router.push(`/users/profile/${user?.id}`);
+        router.push(`/users/profile/${user?.user_id}`);
         break;
 
       case "inbox":
