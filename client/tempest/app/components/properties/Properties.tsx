@@ -7,6 +7,7 @@ import {
   getPropertyList2,
   getPropertyList3,
   createProperty,
+  resetPropertyListHome,
 } from "@/app/lib/features/properties/propertySlice";
 
 function Properties() {
@@ -34,10 +35,14 @@ function Properties() {
     dispatch(
       getPropertyList3({ filters: { status: "ACTIVE", location: "beijing" } })
     );
+
+    return () => {
+      dispatch(resetPropertyListHome());
+    };
   }, [dispatch, createPropertySuccess]);
 
   return (
-    <div className="pl-4 pr-0 sm:px-4 md:px-8 lg:px-12 mt-5">
+    <div className="space-y-4">
       <PropertyList
         label="Stay in Shanghai"
         properties={propertyList1}
@@ -46,12 +51,12 @@ function Properties() {
       <PropertyList
         label="Available in Shenzhen this weekend"
         properties={propertyList2}
-        loading={propertyList1Loading}
+        loading={propertyList2Loading}
       />
       <PropertyList
         label="Popular in Beijing"
         properties={propertyList3}
-        loading={propertyList1Loading}
+        loading={propertyList3Loading}
       />
     </div>
   );
