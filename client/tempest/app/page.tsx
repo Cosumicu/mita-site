@@ -4,7 +4,7 @@ import Marquee from "react-fast-marquee";
 
 export default function Home() {
   return (
-    <>
+    <div>
       <Alert
         banner
         message={
@@ -24,8 +24,9 @@ export default function Home() {
           </Marquee>
         }
       />
-
-      <Properties />
-    </>
+      <div className="p-4 sm:p-8">
+        <Properties />
+      </div>
+    </div>
   );
 }
