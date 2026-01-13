@@ -42,9 +42,9 @@ const SearchBar: React.FC = () => {
   };
 
   return (
-    <div className="min-w-[100px] p-1">
+    <div className="pb-4">
       {/* LARGE SCREENS */}
-      <div className="hidden sm:flex bg-white p-2 rounded-xl shadow-sm transition-all duration-200 divide-x divide-gray-200 hover:shadow-lg">
+      <div className="hidden sm:flex bg-white p-2 border border-gray-200 shadow-xs rounded-xl">
         <div className="flex-1">
           <Input
             placeholder="Where are you going?"
@@ -75,8 +75,8 @@ const SearchBar: React.FC = () => {
             className="!border-none !w-[150px] "
             placeholder="Add Guests"
           />
-          <span className="text-gray-400 text-sm pr-2">
-            {guests == null ? "" : guests === 1 ? "guest" : "guests"}
+          <span className="text-gray-400 text-sm pl-4">
+            {guests == null ? "" : guests === 1 ? "guest" : " guests"}
           </span>
         </div>
 
@@ -93,10 +93,9 @@ const SearchBar: React.FC = () => {
         </div>
       </div>
 
-      <div className="sm:hidden">
+      <div className="sm:hidden px-4">
         <Button
           color="primary"
-          variant="outlined"
           block
           shape="round"
           icon={<SearchOutlined />}
@@ -114,41 +113,41 @@ const SearchBar: React.FC = () => {
         onOk={onSearch}
         onCancel={() => setIsModalOpen(false)}
         okText="Search"
-        centered
       >
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2">
-            <EnvironmentOutlined className="text-gray-500" />
+          <div className="flex items-center gap-2 rounded-xl px-3 py-2">
             <Input
-              placeholder="Location"
+              placeholder="Where are you going?"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              bordered={false}
+              className=" !shadow-none focus:!shadow-none focus:!border-none"
             />
           </div>
 
-          <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2">
-            <CalendarOutlined className="text-gray-500" />
+          <div className="flex items-center gap-2 rounded-xl px-3 py-2">
             <RangePicker
-              style={{ width: "100%" }}
+              format="ddd, MMM D"
+              suffixIcon=""
+              className="!border-none !shadow-none w-full [&>.ant-picker-suffix]:hidden"
               onChange={(values) =>
                 setDates(values as [dayjs.Dayjs | null, dayjs.Dayjs | null])
               }
-              bordered={false}
+              disabledDate={disabledDate}
               placeholder={["Check-in", "Checkout"]}
             />
           </div>
 
-          <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2">
-            <UserOutlined className="text-gray-500" />
+          <div className="flex items-center gap-2 rounded-xl px-3 py-2">
             <InputNumber
               min={1}
               value={guests}
               onChange={(value) => setGuests(value || 1)}
-              bordered={false}
-              className="w-full"
-              placeholder="Guests"
+              className="!border-none !w-[150px] "
+              placeholder="Add Guests"
             />
+            <span className="text-gray-400 text-sm pl-4">
+              {guests == null ? "" : guests === 1 ? "guest" : " guests"}
+            </span>
           </div>
         </div>
       </Modal>
