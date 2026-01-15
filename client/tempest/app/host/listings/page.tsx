@@ -40,7 +40,7 @@ export default function MyPropertiesPage() {
     if (user?.id) {
       dispatch(
         getUserPropertyList({
-          filters: { userId: user.id, status: statusFilter },
+          filters: { user: user.user_id, status: statusFilter },
           pagination: { page: currentPage, page_size: pageSize },
         })
       );
@@ -93,21 +93,6 @@ export default function MyPropertiesPage() {
       dataIndex: "created_at",
       render: (date: string) => `${formatDate(date)}`,
     },
-    // {
-    //   title: "Views",
-    //   dataIndex: "views_count",
-    //   align: "center",
-    // },
-    // {
-    //   title: "Likes",
-    //   dataIndex: "likes_count",
-    //   align: "center",
-    // },
-    // {
-    //   title: "Reservations",
-    //   dataIndex: "reservations_count",
-    //   align: "center",
-    // },
     {
       title: "Status",
       dataIndex: "status",
@@ -188,79 +173,81 @@ export default function MyPropertiesPage() {
   };
 
   return (
-    <div className="px-4 sm:px-10 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="font-semibold text-xl sm:text-3xl">Listings</p>
-        </div>
-        <div className="flex gap-2">
-          <div className="flex gap-1 items-center">
-            <Button color="default" variant="filled" size="small">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="gray"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="icon icon-tabler icons-tabler-outline icon-tabler-download"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
-                <path d="M7 11l5 5l5 -5" />
-                <path d="M12 4l0 12" />
-              </svg>
-            </Button>
+    <div className="ui-container">
+      <div className="ui-main-content">
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="font-semibold text-xl sm:text-2xl">Listings</p>
+          </div>
+          <div className="flex gap-2">
+            <div className="flex gap-1 items-center">
+              <Button color="default" variant="filled" size="small">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="gray"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="icon icon-tabler icons-tabler-outline icon-tabler-download"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                  <path d="M7 11l5 5l5 -5" />
+                  <path d="M12 4l0 12" />
+                </svg>
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="">
-        <Segmented<string>
-          options={[
-            { label: "All", value: "" },
-            { label: "Active", value: "ACTIVE" },
-            { label: "Inactive", value: "INACTIVE" },
-            { label: "Suspended", value: "SUSPENDED" },
-          ]}
-          onChange={(value) => {
-            setCurrentPage(1);
-            setStatusFilter(value);
-          }}
-        />
-      </div>
+        <div className="">
+          <Segmented<string>
+            options={[
+              { label: "All", value: "" },
+              { label: "Active", value: "ACTIVE" },
+              { label: "Inactive", value: "INACTIVE" },
+              { label: "Suspended", value: "SUSPENDED" },
+            ]}
+            onChange={(value) => {
+              setCurrentPage(1);
+              setStatusFilter(value);
+            }}
+          />
+        </div>
 
-      <div className="overflow-x-auto">
-        <Table
-          columns={columns}
-          dataSource={tableData}
-          loading={userPropertyListLoading}
-          pagination={{
-            current: currentPage,
-            pageSize,
-            total: count,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
-          }}
-          onChange={handleTableChange}
-        />
+        <div className="overflow-x-auto">
+          <Table
+            columns={columns}
+            dataSource={tableData}
+            loading={userPropertyListLoading}
+            pagination={{
+              current: currentPage,
+              pageSize,
+              total: count,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
+            }}
+            onChange={handleTableChange}
+          />
+        </div>
+        <Drawer
+          title="Listing Details"
+          placement="right"
+          width={500}
+          onClose={() => setIsPropertyDetailsDrawerOpen(false)}
+          open={isPropertyDetailsDrawerOpen}
+        >
+          {selectedProperty ? (
+            <PropertyDetailsDrawer propertyId={selectedProperty.id} />
+          ) : (
+            <Spin />
+          )}
+        </Drawer>
       </div>
-      <Drawer
-        title="Listing Details"
-        placement="right"
-        width={500}
-        onClose={() => setIsPropertyDetailsDrawerOpen(false)}
-        open={isPropertyDetailsDrawerOpen}
-      >
-        {selectedProperty ? (
-          <PropertyDetailsDrawer propertyId={selectedProperty.id} />
-        ) : (
-          <Spin />
-        )}
-      </Drawer>
     </div>
   );
 }

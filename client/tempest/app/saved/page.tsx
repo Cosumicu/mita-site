@@ -7,9 +7,10 @@ import {
   toggleFavorite,
 } from "@/app/lib/features/properties/propertySlice";
 import Link from "next/link";
-import { Alert, Card, Skeleton, Spin } from "antd";
+import { Card } from "antd";
 import { useRouter, usePathname } from "next/navigation";
 import { formatCurrency } from "@/app/lib/utils/format";
+import ListingLoading from "../components/common/ListingLoading";
 
 export default function FavoritesPage() {
   const dispatch = useAppDispatch();
@@ -43,67 +44,17 @@ export default function FavoritesPage() {
   }, [user, userLoading, hasCheckedAuth, dispatch, router, pathname]);
 
   if (!hasCheckedAuth || userLoading) {
-    return (
-      <div className="h-screen px-4 sm:px-10 space-y-4">
-        <p className="font-semibold sm:text-xl">Saved Listings</p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 xl:grid-cols-4 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Card
-              key={i}
-              className="rounded-xl !shadow-none"
-              size="small"
-              variant="borderless"
-              cover={
-                <div className="w-full h-[160px] sm:h-[200px]">
-                  <Skeleton.Image
-                    active
-                    className="!w-full !h-full !rounded-xl"
-                  />
-                </div>
-              }
-            >
-              <Skeleton active title={false} />
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
+    return <ListingLoading title="Saved Listings"></ListingLoading>;
   }
 
   if (!user) {
-    return (
-      <div className="h-screen px-4 sm:px-10 space-y-4">
-        <p className="font-semibold sm:text-xl">Saved Listings</p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 xl:grid-cols-4 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Card
-              key={i}
-              className="rounded-xl !shadow-none"
-              size="small"
-              variant="borderless"
-              cover={
-                <div className="w-full h-[160px] sm:h-[200px]">
-                  <Skeleton.Image
-                    active
-                    className="!w-full !h-full !rounded-xl"
-                  />
-                </div>
-              }
-            >
-              <Skeleton active title={false} paragraph={{ rows: 2 }} />
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
+    return <ListingLoading title="Saved Listings"></ListingLoading>;
   }
 
   return (
-    <div className="h-screen px-4 sm:px-10 space-y-4">
-      <p className="font-semibold text-xl">Saved Listings</p>
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-6 xl:grid-cols-4 gap-4">
+    <div className="ui-container ui-main-content">
+      <p className="font-semibold text-xl sm:text-2xl">Saved Listings</p>
+      <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-6 gap-4">
         {userLikesList.map((property: any) => (
           <Link href={`/properties/${property.id}`} key={property.id}>
             <Card
@@ -112,8 +63,8 @@ export default function FavoritesPage() {
               size="small"
               variant="borderless"
             >
-              <div className="w-[160px] sm:w-[184px] space-y-2 relative">
-                <div className="aspect-[16/15]">
+              <div className="w-full space-y-2 relative">
+                <div className="aspect-[16/15] w-full">
                   <img
                     className="w-full h-full object-cover rounded-xl"
                     alt={property.title}

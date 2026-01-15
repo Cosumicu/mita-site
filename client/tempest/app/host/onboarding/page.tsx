@@ -1,27 +1,33 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { Space, Card, Button, Tag, Spin, Empty, Steps, Alert } from "antd";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Card, Button, Spin, Alert, Steps, Empty, Space, Tag } from "antd";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import { getUserPropertyList } from "@/app/lib/features/properties/propertySlice";
-// OPTIONAL: use your existing action if you have one to refresh user/profile
-// import { getUserProfile } from "@/app/lib/features/user/userSlice";
 import api from "@/app/lib/features/axiosInstance";
-import LeftImage from "@/app/components/navbar/LeftImage";
 
 export default function HostOnboardingPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const { user } = useAppSelector((state) => state.user);
+  const {
+    user,
+    hasCheckedAuth,
+    isLoading: userLoading,
+  } = useAppSelector((state) => state.user);
 
-  const { data, loading } = useAppSelector(
+  const { data, loading, error, message } = useAppSelector(
     (state) => state.property.userPropertyList
   );
 
   const [activating, setActivating] = useState(false);
   const [activateError, setActivateError] = useState<string | null>(null);
+
+  const userId = user?.user_id ?? user?.id ?? null;
+
+  // ✅ Prevent repeated fetches for same userId (dev strict mode + rerenders)
+  const lastFetchedUserId = useRef<string | number | null>(null);
 
   // data might be paginated ({results: []}) or a plain array
   const properties = useMemo(() => {
@@ -31,7 +37,6 @@ export default function HostOnboardingPage() {
     return [];
   }, [data]);
 
-  // Pick the latest created property (fallback to first if created_at not present)
   const latestProperty = useMemo(() => {
     if (!properties.length) return null;
 
@@ -45,8 +50,8 @@ export default function HostOnboardingPage() {
   }, [properties]);
 
   // STEP LOGIC
-  const hasListing = properties.length > 0; // or properties.some(p => p.status !== "DRAFT")
-  const hasContactNo = !!user?.phone_number || !!user?.phone_number;
+  const hasListing = properties.length > 0;
+  const hasContactNo = !!user?.phone_number;
   const hasGovId = !!user?.valid_id;
   const hasProfileReqs = hasContactNo && hasGovId;
 
@@ -59,18 +64,42 @@ export default function HostOnboardingPage() {
     return 2;
   }, [hasListing, hasProfileReqs]);
 
+  // ✅ Auth / routing guard
+  useEffect(() => {
+    if (!hasCheckedAuth || userLoading) return;
+
+    if (!user) {
+      router.replace(`/login?next=${encodeURIComponent("/host/onboarding")}`);
+      return;
+    }
+
+    if (user.host_status === "ACTIVE") {
+      router.replace("/host/dashboard");
+    }
+  }, [hasCheckedAuth, userLoading, user, router]);
+
+  // ✅ Fetch properties when we have a stable userId
+  useEffect(() => {
+    if (!userId) return;
+    if (lastFetchedUserId.current === userId) return;
+
+    lastFetchedUserId.current = userId;
+
+    dispatch(
+      getUserPropertyList({
+        filters: { user: userId, status: "" },
+        pagination: { page: 1, page_size: 10 },
+      })
+    );
+  }, [dispatch, userId]);
+
   async function activateHost() {
     try {
       setActivateError(null);
       setActivating(true);
 
-      // Adjust endpoint to whatever you implemented
       await api.post("/api/v1/hosts/activate/");
-
-      // OPTIONAL: refresh user/profile if needed so navbar updates immediately
-      // dispatch(getUserProfile());
-
-      router.push("/host/dashboard"); // change to your host landing page
+      router.push("/host/dashboard");
     } catch (e: any) {
       setActivateError(
         e?.response?.data?.detail || e?.message || "Failed to activate host."
@@ -80,29 +109,20 @@ export default function HostOnboardingPage() {
     }
   }
 
-  useEffect(() => {
-    if (user?.id || user?.user_id) {
-      dispatch(
-        getUserPropertyList({
-          filters: { userId: user.user_id, status: "" },
-          pagination: { page: 1, page_size: 10 },
-        })
-      );
-    }
-  }, [dispatch, user?.user_id, user?.id]);
+  // ✅ Render guards
+  if (!hasCheckedAuth || userLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  // If user is null, the redirect effect will run — render nothing to avoid flicker
+  if (!user) return null;
 
   return (
     <>
-      <nav className="w-full h-16 fixed top-0 left-0 z-10 bg-secondary">
-        <div className="flex justify-between items-center gap-2 mx-2 sm:mx-4 md:mx-6 lg:mx-8 h-full">
-          {/* Left content */}
-          <LeftImage />
-          <div className="flex gap-4 px-4">
-            <button>Help</button>{" "}
-            <button onClick={() => router.push("/")}>Exit</button>
-          </div>
-        </div>
-      </nav>
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Space direction="vertical" size={16} style={{ width: "100%" }}>
           <div className="flex items-start justify-between gap-4">
@@ -111,15 +131,6 @@ export default function HostOnboardingPage() {
               <p className="text-gray-500">
                 Complete the steps below to activate your host account.
               </p>
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                type="primary"
-                onClick={() => router.push("/host/create-listing")}
-              >
-                Create listing
-              </Button>
             </div>
           </div>
 
@@ -149,13 +160,15 @@ export default function HostOnboardingPage() {
                           ? "Done. Your listing is created."
                           : "Create your first listing to continue."}
                       </span>
-                      <Button
-                        size="small"
-                        type={hasListing ? "default" : "primary"}
-                        onClick={() => router.push("/host/create-listing")}
-                      >
-                        {hasListing ? "Create another" : "Create"}
-                      </Button>
+                      {!hasListing && (
+                        <Button
+                          size="small"
+                          type="primary"
+                          onClick={() => router.push("/host/create-listing/")}
+                        >
+                          Create
+                        </Button>
+                      )}
                     </div>
                   ),
                 },
@@ -211,14 +224,12 @@ export default function HostOnboardingPage() {
                       <Button
                         size="small"
                         disabled={!hasListing}
-                        type={
-                          !hasProfileReqs && hasListing ? "primary" : "default"
-                        }
+                        type="primary"
                         onClick={() =>
                           router.push(`/users/profile/${user?.user_id}`)
                         }
                       >
-                        {hasProfileReqs ? "View" : "Edit profile"}
+                        Edit profile
                       </Button>
                     </div>
                   ),
@@ -268,76 +279,67 @@ export default function HostOnboardingPage() {
             )}
           </Card>
 
-          {/* Listing preview card */}
-          <Card title="Your created listing">
-            {loading ? (
-              <Spin />
-            ) : !latestProperty ? (
-              <Empty
-                description="No listing yet. Create your first listing to continue."
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-              >
-                <Button
-                  type="primary"
-                  onClick={() => router.push("/host/create-listing")}
-                >
-                  Create your first listing
-                </Button>
-              </Empty>
-            ) : (
-              <div className="flex items-start gap-4">
-                <img
-                  src={latestProperty.image_url || latestProperty.image}
-                  alt={latestProperty.title}
-                  className="h-20 w-28 rounded-lg object-cover border"
-                />
+          {hasListing && (
+            <Card title="Your created listing">
+              {loading ? (
+                <Spin />
+              ) : (
+                <div className="flex items-start gap-4">
+                  <img
+                    src={latestProperty.image_url || latestProperty.image}
+                    alt={latestProperty.title}
+                    className="h-20 w-28 rounded-lg object-cover border"
+                  />
 
-                <div className="flex-1">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold text-lg">
-                        {latestProperty.title}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Tag>{latestProperty.status}</Tag>
-                        {latestProperty.price_per_night != null && (
-                          <span className="text-gray-500">
-                            ₱
-                            {Number(
-                              latestProperty.price_per_night
-                            ).toLocaleString()}
-                            /night
-                          </span>
-                        )}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-semibold text-lg">
+                          {latestProperty.title}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Tag>{latestProperty.status}</Tag>
+                          {latestProperty.price_per_night != null && (
+                            <span className="text-gray-500">
+                              ₱
+                              {Number(
+                                latestProperty.price_per_night
+                              ).toLocaleString()}
+                              /night
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => router.push("/host/myproperties")}
+                        >
+                          View
+                        </Button>
+                        <Button
+                          type="primary"
+                          onClick={() =>
+                            router.push(
+                              `/host/update-listing/${latestProperty.id}/`
+                            )
+                          }
+                        >
+                          Edit listing
+                        </Button>
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
-                      <Button onClick={() => router.push("/host/myproperties")}>
-                        View
-                      </Button>
-                      <Button
-                        type="primary"
-                        onClick={() =>
-                          router.push(
-                            `/host/update-listing/${latestProperty.id}/`
-                          )
-                        }
-                      >
-                        Edit listing
-                      </Button>
-                    </div>
+                    {latestProperty.description && (
+                      <p className="text-gray-500 mt-2 line-clamp-2">
+                        {latestProperty.description}
+                      </p>
+                    )}
                   </div>
-
-                  {latestProperty.description && (
-                    <p className="text-gray-500 mt-2 line-clamp-2">
-                      {latestProperty.description}
-                    </p>
-                  )}
                 </div>
-              </div>
-            )}
-          </Card>
+              )}
+            </Card>
+          )}
         </Space>
       </div>
     </>

@@ -48,7 +48,7 @@ export default function UserProfilePage() {
   }
 
   return (
-    <div className="p-4 sm:p-8 space-y-6">
+    <div className="ui-container ui-main-content">
       <div className="flex flex-col sm:flex-row border border-gray-200 shadow-lg rounded-lg">
         <div className="sm:basis-1/3 p-6">
           <div className="flex sm:flex-col space-y-2">

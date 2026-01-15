@@ -12,7 +12,9 @@ import { Avatar, Button, Modal, Divider, Spin } from "antd";
 import CreateReservationForm from "@/app/components/forms/CreateReservationForm";
 import Link from "next/link";
 import DeletePropertyConfirmationModal from "@/app/components/modals/DeletePropertyConfirmationModal";
-import { div } from "framer-motion/client";
+import NotFound from "@/app/not-found";
+import { toast } from "react-toastify";
+import { PropertyDetailLoading } from "@/app/components/common/PropertyDetailLoading";
 
 function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
@@ -25,55 +27,43 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     useState(false);
 
   const { user } = useAppSelector((state) => state.user);
-  const {
-    data: propertyDetail,
-    loading: propertyDetailLoading,
-    success: propertyDetailSuccess,
-    error: propertyDetailError,
-    message: propertyDetailMessage,
-  } = useAppSelector((state) => state.property.propertyDetail);
-  const {
-    data: propertyReviews,
-    loading: propertyReviewsLoading,
-    success: propertyReviewsSuccess,
-    error: propertyReviewsError,
-    message: propertyReviewsMessage,
-    count: propertyReviewsCount,
-  } = useAppSelector((state) => state.property.propertyReviews);
-
-  const { success: updatePropertySuccess } = useAppSelector(
-    (state) => state.property.updateProperty
+  const { propertyDetail, propertyReviews, updateProperty } = useAppSelector(
+    (state) => state.property
   );
 
+  const property = propertyDetail.data;
+  const [requestedId, setRequestedId] = useState<string | null>(null);
+
+  const hasRequested = requestedId === id;
+  const isLoading = !hasRequested || propertyDetail.loading;
+  const isNotFound =
+    hasRequested &&
+    !propertyDetail.loading &&
+    propertyDetail.message?.includes("404");
+  const isError =
+    hasRequested && !propertyDetail.loading && !isNotFound && !property;
+
   useEffect(() => {
-    if (id) {
-      dispatch(getPropertyDetail(id));
-      dispatch(
-        getPropertyReviews({
-          propertyId: id,
-          pagination: { page: 1, page_size: 10 },
-        })
-      );
-    }
-  }, [dispatch, updatePropertySuccess, id]);
+    if (!id) return;
 
-  const property = propertyDetail;
+    setRequestedId(id);
 
-  if (propertyDetailLoading) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <Spin size="large" />
-      </div>
+    dispatch(getPropertyDetail(id));
+    dispatch(
+      getPropertyReviews({
+        propertyId: id,
+        pagination: { page: 1, page_size: 10 },
+      })
     );
-  }
+  }, [dispatch, id, updateProperty.success]);
 
-  if (!property || !property.id) {
-    return (
-      <div className="h-screen text-center mt-10 text-gray-500">
-        Property not found.
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!isError) return;
+
+    toast.error("Something went wrong", {
+      toastId: `property-generic-error-${id}`, // dedupe
+    });
+  }, [isError, id]);
 
   const handleToggleFavorite = (e: React.MouseEvent, propertyId: string) => {
     e.preventDefault();
@@ -82,38 +72,40 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     dispatch(toggleFavorite(propertyId));
   };
 
+  if (isLoading) {
+    return <PropertyDetailLoading></PropertyDetailLoading>;
+  }
+
+  if (isNotFound) {
+    return <NotFound />;
+  }
+
+  if (!property) {
+    return;
+  }
+
+  const specs = [
+    { v: property.guests, one: "guest", many: "guests" },
+    { v: property.bedrooms, one: "bedroom", many: "bedrooms" },
+    { v: property.beds, one: "bed", many: "beds" },
+    { v: property.bathrooms, one: "bathroom", many: "bathrooms" },
+  ]
+    .filter((x) => Number(x.v) > 0)
+    .map((x) => {
+      const n = Number(x.v);
+      return `${n} ${n === 1 ? x.one : x.many}`;
+    });
+
   return (
-    <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
-      {/* Header with title and action buttons */}
-      <div className="flex items-center my-6">
+    <div className="ui-container ui-main-content">
+      <div className="flex flex-col  sm:flex-row gap-4">
         <div className="flex-1 min-w-0">
           <p className="text-2xl font-semibold break-words overflow-wrap-break-word">
             {property.title}
           </p>
         </div>
-        {/* {property.user.id === user?.id && (
-          <div className="flex gap-2">
-            <Button
-              color="primary"
-              variant="outlined"
-              size="small"
-              onClick={() => router.push(`/host/update-listing/${property.id}`)}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              danger
-              onClick={() => setIsDeletePropertyModalOpen(true)}
-            >
-              Delete
-            </Button>
-          </div>
-        )} */}
-
         {user && (
-          <div className="flex gap-2 items-center">
+          <div className="sm:block sm:flex gap-2 items-center">
             <Button
               type="default"
               size="small"
@@ -176,63 +168,52 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
         )}
       </div>
       {/* Main image */}
-      <div className="w-full h-[250px] sm:h-[450px] rounded-xl overflow-hidden bg-gray-100 flex justify-center items-center mb-8">
+      <div className="w-full h-[250px] sm:h-[450px] rounded-xl overflow-hidden flex justify-center items-center">
         <img
           src={property.image_url}
           alt={property.title}
-          className="h-full w-auto object-contain"
+          className="h-full w-auto object-contain rounded-xl"
         />
       </div>
       {/* Grid layout for main content and reservation form */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content column (2/3 width on large screens) */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 flex flex-col gap-8">
           {/* Property type and location */}
-          <div className="mb-6">
+          <div>
             <div className="max-w-full">
               <h2 className="text-xl font-semibold break-words overflow-wrap-break-word">
                 {property.category} in {property.location}
               </h2>
             </div>
 
-            {/* Property specs */}
-            <div className="mt-3">
-              <ol className="flex flex-wrap gap-2 text-gray-700 text-sm md:text-base">
-                <li>
-                  {property.guests} {property.guests === 1 ? "guest" : "guests"}
-                </li>
-                <li>•</li>
-                <li>
-                  {property.bedrooms}{" "}
-                  {property.bedrooms === 1 ? "bedroom" : "bedrooms"}
-                </li>
-                <li>•</li>
-                <li>
-                  {property.beds} {property.beds === 1 ? "bed" : "beds"}
-                </li>
-                <li>•</li>
-                <li>
-                  {property.bathrooms}{" "}
-                  {property.bathrooms === 1 ? "bathroom" : "bathrooms"}
-                </li>
-              </ol>
+            <div>
+              {specs.length > 0 && (
+                <ol className="flex flex-wrap gap-2 text-gray-700 text-sm md:text-base">
+                  {specs.map((text, i) => (
+                    <React.Fragment key={text}>
+                      <li>{text}</li>
+                      {i !== specs.length - 1 && <li>•</li>}
+                    </React.Fragment>
+                  ))}
+                </ol>
+              )}
             </div>
           </div>
 
           {/* Reviews placeholder */}
-          <div className="flex w-full border border-gray-200 rounded-lg mb-8 py-4 text-center text-gray-700">
-            <div className="w-1/3 sm:w-[60%] py-2">Some title</div>
+          <div className="flex w-full border border-gray-300 rounded-lg py-4 text-center text-gray-700">
+            <div className="w-1/3 sm:w-[60%] py-2">{property.category}</div>
             <div className="w-1/3 sm:w-[20%] py-2 border-l border-gray-200">
-              {propertyDetail.average_rating}{" "}
-              <span className="text-sm">Stars</span>
+              {property.average_rating} <span className="text-sm">Stars</span>
             </div>
             <div className="w-1/3 sm:w-[20%] py-2 border-l border-gray-200">
-              {propertyReviewsCount} <span className="text-sm">Reviews</span>
+              {propertyReviews.count} <span className="text-sm">Reviews</span>
             </div>
           </div>
 
           {/* Host info */}
-          <div className="flex items-center mb-8">
+          <div className="flex items-center">
             <Link
               href={`/users/profile/${property.user.id}`}
               className="flex items-center gap-3"
@@ -247,16 +228,16 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
             </Link>
           </div>
 
-          <div className="mb-8">
-            <h3 className="font-semibold text-xl mb-4">Description</h3>
-            <div className="whitespace-pre-line text-gray-700 leading-relaxed break-words overflow-wrap-break-word word-break-break-word">
+          <div className="ui-main-content">
+            <p className="font-semibold text-xl">Description</p>
+            <p className="whitespace-pre-line text-gray-700 leading-relaxed break-words overflow-wrap-break-word word-break-break-word">
               {property.description}
-            </div>
+            </p>
           </div>
 
           {/* Amenities */}
-          <div className="mb-8">
-            <h3 className="font-semibold text-xl mb-4">Amenities & Features</h3>
+          <div className="ui-main-content">
+            <p className="font-semibold text-xl">Amenities & Features</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {property.tags?.length > 0 ? (
                 property.tags.map((tag) => (
@@ -284,7 +265,7 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
             </div>
 
             {/* Additional info or call-to-action can go here */}
-            <div className="mt-6 p-4 border border-gray-200 rounded-xl text-center text-gray-400">
+            <div className="my-6 p-4 border border-gray-200 rounded-xl text-center text-gray-400">
               Ads
             </div>
           </div>
@@ -294,35 +275,35 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
       <Divider className="border-gray-300 border-[1]" />
 
       {/* Reviews Section */}
-      <div className="mb-8">
-        <h3 className="text-xl font-semibold mb-4">
+      <div className="ui-main-content">
+        <p className="text-xl font-semibold">
           Reviews
-          {propertyReviews?.length > 0 && (
-            <span className="ml-2 text-gray-500 text-sm">
-              ({propertyReviewsCount})
+          {propertyReviews.data?.length > 0 && (
+            <span className="px-2 text-gray-500 font-normal">
+              ({propertyReviews.count})
             </span>
           )}
-        </h3>
+        </p>
 
-        {propertyReviewsLoading && (
+        {propertyReviews.loading && (
           <div className="flex h-full items-center justify-center">
             <Spin size="large" />
           </div>
         )}
 
-        {!propertyReviewsLoading && propertyReviews?.length === 0 && (
+        {!propertyReviews.loading && propertyReviews.data?.length === 0 && (
           <span className="text-gray-500 text-sm col-span-2">
             No reviews yet
           </span>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {propertyReviews?.map((review) => (
+          {propertyReviews.data?.map((review) => (
             <div
               key={review.id}
               className="border border-gray-200 rounded-xl p-4"
             >
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-3 space-y-4">
                 <Avatar size={40} src={review.user.profile_picture_url} />
                 <div>
                   <p className="font-medium">{review.user.username}</p>
@@ -333,7 +314,7 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
 
                 <div className="ml-auto text-sm ">
                   {review.rating}
-                  <span className="text-yellow-400 text-xl px-1">★</span>
+                  <span className="text-primary text-xl px-1">★</span>
                 </div>
               </div>
               {review.comment && (
@@ -345,12 +326,15 @@ function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           ))}
         </div>
 
-        {propertyReviewsCount > 6 && (
+        {propertyReviews.count > 6 && (
           <div className="my-4 ">
-            <Button>View all {propertyReviewsCount} reviews</Button>
+            <Button>View all {propertyReviews.count} reviews</Button>
           </div>
         )}
       </div>
+
+      <Divider className="border-gray-300 border-[1]" />
+
       {/* Delete Property Modal */}
       <Modal
         title={

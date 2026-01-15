@@ -5,12 +5,12 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import StoreProvider from "./StoreProvider";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, Slide } from "react-toastify";
-import Navbar from "./components/navbar/Navbar";
+import Header from "./components/header/Header";
 import { InitUser } from "./users/InitUser";
 import Loading from "./components/common/Loading";
 import { ConfigProvider } from "antd";
 import Footer from "./components/footer/Footer";
-import NavbarMobile from "./components/navbar/NavbarMobile";
+import SearchSection from "./components/search/SearchSection";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -46,8 +46,9 @@ export default function RootLayout({
             <AntdRegistry>
               <Loading />
               <InitUser />
-              <Navbar />
-              <div className="flex-1">{children}</div>
+              <Header />
+              <SearchSection />
+              <div className="flex flex-col flex-1">{children}</div>
               <div className="sm:hidden">{/* <NavbarMobile /> */}</div>
               <Footer />
             </AntdRegistry>

@@ -76,116 +76,128 @@ export default function ReservationRequestListPage() {
   };
 
   return (
-    <div className="px-4 sm:px-10 space-y-6">
-      <p className="font-semibold text-xl sm:text-3xl">Reservation Requests</p>
+    <div className="ui-container">
+      <div className="ui-main-content">
+        <p className="font-semibold text-xl sm:text-2xl">
+          Reservation Requests
+        </p>
 
-      <div className="px-2">
-        <List
-          itemLayout="vertical"
-          dataSource={reservations}
-          pagination={{
-            current: page,
-            pageSize,
-            total: count,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
-            onChange: (newPage, newSize) => {
-              setPage(newPage);
-              setPageSize(newSize);
-            },
-          }}
-          renderItem={(item: any) => (
-            <List.Item
-              key={item.id}
-              className=""
-              // extra={
-              //   <Image
-              //     src={item.property.image_url}
-              //     className="hidden sm:block sm:w-40 sm:h-30 sm:rounded-md object-cover"
-              //     preview={false}
-              //   />
-              // }
-            >
-              <div className="flex justify-between items-center flex-wrap text-sm">
-                <h3 className="font-semibold text-lg mb-1">
-                  {item.property.title}
-                </h3>
+        <div>
+          <List
+            itemLayout="vertical"
+            dataSource={reservations}
+            pagination={{
+              current: page,
+              pageSize,
+              total: count,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
+              onChange: (newPage, newSize) => {
+                setPage(newPage);
+                setPageSize(newSize);
+              },
+            }}
+            renderItem={(item: any) => (
+              <List.Item key={item.id}>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center flex-wrap text-sm sm:mb-0">
+                    <h3 className="font-semibold text-lg">
+                      {item.property.title}
+                    </h3>
 
-                <div className="flex items-center gap-2 text-gray-500 flex-wrap">
-                  <p>
-                    {`${new Date(item.start_date).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })} - ${new Date(item.end_date).toLocaleDateString(
-                      "en-US",
-                      {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
+                    <div className="flex items-center gap-2 text-gray-500 flex-wrap">
+                      <p>
+                        {`${new Date(item.start_date).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )} - ${new Date(item.end_date).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}`}
+                      </p>
+                      <span>•</span>
+                      <p>{item.guests} Guests</p>
+                      <span>•</span>
+                      <p className="text-black">
+                        ₱{formatCurrency(Number(item.total_amount))}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="hidden sm:block text-gray-500 text-sm mb-2">
+                    {item.property.location}
+                  </p>
+
+                  <div className="flex items-center gap-3">
+                    <Avatar
+                      size={48}
+                      src={item.user.profile_picture_url}
+                      icon={
+                        !item.user.avatar_url ? <UserOutlined /> : undefined
                       }
-                    )}`}
-                  </p>
-                  <span>•</span>
-                  <p>{item.guests} Guests</p>
-                  <span>•</span>
-                  <p className="text-black">
-                    ₱{formatCurrency(Number(item.total_amount))}
-                  </p>
+                    />
+                    <div className="text-sm">
+                      <p className="font-semibold">
+                        {item.user.full_name || item.user.username}
+                      </p>
+                      <p className="text-gray-500">{item.user.email}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    Seals drift through the cold-blue quiet like soft commas in
+                    the ocean’s sentence, surfacing with a quick breath before
+                    slipping back into the green. Along rocky shores they gather
+                    in loose, drowsy piles, whiskers twitching as if they’re
+                    listening to stories told by wind and tide. Now and then one
+                    lifts its head to watch gulls argue overhead, blinking
+                    slowly as foam threads itself around the stones. In the
+                    water they turn playful and precise—spinning, gliding, and
+                    vanishing in a blink—leaving only ripples and a suggestion
+                    of laughter behind. Even the sun seems to pause on their
+                    slick backs, warming them for a moment before the sea calls
+                    them under again.
+                  </div>
+
+                  {item.status === "PENDING" && (
+                    <div className="flex justify-end gap-2 mt-4">
+                      <Button
+                        type="primary"
+                        size="small"
+                        onClick={() => {
+                          dispatch(approveReservation(item.id));
+                          dispatch(resetReservationRequestActions());
+                        }}
+                      >
+                        Approve
+                      </Button>
+
+                      <Button
+                        type="primary"
+                        size="small"
+                        danger
+                        onClick={() => {
+                          dispatch(declineReservation(item.id));
+                          dispatch(resetReservationRequestActions());
+                        }}
+                      >
+                        Decline
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              </div>
-
-              <p className="hidden sm:block text-gray-500 text-sm mb-2">
-                {item.property.location}
-              </p>
-
-              <div className="flex items-center gap-3 mb-4">
-                <Avatar
-                  size={48}
-                  src={item.user.profile_picture_url}
-                  icon={!item.user.avatar_url ? <UserOutlined /> : undefined}
-                />
-                <div className="text-sm">
-                  <p className="text-gray-500">{item.user.username}</p>
-                  <p className="text-gray-500">{item.user.email}</p>
-                </div>
-              </div>
-
-              <div>
-                message: placeholder placeholder placeholder placeholder
-                placeholder placeholder placeholder placeholder placeholder
-                placeholder placeholder placeholder placeholder placeholder
-                placeholder placeholder placeholder placeholder placeholder
-                placeholder placeholder placeholder placeholder placeholder
-              </div>
-
-              {item.status === "PENDING" && (
-                <div className="flex justify-end gap-2 mt-4">
-                  <Button
-                    type="primary"
-                    onClick={() => {
-                      dispatch(approveReservation(item.id));
-                      dispatch(resetReservationRequestActions());
-                    }}
-                  >
-                    Approve
-                  </Button>
-
-                  <Button
-                    type="primary"
-                    danger
-                    onClick={() => {
-                      dispatch(declineReservation(item.id));
-                      dispatch(resetReservationRequestActions());
-                    }}
-                  >
-                    Decline
-                  </Button>
-                </div>
-              )}
-            </List.Item>
-          )}
-        />
+              </List.Item>
+            )}
+          />
+        </div>
       </div>
     </div>
   );

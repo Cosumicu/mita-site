@@ -2,12 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  SearchOutlined,
-  EnvironmentOutlined,
-  CalendarOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import { Input, Modal, DatePicker, InputNumber, Button } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -42,7 +37,7 @@ const SearchBar: React.FC = () => {
   };
 
   return (
-    <div className="pb-4">
+    <div>
       {/* LARGE SCREENS */}
       <div className="hidden sm:flex bg-white p-2 border border-gray-200 shadow-xs rounded-xl">
         <div className="flex-1">
@@ -93,7 +88,7 @@ const SearchBar: React.FC = () => {
         </div>
       </div>
 
-      <div className="sm:hidden px-4">
+      <div className="sm:hidden">
         <Button
           color="primary"
           block

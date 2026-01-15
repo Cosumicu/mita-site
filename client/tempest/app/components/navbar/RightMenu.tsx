@@ -1,19 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Avatar, Drawer, Menu, Button, Modal } from "antd";
 import type { MenuProps } from "antd";
 import {
   MenuOutlined,
   QuestionCircleOutlined,
   UserOutlined,
-  MailOutlined,
   SettingOutlined,
   LogoutOutlined,
   TagOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import RegisterForm from "../modals/RegisterForm";
 import LoginForm from "../modals/LoginForm";
 import { logout, reset as resetAuth } from "../../lib/features/auth/authSlice";
@@ -28,27 +27,11 @@ import Link from "next/link";
 type MenuItem = Required<MenuProps>["items"][number];
 
 const items2: MenuItem[] = [
-  {
-    key: "help",
-    label: "Help & Support",
-    icon: <QuestionCircleOutlined />,
-  },
-  {
-    key: "gift-cards",
-    label: "Gift Cards",
-    icon: <TagOutlined />,
-  },
+  { key: "help", label: "Help & Support", icon: <QuestionCircleOutlined /> },
+  { key: "gift-cards", label: "Gift Cards", icon: <TagOutlined /> },
   { type: "divider" },
-  {
-    key: "login",
-    label: "Login",
-    icon: <UserOutlined />,
-  },
-  {
-    key: "register",
-    label: "Register",
-    icon: <PlusOutlined />,
-  },
+  { key: "login", label: "Login", icon: <UserOutlined /> },
+  { key: "register", label: "Register", icon: <PlusOutlined /> },
   { type: "divider" },
   {
     key: "settings",
@@ -61,181 +44,163 @@ const items2: MenuItem[] = [
   },
 ];
 
-const items1: MenuItem[] = [
-  {
-    key: "user-section",
-    label: "User",
-    type: "group",
-    children: [
-      { key: "profile", label: "Profile" },
-      { key: "inbox", label: "Inbox" },
-      { key: "saved", label: "Saved" },
-    ],
-  },
-  { type: "divider" },
-
-  {
-    key: "guest-section",
-    label: "Guest",
-    type: "group",
-    children: [
-      {
-        key: "guest-reservations",
-        label: "Reservations",
-      },
-    ],
-  },
-  { type: "divider" },
-  {
-    key: "host-section",
-    label: "Host",
-    type: "group",
-    children: [
-      { key: "host-dashboard", label: "Dashboard" },
-      { key: "host-calendar", label: "Calendar" },
-      { key: "host-properties", label: "Listings" },
-      { key: "host-reservations", label: "Reservations" },
-      {
-        key: "host-requests",
-        label: "Reservation Requests",
-      },
-    ],
-  },
-  { type: "divider" },
-
-  {
-    key: "logout-section",
-    label: "Account",
-    type: "group",
-    children: [
-      { key: "settings", label: "Settings", icon: <SettingOutlined /> },
-      {
-        key: "logout",
-        label: "Logout",
-        icon: <LogoutOutlined />,
-        className: "text-red-500 font-semibold",
-      },
-    ],
-  },
-];
-
 function RightMenu() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const pathname = usePathname();
 
   const { user } = useAppSelector((state) => state.user);
-  const [current, setCurrent] = useState("1");
 
+  const [current, setCurrent] = useState("1");
   const [openMain, setOpenMain] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
   const [openRegister, setOpenRegister] = useState(false);
 
-  const showMain = () => {
-    setOpenMain(true);
-  };
-  const onCloseMain = () => {
-    setOpenMain(false);
-  };
+  const isHostActive = user?.host_status === "ACTIVE";
 
-  const showLogin = () => {
-    setOpenLogin(true);
-  };
-  const onCloseLogin = () => {
-    setOpenLogin(false);
-  };
+  // ✅ Build authenticated menu items based on host_status
+  const authedItems: MenuItem[] = useMemo(() => {
+    const base: MenuItem[] = [
+      {
+        key: "user-section",
+        label: "User",
+        type: "group",
+        children: [
+          { key: "profile", label: "Profile" },
+          { key: "inbox", label: "Inbox" },
+          { key: "saved", label: "Saved" },
+        ],
+      },
+      { type: "divider" },
+      {
+        key: "guest-section",
+        label: "Guest",
+        type: "group",
+        children: [{ key: "guest-reservations", label: "Reservations" }],
+      },
+      { type: "divider" },
+    ];
 
-  const showRegister = () => {
-    setOpenRegister(true);
-  };
-  const onCloseRegister = () => {
-    setOpenRegister(false);
-  };
+    // ✅ Only include Host menu when ACTIVE
+    if (isHostActive) {
+      base.push({
+        key: "host-section",
+        label: "Host",
+        type: "group",
+        children: [
+          { key: "host-dashboard", label: "Dashboard" },
+          { key: "host-calendar", label: "Calendar" },
+          { key: "host-properties", label: "Listings" },
+          { key: "host-reservations", label: "Reservations" },
+          { key: "host-requests", label: "Reservation Requests" },
+        ],
+      });
+      base.push({ type: "divider" });
+    }
+
+    base.push({
+      key: "logout-section",
+      label: "Account",
+      type: "group",
+      children: [
+        { key: "settings", label: "Settings", icon: <SettingOutlined /> },
+        {
+          key: "logout",
+          label: "Logout",
+          icon: <LogoutOutlined />,
+          className: "text-red-500 font-semibold",
+        },
+      ],
+    });
+
+    return base;
+  }, [isHostActive]);
+
+  const showMain = () => setOpenMain(true);
+  const onCloseMain = () => setOpenMain(false);
+
+  const showLogin = () => setOpenLogin(true);
+  const onCloseLogin = () => setOpenLogin(false);
+
+  const showRegister = () => setOpenRegister(true);
+  const onCloseRegister = () => setOpenRegister(false);
 
   const onClick: MenuProps["onClick"] = async (e) => {
-    console.log("click ", e);
     setCurrent(e.key);
 
     switch (e.key) {
       case "login":
-        if (pathname === "/login") {
-          setOpenMain(false);
-          return;
-        }
+        if (pathname === "/login") return onCloseMain();
         if (pathname === "/register") {
           router.push("/login");
-          setOpenMain(false);
-          return;
+          return onCloseMain();
         }
         showLogin();
         break;
 
       case "register":
-        if (pathname === "/register") {
-          setOpenMain(false);
-          return;
-        }
+        if (pathname === "/register") return onCloseMain();
         if (pathname === "/login") {
           router.push("/register");
-          setOpenMain(false);
-          return;
+          return onCloseMain();
         }
         showRegister();
         break;
 
       case "help":
-        setOpenMain(false);
-        router.push(`/help`);
+        onCloseMain();
+        router.push("/help");
         break;
 
       case "gift-cards":
-        setOpenMain(false);
-        router.push(`/gift2cards`);
+        onCloseMain();
+        router.push("/gift2cards");
         break;
 
       case "profile":
-        setOpenMain(false);
+        onCloseMain();
         router.push(`/users/profile/${user?.user_id}`);
         break;
 
       case "inbox":
-        setOpenMain(false);
-        router.push(`/messages`);
-        break;
-
-      case "host-dashboard":
-        setOpenMain(false);
-        router.push(`/host/dashboard`);
-        break;
-
-      case "host-calendar":
-        setOpenMain(false);
-        router.push(`/host/calendar`);
-        break;
-
-      case "host-properties":
-        setOpenMain(false);
-        router.push(`/host/myproperties`);
-        break;
-
-      case "host-requests":
-        setOpenMain(false);
-        router.push(`/host/requests`);
+        onCloseMain();
+        router.push("/messages");
         break;
 
       case "saved":
-        setOpenMain(false);
-        router.push(`/saved`);
+        onCloseMain();
+        router.push("/saved");
         break;
 
       case "guest-reservations":
-        setOpenMain(false);
-        router.push(`/guest/reservations`);
+        onCloseMain();
+        router.push("/guest/reservations");
+        break;
+
+      // Host routes (these keys won't exist unless ACTIVE, but keeping is fine)
+      case "host-dashboard":
+        onCloseMain();
+        router.push("/host/dashboard");
+        break;
+
+      case "host-calendar":
+        onCloseMain();
+        router.push("/host/calendar");
+        break;
+
+      case "host-properties":
+        onCloseMain();
+        router.push("/host/listings");
+        break;
+
+      case "host-requests":
+        onCloseMain();
+        router.push("/host/requests");
         break;
 
       case "host-reservations":
-        setOpenMain(false);
-        router.push(`/host/reservations`);
+        onCloseMain();
+        router.push("/host/reservations");
         break;
 
       case "logout":
@@ -254,12 +219,9 @@ function RightMenu() {
   const handleBecomeAHost = async () => {
     try {
       const freshUser = await dispatch(getCurrentUser()).unwrap();
-
-      if (freshUser.host_status === "INACTIVE") {
+      if (freshUser.host_status === "INACTIVE")
         router.push("/host/create-listing");
-      } else {
-        router.push("/host/onboarding");
-      }
+      else router.push("/host/onboarding");
     } catch (error) {
       console.error("Something went wrong", error);
     }
@@ -269,12 +231,8 @@ function RightMenu() {
     <div className="flex items-center gap-1 sm:gap-4">
       {user ? (
         <>
-          {["INACTIVE", "ONBOARDING"].includes(user?.host_status) && (
-            <Button
-              type="primary"
-              onClick={handleBecomeAHost}
-              className="px-6 py-2 tracking-wide"
-            >
+          {["INACTIVE", "ONBOARDING"].includes(user.host_status) && (
+            <Button shape="round" type="primary" onClick={handleBecomeAHost}>
               <div>Become a Host</div>
             </Button>
           )}
@@ -283,16 +241,13 @@ function RightMenu() {
             <Avatar
               className="!hidden sm:!inline-block"
               size={48}
-              src={user?.profile_picture_url}
+              src={user.profile_picture_url}
             />
           </Link>
         </>
-      ) : (
-        <></>
-      )}
+      ) : null}
+
       <div className="outline-none" onClick={showMain} tabIndex={-1}>
-        {" "}
-        {/* style={{ outline: "none" }} tabIndex={-1} solves the issue of border showing when drawer is opened */}
         <MenuOutlined />
       </div>
 
@@ -301,21 +256,17 @@ function RightMenu() {
         closable={{ "aria-label": "Close Button" }}
         onClose={onCloseMain}
         open={openMain}
-        styles={{
-          body: {
-            padding: 4,
-          },
-        }}
+        styles={{ body: { padding: 4 } }}
       >
         <Menu
           onClick={onClick}
           style={{ width: "100%" }}
-          defaultOpenKeys={["sub1"]}
           selectedKeys={[current]}
           mode="inline"
-          items={user ? items1 : items2}
+          items={user ? authedItems : items2}
         />
       </Drawer>
+
       <Modal
         title={<span className="block text-center font-semibold">Log in</span>}
         open={openLogin}
@@ -350,6 +301,7 @@ function RightMenu() {
             onSuccess={onCloseRegister}
             onSwitchToLogin={() => {
               onCloseRegister();
+              setOpenRegister(false);
               setOpenLogin(true);
             }}
           />

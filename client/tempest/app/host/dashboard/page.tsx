@@ -55,12 +55,20 @@ const DashboardPage = () => {
     [dashboard.data]
   );
 
+  if (dashboard.loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
-    <div className="m-4 sm:m-8">
-      <div className="space-y-8">
+    <div className="ui-container">
+      <div className="ui-main-content">
         {/* Header */}
         <div className="flex justify-between items-center">
-          <p className="font-semibold text-xl sm:text-3xl">Dashboard</p>
+          <p className="font-semibold text-xl sm:text-2xl">Dashboard</p>
           <Button color="default" variant="filled" size="small">
             <svg
               xmlns="http://www.w3.org/2000/svg"

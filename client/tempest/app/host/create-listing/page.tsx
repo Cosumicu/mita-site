@@ -12,11 +12,11 @@ export default function CreateListingPage() {
   const isOnboarding = user?.host_status === "INACTIVE";
 
   return (
-    <div className="max-w-4xl mx-auto px-4">
+    <div className="ui-container max-w-4xl mx-auto px-4">
       <PropertyForm
         mode="create"
         onSuccess={() => {
-          router.push(isOnboarding ? "/host/onboarding" : "/host/myproperties");
+          router.push(isOnboarding ? "/host/onboarding" : "/host/listings");
         }}
       />
     </div>

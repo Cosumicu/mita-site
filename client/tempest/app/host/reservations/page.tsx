@@ -14,14 +14,20 @@ import {
   Avatar,
   Segmented,
 } from "antd";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import ReservationDetailsDrawer from "@/app/components/drawer/ReservationDetailsDrawer";
 import Link from "next/link";
 
 export default function ReservationListPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const pathname = usePathname();
 
+  const {
+    user,
+    isLoading: userLoading,
+    hasCheckedAuth,
+  } = useAppSelector((state) => state.user);
   const {
     data: hostReservationList,
     count,
@@ -36,18 +42,27 @@ export default function ReservationListPage() {
   const [selectedReservation, setSelectedReservation] = useState<any>(null);
 
   useEffect(() => {
+    if (!hasCheckedAuth || userLoading) return;
+    if (!user) {
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+      return;
+    }
+
     dispatch(
       getHostReservationList({
-        filters: {
-          status: statusFilter,
-        },
-        pagination: {
-          page: currentPage,
-          page_size: pageSize,
-        },
+        filters: { status: statusFilter },
+        pagination: { page: currentPage, page_size: pageSize },
       })
     );
-  }, [dispatch, statusFilter, currentPage, pageSize]);
+  }, [
+    dispatch,
+    hasCheckedAuth,
+    userLoading,
+    user,
+    statusFilter,
+    currentPage,
+    pageSize,
+  ]);
 
   const columns = [
     {
@@ -118,12 +133,6 @@ export default function ReservationListPage() {
       title: "Ref. Code",
       dataIndex: "confirmation_code",
     },
-    // {
-    //   title: "Price / Night",
-    //   dataIndex: "price_per_night",
-    //   render: (_: any, record: any) =>
-    //     `₱${formatCurrency(Number(record.price_per_night))}`,
-    // },
     {
       title: "Total Amount",
       dataIndex: "total_amount",
@@ -202,81 +211,88 @@ export default function ReservationListPage() {
   };
 
   return (
-    <div className="px-4 sm:px-10 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="font-semibold text-xl sm:text-3xl">Host Reservations</p>
-        </div>
-        <div className="flex gap-2">
-          <div className="flex gap-1 items-center">
-            <Button color="default" variant="filled" size="small">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="gray"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="icon icon-tabler icons-tabler-outline icon-tabler-download"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
-                <path d="M7 11l5 5l5 -5" />
-                <path d="M12 4l0 12" />
-              </svg>
-            </Button>
+    <div className="ui-container">
+      <div className="ui-main-content">
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="font-semibold text-xl sm:text-3xl">
+              Host Reservations
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <div className="flex gap-1 items-center">
+              <Button color="default" variant="filled" size="small">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="gray"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="icon icon-tabler icons-tabler-outline icon-tabler-download"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                  <path d="M7 11l5 5l5 -5" />
+                  <path d="M12 4l0 12" />
+                </svg>
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="">
-        <Segmented<string>
-          options={[
-            { label: "All", value: "" },
-            { label: "Pending", value: "PENDING" },
-            { label: "Approved", value: "APPROVED" },
-            { label: "Declined", value: "DECLINED" },
-            { label: "Expired", value: "EXPIRED" },
-            { label: "Completed", value: "COMPLETED" },
-          ]}
-          onChange={(value) => {
-            setCurrentPage(1);
-            setStatusFilter(value);
-          }}
-        />
+        <div className="max-w-full overflow-x-auto whitespace-nowrap [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="inline-block">
+            <Segmented<string>
+              options={[
+                { label: "All", value: "" },
+                { label: "Pending", value: "PENDING" },
+                { label: "Approved", value: "APPROVED" },
+                { label: "Declined", value: "DECLINED" },
+                { label: "Expired", value: "EXPIRED" },
+                { label: "Completed", value: "COMPLETED" },
+              ]}
+              onChange={(value) => {
+                setCurrentPage(1);
+                setStatusFilter(value);
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          {" "}
+          <Table
+            columns={columns}
+            dataSource={tableData}
+            loading={hostReservationListLoading}
+            pagination={{
+              current: currentPage,
+              pageSize,
+              total: count,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
+            }}
+            onChange={handleTableChange}
+          />
+        </div>
+        <Drawer
+          title="Reservation Details"
+          placement="right"
+          width={500}
+          onClose={() => setIsReservationDetailsDrawerOpen(false)}
+          open={isReservationDetailsDrawerOpen}
+        >
+          {selectedReservation ? (
+            <ReservationDetailsDrawer reservationId={selectedReservation} />
+          ) : (
+            <Spin />
+          )}
+        </Drawer>
       </div>
-      <div className="overflow-x-auto">
-        {" "}
-        <Table
-          columns={columns}
-          dataSource={tableData}
-          loading={hostReservationListLoading}
-          pagination={{
-            current: currentPage,
-            pageSize,
-            total: count,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
-          }}
-          onChange={handleTableChange}
-        />
-      </div>
-      <Drawer
-        title="Reservation Details"
-        placement="right"
-        width={500}
-        onClose={() => setIsReservationDetailsDrawerOpen(false)}
-        open={isReservationDetailsDrawerOpen}
-      >
-        {selectedReservation ? (
-          <ReservationDetailsDrawer reservationId={selectedReservation} />
-        ) : (
-          <Spin />
-        )}
-      </Drawer>
     </div>
   );
 }
