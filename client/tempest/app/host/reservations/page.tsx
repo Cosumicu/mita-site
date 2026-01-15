@@ -215,7 +215,7 @@ export default function ReservationListPage() {
       <div className="ui-main-content">
         <div className="flex justify-between items-center">
           <div>
-            <p className="font-semibold text-xl sm:text-3xl">
+            <p className="font-semibold text-xl sm:text-2xl">
               Host Reservations
             </p>
           </div>

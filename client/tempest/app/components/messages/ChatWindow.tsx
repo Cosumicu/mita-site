@@ -16,6 +16,8 @@ type Props = {
   onBack?: () => void;
 };
 
+const WEB_SOCKET_URL = `${process.env.NEXT_PUBLIC_API_HOST_WEB_SOCKET}/properties`;
+
 export default function ChatWindow({ conversation, onBack }: Props) {
   const { user } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -39,7 +41,9 @@ export default function ChatWindow({ conversation, onBack }: Props) {
 
     dispatch(getConversationMessages(conversationId));
 
-    const ws = new WebSocket(`ws://localhost:8080/ws/chat/${conversationId}/`);
+    const ws = new WebSocket(
+      `${process.env.NEXT_PUBLIC_API_HOST_WEB_SOCKET}/ws/chat/${conversationId}/`
+    );
     ws.onopen = () => console.log("WebSocket connected!");
     ws.onclose = () => console.log("WebSocket closed.");
     ws.onerror = (e) => console.error("WebSocket error:", e);
@@ -66,7 +70,7 @@ export default function ChatWindow({ conversation, onBack }: Props) {
     socketRef.current.send(
       JSON.stringify({
         conversation_id: conversationId,
-        sender_id: user.id,
+        sender_id: user.user_id,
         text,
       })
     );
@@ -100,13 +104,13 @@ export default function ChatWindow({ conversation, onBack }: Props) {
               <Avatar
                 size="large"
                 src={
-                  conversation.landlord.id === user?.id
+                  conversation.landlord.id === user?.user_id
                     ? conversation.guest.profile_picture_url
                     : conversation.landlord.profile_picture_url
                 }
               />
               <h2 className="font-semibold text-gray-800 text-lg truncate">
-                {conversation.landlord.id === user?.id
+                {conversation.landlord.id === user?.user_id
                   ? conversation.guest.username
                   : conversation.landlord.username}
               </h2>
@@ -177,7 +181,7 @@ export default function ChatWindow({ conversation, onBack }: Props) {
             </div>
           )} */}
           {messageList.map((msg) => {
-            const isMe = msg.sender.id === user?.id;
+            const isMe = msg.sender.user_id === user?.user_id;
             return (
               <div
                 key={msg.id}
@@ -197,7 +201,13 @@ export default function ChatWindow({ conversation, onBack }: Props) {
                 >
                   <div className="flex flex-col">
                     <span>{msg.text}</span>
-                    <span className="text-[10px] text-white mt-1 self-end">
+                    <span
+                      className={`text-[10px] mt-1 ${
+                        isMe
+                          ? "self-end text-white/80"
+                          : "self-start text-gray-600"
+                      }`}
+                    >
                       {formatTimeV2(msg.created_at)}
                     </span>
                   </div>

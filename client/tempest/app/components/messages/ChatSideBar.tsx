@@ -36,14 +36,14 @@ export default function ChatSidebar({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 bg-white shadow-sm">
-        <p className="text-lg sm:text-xl">Inbox</p>
+      <div className="flex items-center px-4 bg-white shadow-sm h-[72px]">
+        <p className="font-semibold text-xl sm:text-2xl">Inbox</p>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         <AnimatePresence initial={false}>
           {conversationList.map((conv) => {
-            const isMe = conv.landlord.id === user?.id;
+            const isMe = conv.landlord.user_id === user?.user_id;
             const other = isMe ? conv.guest : conv.landlord;
             const isSelected = selectedConversation?.id === conv.id;
 

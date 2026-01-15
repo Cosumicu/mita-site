@@ -25,7 +25,6 @@ export interface LoginData {
 
 // USER TYPES
 export interface User {
-  id: string;
   user_id: string;
   username: string;
   first_name: string;

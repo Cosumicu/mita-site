@@ -22,7 +22,26 @@ const Navbar = () => {
   return (
     <div>
       <div className="flex h-12 items-center justify-between gap-2">
-        <LeftImage />
+        <div className="flex">
+          <LeftImage />
+          {isHome && (
+            <div className="hidden px-4 sm:block max-w-full overflow-x-auto whitespace-nowrap [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="inline-block">
+                <Segmented<string>
+                  className="!bg-secondary"
+                  options={[
+                    { label: "Stays", value: "1" },
+                    { label: "Experiences", value: "2" },
+                    { label: "Services", value: "3" },
+                    { label: "Flights", value: "4" },
+                    { label: "Attractions", value: "5" },
+                  ]}
+                  defaultValue="1"
+                />
+              </div>
+            </div>
+          )}
+        </div>
 
         {path ? (
           <div className="flex gap-4">
@@ -37,7 +56,7 @@ const Navbar = () => {
       {!isHome ? (
         <></>
       ) : (
-        <div className="max-w-full overflow-x-auto whitespace-nowrap [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="block sm:hidden max-w-full overflow-x-auto whitespace-nowrap [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="inline-block">
             <Segmented<string>
               className="!bg-secondary"
