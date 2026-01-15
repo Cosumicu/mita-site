@@ -23,6 +23,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { getUserPropertyList } from "@/app/lib/features/properties/propertySlice";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -219,11 +220,33 @@ function RightMenu() {
   const handleBecomeAHost = async () => {
     try {
       const freshUser = await dispatch(getCurrentUser()).unwrap();
-      if (freshUser.host_status === "INACTIVE")
+
+      // If already active, go to dashboard
+      if (freshUser.host_status === "ACTIVE") {
+        onCloseMain();
+        router.push("/host/dashboard");
+        return;
+      }
+
+      const res = await dispatch(
+        getUserPropertyList({
+          filters: { user: freshUser.user_id, status: "" },
+          pagination: { page: 1, page_size: 1 },
+        })
+      ).unwrap();
+
+      const hasListing = (res?.results?.length ?? 0) > 0;
+
+      onCloseMain();
+
+      if (hasListing) {
+        router.push("/host/onboarding");
+      } else {
         router.push("/host/create-listing");
-      else router.push("/host/onboarding");
+      }
     } catch (error) {
       console.error("Something went wrong", error);
+      toast.error("Could not check host status. Please try again.");
     }
   };
 

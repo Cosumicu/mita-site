@@ -17,6 +17,7 @@ type UserState = {
 
   // ✅ NEW: update profile async state
   updateProfile: AsyncState<null>;
+  updateHostStatus: AsyncState<null>;
 
   isError: boolean;
   isLoading: boolean;
@@ -37,8 +38,8 @@ const initialState: UserState = {
   user: null,
   userDetail: initialAsyncState<User | null>(null),
 
-  // ✅ NEW
   updateProfile: initialAsyncState<null>(null),
+  updateHostStatus: initialAsyncState<null>(null),
 
   isError: false,
   isLoading: false,
@@ -79,7 +80,6 @@ export const getUserProfile = createAsyncThunk<
   }
 });
 
-// ✅ NEW thunk
 export const updateMyProfile = createAsyncThunk<
   User,
   FormData,
@@ -102,6 +102,28 @@ export const updateMyProfile = createAsyncThunk<
   }
 });
 
+export const updateMyHostStatus = createAsyncThunk<
+  User,
+  { host_status: string },
+  { rejectValue: string }
+>("user/updateMyHostStatus", async ({ host_status }, thunkAPI) => {
+  try {
+    const data = await userService.updateMyHostStatus(host_status);
+    return data;
+  } catch (err) {
+    const error = err as AxiosError<any>;
+    const msg =
+      error.response?.data?.detail ||
+      error.response?.data?.message ||
+      (typeof error.response?.data === "string"
+        ? error.response?.data
+        : null) ||
+      error.message ||
+      "Failed to update host status";
+    return thunkAPI.rejectWithValue(msg);
+  }
+});
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -120,6 +142,9 @@ export const userSlice = createSlice({
     // ✅ optional: reset update-only flags
     resetUpdateProfile: (state) => {
       state.updateProfile = initialAsyncState<null>(null);
+    },
+    resetUpdateHostStatus: (state) => {
+      state.updateHostStatus = initialAsyncState<null>(null);
     },
   },
   extraReducers: (builder) => {
@@ -187,6 +212,56 @@ export const userSlice = createSlice({
         state.updateProfile.error = true;
         state.updateProfile.success = false;
         state.updateProfile.message = action.payload as string;
+      }) // updateMyHostStatus
+      .addCase(updateMyHostStatus.pending, (state) => {
+        state.updateHostStatus.loading = true;
+        state.updateHostStatus.error = false;
+        state.updateHostStatus.success = false;
+        state.updateHostStatus.message = "";
+      })
+      .addCase(
+        updateMyHostStatus.fulfilled,
+        (state, action: PayloadAction<User>) => {
+          state.updateHostStatus.loading = false;
+          state.updateHostStatus.success = true;
+
+          //  update user in store immediately (so routing/guards update)
+          if (state.user) {
+            // Case 1: your API returns host_status at root
+            if (
+              "host_status" in state.user &&
+              (action.payload as any).host_status
+            ) {
+              (state.user as any).host_status = (
+                action.payload as any
+              ).host_status;
+            }
+
+            // Case 2: your API nests it: user.profile.host_status
+            if (
+              (state.user as any).profile &&
+              (action.payload as any).profile
+            ) {
+              (state.user as any).profile.host_status = (
+                action.payload as any
+              ).profile.host_status;
+            }
+
+            // safest: just replace user if the response is the full user object
+            // state.user = action.payload;
+          }
+
+          // also keep userDetail in sync if you're showing profile page
+          if (state.userDetail.data?.id === action.payload.id) {
+            state.userDetail.data = action.payload;
+          }
+        }
+      )
+      .addCase(updateMyHostStatus.rejected, (state, action) => {
+        state.updateHostStatus.loading = false;
+        state.updateHostStatus.error = true;
+        state.updateHostStatus.success = false;
+        state.updateHostStatus.message = action.payload as string;
       });
   },
 });

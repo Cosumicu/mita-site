@@ -16,5 +16,17 @@ const updateMyProfile = async (formData: FormData): Promise<User> => {
   return response.data;
 };
 
-const userService = { getCurrentUser, getUserProfile, updateMyProfile };
+const updateMyHostStatus = async (host_status: string): Promise<User> => {
+  const response = await api.patch<User>("/profile/hosts/status/", {
+    host_status,
+  });
+  return response.data;
+};
+
+const userService = {
+  getCurrentUser,
+  getUserProfile,
+  updateMyProfile,
+  updateMyHostStatus,
+};
 export default userService;

@@ -62,6 +62,10 @@ type PropertyState = {
   // UPDATE & DELETE
   updateProperty: AsyncState<Property | null>;
   deleteProperty: AsyncState<Property | null>;
+  updatePropertyStatus: AsyncState<{
+    propertyId: string;
+    status: string;
+  } | null>;
 };
 
 const initialAsyncState = <T>(data: T): AsyncState<T> => ({
@@ -109,6 +113,7 @@ const initialState: PropertyState = {
 
   updateProperty: initialAsyncState(null),
   deleteProperty: initialAsyncState(null),
+  updatePropertyStatus: initialAsyncState(null),
 };
 
 export const getPropertyList = createAsyncThunk<
@@ -545,6 +550,24 @@ export const toggleFavorite = createAsyncThunk<
   }
 });
 
+export const updatePropertyStatus = createAsyncThunk<
+  { propertyId: string; status: string },
+  { propertyId: string; status: string },
+  { rejectValue: string }
+>("property/updatePropertyStatus", async ({ propertyId, status }, thunkAPI) => {
+  try {
+    const data = await propertyService.updatePropertyStatus(propertyId, status);
+    return { propertyId, status: data.status };
+  } catch (err) {
+    const error = err as AxiosError<{ message?: string }>;
+    return thunkAPI.rejectWithValue(
+      error.response?.data?.message ||
+        error.message ||
+        "Failed to update status"
+    );
+  }
+});
+
 export const propertySlice = createSlice({
   name: "property",
   initialState,
@@ -605,6 +628,9 @@ export const propertySlice = createSlice({
     },
     resetCreatePropertyReview: (state) => {
       state.createPropertyReview = initialAsyncState(null);
+    },
+    resetUpdatePropertyStatus: (state) => {
+      state.updatePropertyStatus = initialAsyncState(null);
     },
   },
   extraReducers: (builder) => {
@@ -1028,6 +1054,22 @@ export const propertySlice = createSlice({
       .addCase(toggleFavorite.rejected, (state, action) => {
         state.propertyList.error = true;
         state.propertyList.message = action.payload as string;
+      })
+      // UPDATE PROPERTY STATUS
+      .addCase(updatePropertyStatus.pending, (state) => {
+        state.updatePropertyStatus.loading = true;
+        state.updatePropertyStatus.error = false;
+        state.updatePropertyStatus.success = false;
+        state.updatePropertyStatus.message = "";
+      })
+      .addCase(updatePropertyStatus.fulfilled, (state) => {
+        state.updatePropertyStatus.loading = false;
+        state.updatePropertyStatus.success = true;
+      })
+      .addCase(updatePropertyStatus.rejected, (state, action) => {
+        state.updatePropertyStatus.loading = false;
+        state.updatePropertyStatus.error = true;
+        state.updatePropertyStatus.message = action.payload as string;
       });
   },
 });

@@ -1,9 +1,9 @@
 from django_countries.serializer_fields import CountryField
 from rest_framework import fields, serializers
 from phonenumber_field.serializerfields import PhoneNumberField
+from django.utils import timezone
 
-from .models import Profile, Gender
-
+from .models import Profile, Gender, HostStatus
 
 class ProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.CharField(source="user.id", read_only=True)
@@ -77,7 +77,6 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             "about_me",
             "phone_number",
             "gender",
-            "country",
             "city",
             "valid_id",
         ]
@@ -86,3 +85,20 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         if value not in dict(Gender.choices):
             raise serializers.ValidationError("Invalid gender.")
         return value
+
+class ProfileHostStatusUpdateSerializer(serializers.ModelSerializer):
+    host_status = serializers.ChoiceField(choices=HostStatus.choices)
+
+    class Meta:
+        model = Profile
+        fields = ["host_status"]
+
+    def update(self, instance, validated_data):
+        new_status = validated_data.get("host_status", instance.host_status)
+
+        if instance.host_status != HostStatus.ACTIVE and new_status == HostStatus.ACTIVE:
+            instance.host_since = timezone.now()
+
+        instance.host_status = new_status
+        instance.save(update_fields=["host_status", "host_since"])
+        return instance

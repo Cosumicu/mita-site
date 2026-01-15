@@ -6,7 +6,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 from .models import Profile
 from apps.users.models import User
-from .serializers import ProfileSerializer, ProfileUpdateSerializer
+from .serializers import ProfileSerializer, ProfileUpdateSerializer, ProfileHostStatusUpdateSerializer
 
 class ProfileListView(generics.ListAPIView):
     queryset = Profile.objects.all()
@@ -34,3 +34,11 @@ class MyProfileView(generics.RetrieveUpdateAPIView):
         if self.request.method in ["PUT", "PATCH"]:
             return ProfileUpdateSerializer
         return ProfileSerializer
+
+class ProfileHostStatusUpdateView(generics.UpdateAPIView):
+    serializer_class = ProfileHostStatusUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["patch"]
+
+    def get_object(self):
+        return get_object_or_404(Profile, user=self.request.user)

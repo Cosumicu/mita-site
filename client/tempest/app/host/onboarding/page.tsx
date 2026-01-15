@@ -4,8 +4,13 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Card, Button, Spin, Alert, Steps, Empty, Space, Tag } from "antd";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
-import { getUserPropertyList } from "@/app/lib/features/properties/propertySlice";
+import {
+  getUserPropertyList,
+  updatePropertyStatus,
+} from "@/app/lib/features/properties/propertySlice";
 import api from "@/app/lib/features/axiosInstance";
+import { updateMyHostStatus } from "@/app/lib/features/users/userSlice";
+import { toast } from "react-toastify";
 
 export default function HostOnboardingPage() {
   const router = useRouter();
@@ -26,7 +31,7 @@ export default function HostOnboardingPage() {
 
   const userId = user?.user_id ?? user?.id ?? null;
 
-  // ✅ Prevent repeated fetches for same userId (dev strict mode + rerenders)
+  // Prevent repeated fetches for same userId (dev strict mode + rerenders)
   const lastFetchedUserId = useRef<string | number | null>(null);
 
   // data might be paginated ({results: []}) or a plain array
@@ -64,7 +69,7 @@ export default function HostOnboardingPage() {
     return 2;
   }, [hasListing, hasProfileReqs]);
 
-  // ✅ Auth / routing guard
+  // Auth / routing guard
   useEffect(() => {
     if (!hasCheckedAuth || userLoading) return;
 
@@ -78,7 +83,7 @@ export default function HostOnboardingPage() {
     }
   }, [hasCheckedAuth, userLoading, user, router]);
 
-  // ✅ Fetch properties when we have a stable userId
+  // Fetch properties when we have a stable userId
   useEffect(() => {
     if (!userId) return;
     if (lastFetchedUserId.current === userId) return;
@@ -98,7 +103,14 @@ export default function HostOnboardingPage() {
       setActivateError(null);
       setActivating(true);
 
-      await api.post("/api/v1/hosts/activate/");
+      await dispatch(
+        updatePropertyStatus({
+          propertyId: latestProperty.id,
+          status: "ACTIVE",
+        })
+      ).unwrap();
+      await dispatch(updateMyHostStatus({ host_status: "ACTIVE" })).unwrap();
+
       router.push("/host/dashboard");
     } catch (e: any) {
       setActivateError(
@@ -106,10 +118,11 @@ export default function HostOnboardingPage() {
       );
     } finally {
       setActivating(false);
+      toast.success("You are now a Host.");
     }
   }
 
-  // ✅ Render guards
+  // Render guards
   if (!hasCheckedAuth || userLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -221,16 +234,20 @@ export default function HostOnboardingPage() {
                         </div>
                       </div>
 
-                      <Button
-                        size="small"
-                        disabled={!hasListing}
-                        type="primary"
-                        onClick={() =>
-                          router.push(`/users/profile/${user?.user_id}`)
-                        }
-                      >
-                        Edit profile
-                      </Button>
+                      {!hasProfileReqs ? (
+                        <Button
+                          size="small"
+                          disabled={!hasListing}
+                          type="primary"
+                          onClick={() =>
+                            router.push(`/users/profile/${user?.user_id}`)
+                          }
+                        >
+                          Edit profile
+                        </Button>
+                      ) : (
+                        <></>
+                      )}
                     </div>
                   ),
                 },

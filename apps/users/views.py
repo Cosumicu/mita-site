@@ -26,15 +26,15 @@ class LoginView(APIView):
                                 value=access_token,
                                 httponly=True,
                                 secure=False,
-                                samesite="Strict",
-                                max_age=timedelta(minutes=1))
+                                samesite="Lax",
+                                max_age=timedelta(minutes=1).total_seconds())
             
             response.set_cookie(key="refresh_token",
                                 value=str(refresh),
                                 httponly=True,
                                 secure=False,
-                                samesite="Strict",
-                                max_age=timedelta(days=1))
+                                samesite="Lax",
+                                max_age=timedelta(days=1).total_seconds())
             return response
         
         return Response( serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -73,8 +73,8 @@ class CookieTokenRefreshView(TokenRefreshView):
                                 value=access_token,
                                 httponly=True,
                                 secure=False,
-                                samesite="Strict",
-                                max_age=timedelta(minutes=1))
+                                samesite="Lax",
+                                max_age=timedelta(minutes=1).total_seconds())
             return response
         
         except InvalidToken:

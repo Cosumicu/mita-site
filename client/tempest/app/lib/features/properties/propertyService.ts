@@ -208,6 +208,14 @@ const toggleFavorite = async (propertyId: string) => {
   return response.data;
 };
 
+const updatePropertyStatus = async (propertyId: string, status: string) => {
+  const response = await api.patch<{ status: string }>(
+    `${PROPERTY_BASE_URL}/${propertyId}/status/`,
+    { status }
+  );
+  return response.data;
+};
+
 const propertyService = {
   getReservationList,
   getPropertyList1,
@@ -232,5 +240,6 @@ const propertyService = {
   getPropertyReviews,
   createPropertyReview,
   toggleFavorite,
+  updatePropertyStatus,
 };
 export default propertyService;
