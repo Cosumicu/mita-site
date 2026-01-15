@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django_filters',
 
     'djoser',
-
+    'anymail',
     'djcelery_email',
     'django_celery_beat',
 
