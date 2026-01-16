@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap outlines the planned direction for Mita Site monorepo. Items may shift as priorities change.
+This roadmap outlines the planned direction for Mita Site. Items may shift as priorities change.
 
 ---
 ## 1) Improve API Performance
@@ -8,7 +8,7 @@ This roadmap outlines the planned direction for Mita Site monorepo. Items may sh
 - Caching
 - Check for N + 1 Queries
 - Improve Pagination
-- Payload Compression
+- Payload Compression ??
 
 ## 2) Features
 
@@ -16,7 +16,7 @@ This roadmap outlines the planned direction for Mita Site monorepo. Items may sh
 - Implement a lightweight algorithm for recommendations
 - Multiple images for listings
 - Cancellation rules
-- Reservation lifecycle improvements
+- Reservation improvements
 - Notifications
 
 ---
@@ -25,8 +25,8 @@ This roadmap outlines the planned direction for Mita Site monorepo. Items may sh
 
 - Tests
 - Security
-- graphql support
+- graphql support ??
 - cloudflare
 - k8s
-- stripe
-- aws
+- stripe ???
+- aws ?
