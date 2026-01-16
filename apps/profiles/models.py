@@ -21,8 +21,6 @@ class HostStatus(models.TextChoices):
 
 class Profile(TimeStampedUUIDModel):
     user = models.OneToOneField(User, related_name="profile", on_delete = models.CASCADE)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
     profile_picture = models.ImageField(upload_to="profile_pictures", default="profile_pictures/default_profile_picture.jpg")
     about_me = models.TextField(default="...", max_length=255)
     phone_number = PhoneNumberField(max_length=30, null=True, blank=True)
@@ -41,6 +39,3 @@ class Profile(TimeStampedUUIDModel):
 
     def profile_picture_url(self):
         return f'{settings.WEBSITE_URL}{self.profile_picture.url}'
-
-    def __str__(self):
-        return f"{self.user.username}'s profile"

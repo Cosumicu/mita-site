@@ -9,7 +9,7 @@ class UserAdmin(BaseUserAdmin):
     ordering = ['email']
     add_form = CustomUserCreationForm
     model = User
-    list_display = ['id', 'email', 'username', 'is_staff', 'is_active', 'date_joined']
+    list_display = ['id', 'email', 'username', 'first_name', 'last_name', 'is_staff', 'is_active', 'date_joined']
     list_display_links = ['id', 'email']
     list_filter = ['is_staff', 'is_active']
     fieldsets = (
@@ -22,7 +22,7 @@ class UserAdmin(BaseUserAdmin):
         (
             ("Personal Information"),
             {
-                "fields": ("username",)
+                "fields": ("username",'first_name', 'last_name',)
             },
         ),
         (
