@@ -36,13 +36,13 @@ A full-stack booking platform where guests can browse listings, book stays, and 
 - Host dashboard
 - Host calendar
 
-### Other features
-- Live chat with host/guest
-- Toasts
-
 ### System
 - Authentication (JWT)
 - Pagination and filtering
+- 
+### Other features
+- Live chat with host/guest
+- Toasts
 
 ## Monorepo Structure
 .
