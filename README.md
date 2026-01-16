@@ -45,19 +45,23 @@ A full-stack booking platform where guests can browse listings, book stays, and 
 - Toasts
 
 ## Monorepo Structure
+
+```text
 .
-├── apps/ # Django apps
-├── booking_site/ # Django project
-├── client/tempest/ # Frontend client app
-│ └── .env.example # Next.js .env file example
+├── apps/                     # Django apps
+├── booking_site/             # Django project (settings/urls/asgi/wsgi)
+├── client/
+│   └── tempest/              # Frontend client app (Next.js)
+│       └── .env.example      # Frontend env example
 ├── docker/
-│ └── local/ # Local Docker configs / scripts
-├── docker-compose.yml # Dev stack
-├── docker-compose.prod.yml # Production stack
-├── manage.py # Django entrypoint
-├── requirements.txt # Backend Python dependencies
-├── Makefile # Dev/prod helper commands
+│   └── local/                # Local Docker configs / scripts
+├── docker-compose.yml        # Dev stack
+├── docker-compose.prod.yml   # Production stack
+├── manage.py                 # Django entrypoint
+├── requirements.txt          # Backend Python dependencies
+├── Makefile                  # Dev/prod helper commands
+├── .env.example              # Backend env example (Django)
 ├── .dockerignore
-├── .gitignore
-└── .env.example # Django .env file example
+└── .gitignore
+
 
