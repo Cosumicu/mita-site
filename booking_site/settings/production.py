@@ -41,7 +41,6 @@ you would use depends on the service itsself.
 SITE_NAME = "Mita Site - Prod"
 
 EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend'
-EMAIL_USE_TLS = True
 
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
@@ -54,9 +53,6 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "Asia/Manila"
 
-SENDGRID_API_KEY = env('SENDGRID_API_KEY')
-
-EMAIL_HOST = env('EMAIL_HOST')
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
-EMAIL_PORT = env("EMAIL_PORT", default=587, cast=int)
+ANYMAIL = {
+    "RESEND_API_KEY": env("RESEND_API_KEY"),
+}
