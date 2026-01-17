@@ -27,6 +27,10 @@ CHANNEL_LAYERS = {
 
 CORS_ALLOW_CREDENTIALS = True
 
+CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS").split(" ")
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 """
 So basically, what s happening here is that I used celery email backends to handle emails
 asynchronously. And to implement sendgrid service, you need to set CELERY_EMAIL_BACKEND

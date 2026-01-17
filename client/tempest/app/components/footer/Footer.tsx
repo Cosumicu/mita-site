@@ -83,11 +83,17 @@ const Footer: React.FC = () => {
   ];
 
   const aboutLinks: FooterLink[] = [
-    { label: "About this project", href: "/about" },
-    { label: "Contact", href: "/contact" },
+    {
+      label: "About this project",
+      href: "https://github.com/cosumicu/mita-site/blob/main/README.md",
+    },
+    {
+      label: "Roadmap",
+      href: "https://github.com/cosumicu/mita-site/blob/main/ROADMAP.md",
+    },
     {
       label: "Developer profile",
-      href: "https://github.com/yourname",
+      href: "https://github.com/cosumicu",
       external: true,
     },
   ];
